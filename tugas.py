@@ -17,9 +17,12 @@ st.write(dataset.head())
 X = dataset.iloc[:, :-1]  # features
 y = dataset.iloc[:, -1]  # target variable
 
+# Select only numerical columns
+X_num = X.select_dtypes(include=[np.number])
+
 # Standarisasi data menggunakan StandardScaler
 scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+X_scaled = scaler.fit_transform(X_num.to_numpy())
 
 # Split data train dan test
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
