@@ -8,7 +8,9 @@ from sklearn.metrics import accuracy_score, classification_report
 import streamlit as st
 
 # 2. Load dataset
-data = pd.read_csv('/mnt/data/aug_train.csv')
+data = pd.read_csv('aug_train.csv')
+# Tampilkan beberapa baris pertama dari dataset untuk memahami strukturnya
+print(data.head())
 
 # 3. Standarisasi data
 # Pilih fitur yang relevan dan target
@@ -43,12 +45,17 @@ data['experience'] = data['experience'].map(experience_mapping)
 X = data[features]
 y = data[target]
 
+# Impute missing values with mean
+from sklearn.impute import SimpleImputer
+imputer = SimpleImputer(strategy='mean')
+X_imputed = imputer.fit_transform(X)
+
 # Standarisasi fitur
 scaler = StandardScaler()
-X = scaler.fit_transform(X)
+X_scaled = scaler.fit_transform(X_imputed)
 
 # 4. Split data train dan test
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
 # 5. Membuat model menggunakan algoritma Logistic Regression
 model = LogisticRegression()
