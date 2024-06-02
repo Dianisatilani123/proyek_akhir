@@ -1,84 +1,96 @@
+# 1. Tentukan library yang digunakan
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
+import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 import streamlit as st
 
-# Load dataset
-menstruasi_dataset = pd.read_csv('menstruasi_dataset.csv')
-keputihan_dataset = pd.read_csv('keputihan_dataset.csv')
+# 2. Load dataset
+data = pd.read_csv('/mnt/data/aug_train.csv')
 
-# Standarisasi data
+# 3. Standarisasi data
+# Pilih fitur yang relevan dan target
+features = ['gender', 'education_level', 'experience', 'city_development_index']
+target = 'target'
+
+# Menghapus baris dengan nilai yang hilang pada fitur yang dipilih dan target
+data = data.dropna(subset=features + [target])
+
+# Encoding gender menjadi numerik
+data['gender'] = data['gender'].map({'Male': 0, 'Female': 1})
+
+# Encoding education_level menjadi numerik
+education_level_mapping = {
+    'Primary School': 1,
+    'High School': 2,
+    'Graduate': 3,
+    'Masters': 4,
+    'Phd': 5
+}
+data['education_level'] = data['education_level'].map(education_level_mapping)
+
+# Encoding experience menjadi numerik
+experience_mapping = {
+    '<1': 0,
+    '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
+    '10': 10, '11': 11, '12': 12, '13': 13, '14': 14, '15': 15, '16': 16, '17': 17, '18': 18, '19': 19, '20': 20, '>20': 21
+}
+data['experience'] = data['experience'].map(experience_mapping)
+
+# Memisahkan fitur dan target
+X = data[features]
+y = data[target]
+
+# Standarisasi fitur
 scaler = StandardScaler()
-menstruasi_dataset[['Durasi', 'Gejala']] = scaler.fit_transform(menstruasi_dataset[['Durasi', 'Gejala']])
-keputihan_dataset[['Warna', 'Karakteristik', 'Penyebab']] = scaler.fit_transform(keputihan_dataset[['Warna', 'Karakteristik', 'Penyebab']])
+X = scaler.fit_transform(X)
 
-# Split data train dan test
-X_menstruasi = menstruasi_dataset.drop('Fase', axis=1)
-y_menstruasi = menstruasi_dataset['Fase']
-X_train_menstruasi, X_test_menstruasi, y_train_menstruasi, y_test_menstruasi = train_test_split(X_menstruasi, y_menstruasi, test_size=0.2, random_state=42)
+# 4. Split data train dan test
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-X_keputihan = keputihan_dataset.drop('Jenis Keputihan', axis=1)
-y_keputihan = keputihan_dataset['Jenis Keputihan']
-X_train_keputihan, X_test_keputihan, y_train_keputihan, y_test_keputihan = train_test_split(X_keputihan, y_keputihan, test_size=0.2, random_state=42)
+# 5. Membuat model menggunakan algoritma Logistic Regression
+model = LogisticRegression()
+model.fit(X_train, y_train)
 
-# Membuat model menggunakan algoritma Random Forest
-rf_menstruasi = RandomForestClassifier(n_estimators=100, random_state=42)
-rf_menstruasi.fit(X_train_menstruasi, y_train_menstruasi)
+# 6. Membuat model evaluasi untuk uji akurasi
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+report = classification_report(y_test, y_pred)
 
-rf_keputihan = RandomForestClassifier(n_estimators=100, random_state=42)
-rf_keputihan.fit(X_train_keputihan, y_train_keputihan)
+# 7. Membuat model untuk aplikasi
+def predict_acceptance(input_data):
+    input_data = np.array(input_data).reshape(1, -1)
+    input_data = scaler.transform(input_data)
+    prediction = model.predict(input_data)
+    return prediction
 
-# Membuat model evaluasi untuk uji akurasi
-y_pred_menstruasi = rf_menstruasi.predict(X_test_menstruasi)
-y_pred_keputihan = rf_keputihan.predict(X_test_keputihan)
+# 8. Deploy aplikasi AI dengan streamlit
+def main():
+    st.title("AI Deteksi Bias Gender pada Perekrutan Kerja")
+    
+    st.write("Masukkan fitur-fitur untuk memprediksi apakah kandidat diterima:")
+    
+    city_development_index = st.number_input("City Development Index", min_value=0.0, max_value=1.0, step=0.01)
+    education_level = st.selectbox("Education Level", list(education_level_mapping.keys()))
+    education_level = education_level_mapping[education_level]
+    experience = st.selectbox("Experience", list(experience_mapping.keys()))
+    experience = experience_mapping[experience]
+    
+    gender = st.selectbox("Gender", ["Male", "Female"])
+    gender = 0 if gender == "Male" else 1
+    
+    if st.button("Prediksi"):
+        result = predict_acceptance([gender, education_level, experience, city_development_index])
+        if result == 1:
+            st.success("Kandidat diterima")
+        else:
+            st.error("Kandidat ditolak")
+    
+    st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+    st.write("Laporan Klasifikasi:")
+    st.text(report)
 
-print("Akurasi Menstruasi:", accuracy_score(y_test_menstruasi, y_pred_menstruasi))
-print("Laporan Klasifikasi Menstruasi:\n", classification_report(y_test_menstruasi, y_pred_menstruasi))
-
-print("Akurasi Keputihan:", accuracy_score(y_test_keputihan, y_pred_keputihan))
-print("Laporan Klasifikasi Keputihan:\n", classification_report(y_test_keputihan, y_pred_keputihan))
-
-# Membuat model aplikasi dengan streamlit
-st.title("Aplikasi Kesehatan Wanita")
-
-st.header("Registrasi dan Profil Pengguna")
-usia = st.number_input("Usia")
-riwayat_kesehatan = st.text_input("Riwayat Kesehatan")
-siklus_menstruasi = st.text_input("Siklus Menstruasi")
-
-st.header("Input Data Kesehatan")
-siklus_menstruasi_input = st.text_input("Siklus Menstruasi")
-keputihan_input = st.text_input("Keputihan")
-
-if st.button("Analisis"):
-    # Membuat prediksi menggunakan model
-    X_input_menstruasi = pd.DataFrame({'Durasi': [siklus_menstruasi_input], 'Gejala': ['']})
-    X_input_menstruasi[['Durasi', 'Gejala']] = scaler.transform(X_input_menstruasi[['Durasi', 'Gejala']])
-    y_pred_menstruasi = rf_menstruasi.predict(X_input_menstruasi)
-
-    X_input_keputihan = pd.DataFrame({'Warna': [keputihan_input], 'Karakteristik': [''], 'Penyebab': ['']})
-    X_input_keputihan[['Warna', 'Karakteristik', 'Penyebab']] = scaler.transform(X_input_keputihan[['Warna', 'Karakteristik', 'Penyebab']])
-    y_pred_keputihan = rf_keputihan.predict(X_input_keputihan)
-
-    # Menampilkan hasil analisis
-    st.write("Hasil Analisis:")
-    st.write("Fase Menstruasi:", y_pred_menstruasi[0])
-    st.write("Jenis Keputihan:", y_pred_keputihan[0])
-
-    # Menampilkan saran medis yang dipersonalisasi
-    st.write("Saran Medis:")
-    # TODO: implementasi saran medis yang dipersonalisasi
-
-    # Menampilkan artikel dan video edukasi yang relevan
-    st.write("Artikel dan Video Edukasi:")
-    # TODO: implementasi artikel dan video edukasi yang relevan
-
-    # Menampilkan konsultasi dengan dokter
-    st.write("Konsultasi dengan Dokter:")
-    # TODO: implementasi konsultasi dengan dokter
-
-    # Menampilkan akses layanan kesehatan
-    st.write("Akses Layanan Kesehatan:")
-    # TODO: implementasi akses layanan kesehatan
+if __name__ == "__main__":
+    main()
