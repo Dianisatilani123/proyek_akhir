@@ -1,57 +1,84 @@
 import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
 import streamlit as st
 
 # Load dataset
-dataset = pd.read_csv("dataset.csv")
+menstruasi_dataset = pd.read_csv('menstruasi_dataset.csv')
+keputihan_dataset = pd.read_csv('keputihan_dataset.csv')
 
-# Display dataset
-st.write("Dataset:")
-st.write(dataset.head())
-
-# Assume that the last column is the target variable (y)
-X = dataset.iloc[:, :-1]  # features
-y = dataset.iloc[:, -1]  # target variable
-
-# Select only numerical columns
-X_num = X.select_dtypes(include=[np.number])
-
-# Standarisasi data menggunakan StandardScaler
+# Standarisasi data
 scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X_num.to_numpy())
+menstruasi_dataset[['Durasi', 'Gejala']] = scaler.fit_transform(menstruasi_dataset[['Durasi', 'Gejala']])
+keputihan_dataset[['Warna', 'Karakteristik', 'Penyebab']] = scaler.fit_transform(keputihan_dataset[['Warna', 'Karakteristik', 'Penyebab']])
 
 # Split data train dan test
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+X_menstruasi = menstruasi_dataset.drop('Fase', axis=1)
+y_menstruasi = menstruasi_dataset['Fase']
+X_train_menstruasi, X_test_menstruasi, y_train_menstruasi, y_test_menstruasi = train_test_split(X_menstruasi, y_menstruasi, test_size=0.2, random_state=42)
 
-# Membuat model latih menggunakan Linear Regression
-model = LinearRegression()
-model.fit(X_train, y_train)
+X_keputihan = keputihan_dataset.drop('Jenis Keputihan', axis=1)
+y_keputihan = keputihan_dataset['Jenis Keputihan']
+X_train_keputihan, X_test_keputihan, y_train_keputihan, y_test_keputihan = train_test_split(X_keputihan, y_keputihan, test_size=0.2, random_state=42)
+
+# Membuat model menggunakan algoritma Random Forest
+rf_menstruasi = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_menstruasi.fit(X_train_menstruasi, y_train_menstruasi)
+
+rf_keputihan = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_keputihan.fit(X_train_keputihan, y_train_keputihan)
 
 # Membuat model evaluasi untuk uji akurasi
-y_pred = model.predict(X_test)
-mse = mean_squared_error(y_test, y_pred)
-st.write("Mean Squared Error:", mse)
+y_pred_menstruasi = rf_menstruasi.predict(X_test_menstruasi)
+y_pred_keputihan = rf_keputihan.predict(X_test_keputihan)
 
-# Membuat model aplikasi untuk prediksi
-def predict_proporsi(kabupaten, tahun):
-    X_new = np.array([[kabupaten, tahun]])
-    X_new_scaled = scaler.transform(X_new)
-    y_pred = model.predict(X_new_scaled)
-    return y_pred[0]
+print("Akurasi Menstruasi:", accuracy_score(y_test_menstruasi, y_pred_menstruasi))
+print("Laporan Klasifikasi Menstruasi:\n", classification_report(y_test_menstruasi, y_pred_menstruasi))
 
-# Deploy aplikasi AI ke web online menggunakan Streamlit
-st.title("Cerah Masa Depan")
-st.write("Aplikasi ini membantu remaja membuat keputusan yang lebih baik tentang masa depan mereka.")
+print("Akurasi Keputihan:", accuracy_score(y_test_keputihan, y_pred_keputihan))
+print("Laporan Klasifikasi Keputihan:\n", classification_report(y_test_keputihan, y_pred_keputihan))
 
-# Input form untuk kabupaten dan tahun
-kabupaten = st.selectbox("Pilih Kabupaten:", dataset["Kabupaten/Kota"].unique())
-tahun = st.selectbox("Pilih Tahun:", [2021, 2022, 2023])
+# Membuat model aplikasi dengan streamlit
+st.title("Aplikasi Kesehatan Wanita")
 
-# Button untuk prediksi
-if st.button("Prediksi"):
-    proporsi = predict_proporsi(kabupaten, tahun)
-    st.write("Proporsi perempuan pernah kawin usia 15-49 tahun yang melahirkan anak lahir hidup yang pertama kali berumur kurang dari 20 tahun (MPK20) di", kabupaten, "pada tahun", tahun, "adalah", proporsi)
+st.header("Registrasi dan Profil Pengguna")
+usia = st.number_input("Usia")
+riwayat_kesehatan = st.text_input("Riwayat Kesehatan")
+siklus_menstruasi = st.text_input("Siklus Menstruasi")
+
+st.header("Input Data Kesehatan")
+siklus_menstruasi_input = st.text_input("Siklus Menstruasi")
+keputihan_input = st.text_input("Keputihan")
+
+if st.button("Analisis"):
+    # Membuat prediksi menggunakan model
+    X_input_menstruasi = pd.DataFrame({'Durasi': [siklus_menstruasi_input], 'Gejala': ['']})
+    X_input_menstruasi[['Durasi', 'Gejala']] = scaler.transform(X_input_menstruasi[['Durasi', 'Gejala']])
+    y_pred_menstruasi = rf_menstruasi.predict(X_input_menstruasi)
+
+    X_input_keputihan = pd.DataFrame({'Warna': [keputihan_input], 'Karakteristik': [''], 'Penyebab': ['']})
+    X_input_keputihan[['Warna', 'Karakteristik', 'Penyebab']] = scaler.transform(X_input_keputihan[['Warna', 'Karakteristik', 'Penyebab']])
+    y_pred_keputihan = rf_keputihan.predict(X_input_keputihan)
+
+    # Menampilkan hasil analisis
+    st.write("Hasil Analisis:")
+    st.write("Fase Menstruasi:", y_pred_menstruasi[0])
+    st.write("Jenis Keputihan:", y_pred_keputihan[0])
+
+    # Menampilkan saran medis yang dipersonalisasi
+    st.write("Saran Medis:")
+    # TODO: implementasi saran medis yang dipersonalisasi
+
+    # Menampilkan artikel dan video edukasi yang relevan
+    st.write("Artikel dan Video Edukasi:")
+    # TODO: implementasi artikel dan video edukasi yang relevan
+
+    # Menampilkan konsultasi dengan dokter
+    st.write("Konsultasi dengan Dokter:")
+    # TODO: implementasi konsultasi dengan dokter
+
+    # Menampilkan akses layanan kesehatan
+    st.write("Akses Layanan Kesehatan:")
+    # TODO: implementasi akses layanan kesehatan
