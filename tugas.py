@@ -1,79 +1,54 @@
 import pandas as pd
-import streamlit as st
-from sklearn.preprocessing import StandardScaler
+import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import StandardScaler
+import streamlit as st
 
 # Load dataset
-data1 = pd.read_csv('dataset1.csv')
-data2 = pd.read_csv('dataset2.csv')
-data3 = pd.read_csv('dataset3.csv')
-data4 = pd.read_csv('dataset4.csv')
+dataset = pd.read_csv("dataset.csv")
 
-# Merge datasets based on common columns
-data = pd.concat([data1, data2, data3, data4], axis=0, ignore_index=True)
+# Display dataset
+st.write("Dataset:")
+st.write(dataset.head())
 
-# Print column names to check if 'IKG', 'IDG', and 'RLS' exist
-print("Column names:", data.columns)
+# Assume that the last column is the target variable (y)
+X = dataset.iloc[:, :-1]  # features
+y = dataset.iloc[:, -1]  # target variable
 
-# Define feature columns
-feature_cols = ['IKG', 'IDG', 'RLS']
-
-# Check if feature columns exist in the dataset
-if not all(col in data.columns for col in feature_cols):
-    print("Error: One or more feature columns are missing from the dataset.")
-    exit()
-
-# Split data into features and target
-X = data[feature_cols]
-y = data['MPK20']
-
-# Standardize data
+# Standarisasi data menggunakan StandardScaler
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-# Split data into train and test
+# Split data train dan test
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
-# Create a model using the Random Forest algorithm
-model = RandomForestRegressor(n_estimators=100, random_state=42)
+# Membuat model latih menggunakan Linear Regression
+model = LinearRegression()
 model.fit(X_train, y_train)
 
-# Create a Streamlit app
-st.title("Gender Equality Analysis and Prediction")
+# Membuat model evaluasi untuk uji akurasi
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+st.write("Mean Squared Error:", mse)
 
-# Prediction page
-st.header("Prediction")
-with st.form("prediction_form"):
-    IKG = st.number_input("IKG")
-    IDG = st.number_input("IDG")
-    RLS = st.number_input("RLS")
-    submit_button = st.form_submit_button("Predict")
-
-if submit_button:
-    X_new = pd.DataFrame({'IKG': [IKG], 'IDG': [IDG], 'RLS': [RLS]})
+# Membuat model aplikasi untuk prediksi
+def predict_proporsi(kabupaten, tahun):
+    X_new = np.array([[kabupaten, tahun]])
     X_new_scaled = scaler.transform(X_new)
     y_pred = model.predict(X_new_scaled)
-    st.write("Predicted MPK20:", y_pred[0])
+    return y_pred[0]
 
-# Analysis page
-st.header("Analysis")
-with st.expander("Data Analysis"):
-    data_analysis = data.groupby('Kabupaten/Kota')[feature_cols + ['MPK20']].mean()
-    st.write(data_analysis)
+# Deploy aplikasi AI ke web online menggunakan Streamlit
+st.title("Cerah Masa Depan")
+st.write("Aplikasi ini membantu remaja membuat keputusan yang lebih baik tentang masa depan mereka.")
 
-# Comparison page
-st.header("Comparison")
-with st.expander("Comparison of IKG, IDG, RLS, and MPK20 values across kabupaten/kota"):
-    data_comparison = data.groupby('Kabupaten/Kota')[feature_cols + ['MPK20']].mean().reset_index()
-    st.write(data_comparison)
+# Input form untuk kabupaten dan tahun
+kabupaten = st.selectbox("Pilih Kabupaten:", dataset["Kabupaten/Kota"].unique())
+tahun = st.selectbox("Pilih Tahun:", [2021, 2022, 2023])
 
-# Recommendation page
-st.header("Recommendation")
-with st.expander("Recommendations for improving gender equality in Provinsi Nusa Tenggara Barat"):
-    recommendation = "Berikut adalah rekomendasi untuk meningkatkan kesetaraan gender di Provinsi Nusa Tenggara Barat:... "
-    st.write(recommendation)
-
-if __name__ == '__main__':
-    st.run()
+# Button untuk prediksi
+if st.button("Prediksi"):
+    proporsi = predict_proporsi(kabupaten, tahun)
+    st.write("Proporsi perempuan pernah kawin usia 15-49 tahun yang melahirkan anak lahir hidup yang pertama kali berumur kurang dari 20 tahun (MPK20) di", kabupaten, "pada tahun", tahun, "adalah", proporsi)
