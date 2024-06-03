@@ -89,8 +89,23 @@ def main():
     last_new_job = last_new_job_mapping[last_new_job]
     training_hours = st.number_input("Training Hours", min_value=0, step=1)
 
-   if st.button("Prediksi"):
-        result = predict_acceptance([city_development_index, enrolled_university, 
+  def main():
+    st.title("AI Deteksi Bias Gender pada Perekrutan Kerja")
+
+    st.write("Masukkan fitur-fitur untuk memprediksi apakah kandidat diterima:")
+
+    enrollee_id = st.text_input("Enrollee ID")
+    gender = st.selectbox("Gender", ["Male", "Female"])
+
+    city_development_index = st.text_input("City Development Index")
+    enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()), index=0)
+    enrolled_university = enrolled_university_mapping[enrolled_university]
+    last_new_job = st.selectbox("Last New Job", list(last_new_job_mapping.keys()), index=0)
+    last_new_job = last_new_job_mapping[last_new_job]
+    training_hours = st.number_input("Training Hours", min_value=0, step=1)
+
+    if st.button("Prediksi"):
+        result = predict_acceptance([float(city_development_index), enrolled_university, 
                                      last_new_job, training_hours])
         if result == 1:
             st.write("Kandidat diterima")
