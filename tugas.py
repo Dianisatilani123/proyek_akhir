@@ -78,7 +78,7 @@ if inf_count > 0 or neginf_count > 0:
     X_array = np.nan_to_num(X_array)  # Replace infinity values with NaN
 
 # Check for missing values
-na_count = np.isnan(X_array).sum().sum()
+na_count = np.isnan(X_array).sum()
 if na_count > 0:
     print(f"Found {na_count} missing values.")
 imputer = SimpleImputer(strategy='mean')
