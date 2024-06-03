@@ -11,15 +11,15 @@ import streamlit as st
 data = pd.read_csv('aug_train.csv')
 print(data.head())
 
-# Standarisasi data
+# Standardize data
 features = ['relevent_experience', 'enrolled_university', 
             'education_level', 'training_hours']
 target = 'target'
 
-# Menghapus baris dengan nilai yang hilang pada fitur yang dipilih dan target
+# Drop rows with missing values in selected features and target
 data = data.dropna(subset=features + [target])
 
-# Encoding enrolled_university menjadi numerik
+# Encode enrolled_university to numeric
 enrolled_university_mapping = {
     'no_enrollment': 0,
     'Full time course': 1,
@@ -27,7 +27,7 @@ enrolled_university_mapping = {
 }
 data['enrolled_university'] = data['enrolled_university'].map(enrolled_university_mapping)
 
-# Encoding education_level menjadi numerik
+# Encode education_level to numeric
 education_level_mapping = {
     'Graduate': 0,
     'Masters': 1,
@@ -35,7 +35,7 @@ education_level_mapping = {
 }
 data['education_level'] = data['education_level'].map(education_level_mapping)
 
-# Split data train dan test
+# Split data into train and test
 X = data[features]
 y = data[target]
 
@@ -74,16 +74,25 @@ X_train_scaled = scaler.fit_transform(X_train_array)
 X_test_array = X_test.to_numpy()
 X_test_scaled = scaler.transform(X_test_array)
 
-# Membuat model menggunakan algoritma Logistic Regression
+# Create model using Logistic Regression algorithm
 model = LogisticRegression(max_iter=1000)
 model.fit(X_train_scaled, y_train)
 
-# Membuat model evaluasi untuk uji akurasi
+# Evaluate model for accuracy
 y_pred = model.predict(X_test_scaled)
 accuracy = accuracy_score(y_test, y_pred)
 report = classification_report(y_test, y_pred, zero_division=0)
 
 def predict_acceptance(input_data):
+    """
+    Predict whether a candidate will be accepted based on input features.
+
+    Args:
+    input_data (list): List of input features.
+
+    Returns:
+    int: 1 if the candidate will be accepted, 0 otherwise.
+    """
     relevent_experience_mapping = {
         "Has relevent experience": 1,
         "No relevent experience": 0
@@ -102,11 +111,15 @@ def predict_acceptance(input_data):
     input_data[1] = enrolled_university_mapping[input_data[1]]
     input_data[2] = education_level_mapping[input_data[2]]
     input_data = np.array(input_data, dtype=float)  # Convert to float array
-    input_data = scaler.transform([input_data])  # Reshape to 2D array and transform
+    input_data = input_data.reshape(1, -1)  # Reshape to 2D array
+    input_data = scaler.transform(input_data)  # Transform input data
     prediction = model.predict(input_data)
     return prediction
 
 def main():
+    """
+    Main function to create a Streamlit app.
+    """
     st.title("AI Deteksi Bias Gender pada Perekrutan Kerja")
 
     st.write("Masukkan fitur-fitur untuk memprediksi apakah kandidat diterima:")
@@ -118,14 +131,16 @@ def main():
     training_hours = st.slider("Training Hours", min_value=0, step=1)
 
     if st.button("Prediksi"):
-        result = predict_acceptance([relevent_experience, enrolled_university, education_level, training_hours])
-        if result == 1:
-            st.write("Kandidat diterima")
-        else:
-            st.write("Kandidat ditolak")
-
-        st.write(f"Akurasi model: {accuracy * 100:.2f}%")
-        st.write(report)
+        try:
+            result = predict_acceptance([relevent_experience, enrolled_university, education_level, training_hours])
+            if result == 1:
+                st.write("Kandidat diterima")
+            else:
+                st.write("Kandidat ditolak")
+            st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+            st.write(report)
+        except Exception as e:
+            st.write("Error:", str(e))
 
 if __name__ == "__main__":
     main()
