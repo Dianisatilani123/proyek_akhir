@@ -2,11 +2,9 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.impute import SimpleImputer
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import SVC
 import streamlit as st
 
 # Load dataset
@@ -84,28 +82,18 @@ X = X.astype(float)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
 
-X_train_array = X_train.to_numpy()
-print("X_train_array shape:", X_train_array.shape)
-print("X_train_array dtype:", X_train_array.dtype)
-
-X_train_num = X_train.select_dtypes(include=[np.number])  # Select only numeric columns
-print("X_train_num contains NaN:", np.isnan(X_train_num).any())
-print("X_train_num contains infinity:", np.isinf(X_train_num).any())
-
 scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train_array)
-
-X_test_array = X_test.to_numpy()
-X_test_scaled = scaler.transform(X_test_array)
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
 # Create and tune model using GridSearchCV
 param_grid = {
-    'C': [0.1, 1, 10, 100],
-    'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
-    'gamma': ['scale', 'auto']
+    'n_estimators': [50, 100],
+    'max_depth': [5, 10, 20],
+    'min_samples_split': [2, 5, 10]
 }
-svc = SVC(probability=True)
-grid_search = GridSearchCV(svc, param_grid, cv=5, n_jobs=-1, verbose=1)
+rf = RandomForestClassifier(random_state=42)
+grid_search = GridSearchCV(rf, param_grid, cv=5, n_jobs=-1, verbose=1)
 grid_search.fit(X_train_scaled, y_train)
 
 best_model = grid_search.best_estimator_
