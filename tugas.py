@@ -40,11 +40,12 @@ X = data[features]
 y = data[target]
 
 # Check for infinity values
-inf_count = np.isinf(X).sum().sum()
-neginf_count = np.isneginf(X).sum().sum()
+X_num = X.select_dtypes(include=[np.number])  # Select only numeric columns
+inf_count = np.isinf(X_num).sum().sum()
+neginf_count = np.isneginf(X_num).sum().sum()
 if inf_count > 0 or neginf_count > 0:
     print(f"Found {inf_count} infinity values and {neginf_count} negative infinity values.")
-    X = X.replace([np.inf, -np.inf], np.nan)
+    X_num = X_num.replace([np.inf, -np.inf], np.nan)  # Replace infinity values with NaN
 
 # Check for missing values
 na_count = X.isna().sum().sum()
