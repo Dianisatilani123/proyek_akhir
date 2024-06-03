@@ -87,9 +87,9 @@ def predict_acceptance(input_data):
         'Masters': 1,
         'Phd': 2
     }
-    input_data[0] = relevent_experience_mapping.get(input_data[0], 0)
-    input_data[1] = enrolled_university_mapping.get(input_data[1], 0)
-    input_data[2] = education_level_mapping.get(input_data[2], 0)
+    input_data[0] = relevent_experience_mapping[input_data[0]]
+    input_data[1] = enrolled_university_mapping[input_data[1]]
+    input_data[2] = education_level_mapping[input_data[2]]
     input_data = np.array(input_data).reshape(1, -1)
     input_data = scaler.transform(input_data)
     prediction = model.predict(input_data)
