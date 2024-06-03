@@ -13,7 +13,7 @@ print(data.head())
 
 # Standarisasi data
 features = ['city_development_index', 'enrolled_university', 
-            'last_new_job', 'training_hours', 'relevent_experience', 'education_level', 'major_discipline', 'experience']
+            'last_new_job', 'training_hours', 'elevent_experience', 'education_level', 'ajor_discipline', 'experience']
 target = 'target'
 
 # Menghapus baris dengan nilai yang hilang pada fitur yang dipilih dan target
@@ -64,22 +64,23 @@ X = data[features]
 y = data[target]
 
 # Check for infinity values
-inf_count = np.isinf(X).sum().sum()
-neginf_count = np.isneginf(X).sum().sum()
+X_array = X.to_numpy()  # Convert X to a numpy array
+inf_count = np.isinf(X_array).sum().sum()
+neginf_count = np.isneginf(X_array).sum().sum()
 if inf_count > 0 or neginf_count > 0:
     print(f"Found {inf_count} infinity values and {neginf_count} negative infinity values.")
-    X = X.replace([np.inf, -np.inf], np.nan)
+    X_array = np.nan_to_num(X_array)  # Replace infinity values with NaN
 
 # Check for missing values
-na_count = X.isna().sum().sum()
+na_count = np.isnan(X_array).sum().sum()
 if na_count > 0:
     print(f"Found {na_count} missing values.")
 imputer = SimpleImputer(strategy='mean')
-X = imputer.fit_transform(X)
+X_array = imputer.fit_transform(X_array)
 
-print("Shape of X after imputing NaN values:", X.shape)
+print("Shape of X after imputing NaN values:", X_array.shape)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_array, y, test_size=0.1, random_state=42)
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
