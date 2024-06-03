@@ -14,7 +14,8 @@ print(data.head())
 
 # 3. Standarisasi data
 # Pilih fitur yang relevan dan target
-features = ['gender', 'education_level', 'experience', 'city_development_index']
+features = ['gender', 'education_level', 'experience', 'city_development_index', 
+            'relevent_experience', 'enrolled_university', 'last_new_job', 'training_hours']
 target = 'target'
 
 # Menghapus baris dengan nilai yang hilang pada fitur yang dipilih dan target
@@ -41,30 +42,45 @@ experience_mapping = {
 }
 data['experience'] = data['experience'].map(experience_mapping)
 
-# Memisahkan fitur dan target
+# Encoding relevent_experience menjadi numerik
+data['relevent_experience'] = data['relevent_experience'].map({'Has relevent experience': 1, 'No relevent experience': 0})
+
+# Encoding enrolled_university menjadi numerik
+enrolled_university_mapping = {
+    'no_enrollment': 0,
+    'Full time course': 1,
+    'Part time course': 2
+}
+data['enrolled_university'] = data['enrolled_university'].map(enrolled_university_mapping)
+
+# Encoding last_new_job menjadi numerik
+last_new_job_mapping = {
+    'never': 0,
+    '1': 1, '2': 2, '3': 3, '4': 4, '>4': 5
+}
+data['last_new_job'] = data['last_new_job'].map(last_new_job_mapping)
+
+# 4. Split data train dan test
 X = data[features]
 y = data[target]
 
-# Impute missing values with mean
-from sklearn.impute import SimpleImputer
-imputer = SimpleImputer(strategy='mean')
-X_imputed = imputer.fit_transform(X)
+# Remove rows with NaN values
+X = X.replace([np.inf, -np.inf], np.nan).dropna()
+y = y[X.index]
 
-# Standarisasi fitur
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X_imputed)
-
-# 4. Split data train dan test
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+scaler.fit(X_train)
 
 # 5. Membuat model menggunakan algoritma Logistic Regression
-model = LogisticRegression()
+model = LogisticRegression(max_iter=1000)
 model.fit(X_train, y_train)
+
 
 # 6. Membuat model evaluasi untuk uji akurasi
 y_pred = model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
-report = classification_report(y_test, y_pred)
+report = classification_report(y_test, y_pred, zero_division=0)  # Set zero_division to 0
 
 # 7. Membuat model untuk aplikasi
 def predict_acceptance(input_data):
@@ -79,17 +95,26 @@ def main():
     
     st.write("Masukkan fitur-fitur untuk memprediksi apakah kandidat diterima:")
     
-    city_development_index = st.number_input("City Development Index", min_value=0.0, max_value=1.0, step=0.01)
+    enrollee_id = st.text_input("Enrollee ID")
+    city_development_index = st.number_input("City Development Index", min_value=0.0, max_value=1.0, step=0.001, format="%.3f")
     education_level = st.selectbox("Education Level", list(education_level_mapping.keys()))
     education_level = education_level_mapping[education_level]
     experience = st.selectbox("Experience", list(experience_mapping.keys()))
     experience = experience_mapping[experience]
+    relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
+    relevent_experience = 1 if relevent_experience == "Has relevent experience" else 0
+    enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()))
+    enrolled_university = enrolled_university_mapping[enrolled_university]
+    last_new_job = st.selectbox("Last New Job", list(last_new_job_mapping.keys()))
+    last_new_job = last_new_job_mapping[last_new_job]
+    training_hours = st.number_input("Training Hours", min_value=0, step=1)
     
     gender = st.selectbox("Gender", ["Male", "Female"])
     gender = 0 if gender == "Male" else 1
     
     if st.button("Prediksi"):
-        result = predict_acceptance([gender, education_level, experience, city_development_index])
+        result = predict_acceptance([gender, education_level, experience, city_development_index,
+                                     relevent_experience, enrolled_university, last_new_job, training_hours])
         if result == 1:
             st.success("Kandidat diterima")
         else:
