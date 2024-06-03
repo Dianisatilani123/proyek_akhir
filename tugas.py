@@ -1,10 +1,12 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.impute import SimpleImputer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 import streamlit as st
 
 # Load dataset
@@ -96,12 +98,21 @@ X_train_scaled = scaler.fit_transform(X_train_array)
 X_test_array = X_test.to_numpy()
 X_test_scaled = scaler.transform(X_test_array)
 
-# Create model using Logistic Regression algorithm
-model = LogisticRegression(max_iter=1000)
-model.fit(X_train_scaled, y_train)
+# Create and tune model using GridSearchCV
+param_grid = {
+    'C': [0.1, 1, 10, 100],
+    'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
+    'gamma': ['scale', 'auto']
+}
+svc = SVC(probability=True)
+grid_search = GridSearchCV(svc, param_grid, cv=5, n_jobs=-1, verbose=1)
+grid_search.fit(X_train_scaled, y_train)
+
+best_model = grid_search.best_estimator_
+print(f"Best parameters: {grid_search.best_params_}")
 
 # Evaluate model for accuracy
-y_pred = model.predict(X_test_scaled)
+y_pred = best_model.predict(X_test_scaled)
 accuracy = accuracy_score(y_test, y_pred)
 report = classification_report(y_test, y_pred, zero_division=0)
 
@@ -137,7 +148,7 @@ def predict_acceptance(input_data):
     input_features = np.array(input_features, dtype=float)  # Convert to float array
     input_features = input_features.reshape(1, -1)  # Reshape to 2D array
     input_features = scaler.transform(input_features)  # Transform input data
-    prediction = model.predict(input_features)
+    prediction = best_model.predict(input_features)
     return prediction[0]
 
 def main():
