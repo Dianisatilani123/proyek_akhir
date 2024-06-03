@@ -113,12 +113,12 @@ def main():
     gender = 0 if gender == "Male" else 1
     
     if st.button("Prediksi"):
-        result = predict_acceptance([gender, education_level, experience, city_development_index,
-                                     relevent_experience, enrolled_university, last_new_job, training_hours])
-        if result == 1:
-            st.success("Kandidat diterima")
-        else:
-            st.error("Kandidat ditolak")
+    result = predict_acceptance([enrollee_id,city_development_index,
+                                 relevent_experience, enrolled_university, last_new_job, training_hours])
+    if result == 1:
+        st.success("Kandidat diterima")
+    else:
+        st.error("Kandidat ditolak")
     
     st.write(f"Akurasi model: {accuracy * 100:.2f}%")
     st.write("Laporan Klasifikasi:")
