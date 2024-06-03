@@ -87,9 +87,9 @@ def predict_acceptance(input_data):
         'Masters': 1,
         'Phd': 2
     }
-    input_data[0] = relevent_experience_mapping[input_data[0]]
-    input_data[1] = enrolled_university_mapping[input_data[1]]
-    input_data[2] = education_level_mapping[input_data[2]]
+    input_data[0] = relevent_experience_mapping.get(input_data[0], 0)
+    input_data[1] = enrolled_university_mapping.get(input_data[1], 0)
+    input_data[2] = education_level_mapping.get(input_data[2], 0)
     input_data = np.array(input_data).reshape(1, -1)
     input_data = scaler.transform(input_data)
     prediction = model.predict(input_data)
@@ -101,13 +101,8 @@ def main():
     st.write("Masukkan fitur-fitur untuk memprediksi apakah kandidat diterima:")
 
     relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
-    relevent_experience = 1 if relevent_experience == "Has relevent experience" else 0
-
     enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()), index=0)
-    enrolled_university = enrolled_university_mapping[enrolled_university]
-
     education_level = st.selectbox("Education Level", list(education_level_mapping.keys()), index=0)
-    education_level = education_level_mapping[education_level]
 
     training_hours = st.slider("Training Hours", min_value=0, step=1)
 
