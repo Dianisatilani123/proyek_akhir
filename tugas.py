@@ -13,7 +13,7 @@ print(data.head())
 
 # Check if all features and target exist in the dataset
 features = ['city_development_index', 'enrolled_university', 
-            'last_new_job', 'training_hours', 'relevent_experience', 'education_level', 'major_discipline', 'experience']
+            'last_new_job', 'training_hours', 'elevent_experience', 'education_level', 'ajor_discipline', 'experience']
 target = 'target'
 
 for feature in features + [target]:
@@ -70,19 +70,23 @@ X = data[features]
 y = data[target]
 
 # Check for infinity values
-X_array = X.to_numpy()  # Convert X to a numpy array
-inf_count = np.isinf(X_array).sum()
-neginf_count = np.sum(np.isinf(-X_array))
+inf_count = 0
+neginf_count = 0
+for col in X.columns:
+    if X[col].dtype.kind in 'bifc':  # Check if column is numeric
+        X_array = X[col].to_numpy()  # Convert column to a numpy array
+        inf_count += np.isinf(X_array).sum()
+        neginf_count += np.sum(np.isinf(-X_array))
 if inf_count > 0 or neginf_count > 0:
     print(f"Found {inf_count} infinity values and {neginf_count} negative infinity values.")
-    X_array = np.nan_to_num(X_array)  # Replace infinity values with NaN
+    X = X.replace([np.inf, -np.inf], np.nan)  # Replace infinity values with NaN
 
 # Check for missing values
-na_count = np.isnan(X_array).sum()
+na_count = X.isna().sum().sum()
 if na_count > 0:
     print(f"Found {na_count} missing values.")
 imputer = SimpleImputer(strategy='mean')
-X_array = imputer.fit_transform(X_array)
+X_array = imputer.fit_transform(X)
 
 print("Shape of X after imputing NaN values:", X_array.shape)
 
