@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.impute import SimpleImputer
@@ -34,6 +34,10 @@ education_level_mapping = {
     'Phd': 2
 }
 data['education_level'] = data['education_level'].map(education_level_mapping)
+
+# Encoding relevent_experience menjadi numerik
+le = LabelEncoder()
+data['relevent_experience'] = le.fit_transform(data['relevent_experience'])
 
 # Split data train dan test
 X = data[features]
@@ -82,7 +86,8 @@ def main():
     st.write("Masukkan fitur-fitur untuk memprediksi apakah kandidat diterima:")
 
     enrollee_id = st.text_input("Enrollee ID")
-    relevent_experience = st.slider("Relevent Experience", min_value=0, max_value=10, step=1)
+    relevent_experience = st.selectbox("Relevent Experience", le.classes_, index=0)
+    relevent_experience = le.transform([relevent_experience])[0]
     enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()), index=0)
     enrolled_university = enrolled_university_mapping[enrolled_university]
     education_level = st.selectbox("Education Level", list(education_level_mapping.keys()), index=0)
