@@ -89,16 +89,16 @@ def main():
     last_new_job = last_new_job_mapping[last_new_job]
     training_hours = st.number_input("Training Hours", min_value=0, step=1)
 
-    if st.button("Prediksi"):
-        input_data = [city_development_index, enrolled_university, last_new_job, training_hours]
-        result = predict_acceptance(input_data)
+   if st.button("Prediksi"):
+        result = predict_acceptance([city_development_index, enrolled_university, 
+                                     last_new_job, training_hours])
         if result == 1:
             st.write("Kandidat diterima")
         else:
             st.write("Kandidat ditolak")
-                    
+
     st.write(f"Akurasi model: {accuracy * 100:.2f}%")
     st.write(report)
-               
+
 if __name__ == "__main__":
     main()
