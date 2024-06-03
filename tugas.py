@@ -71,8 +71,8 @@ y = data[target]
 
 # Check for infinity values
 X_array = X.to_numpy()  # Convert X to a numpy array
-inf_count = np.isinf(X_array).sum().sum()
-neginf_count = np.isneginf(X_array).sum().sum()
+inf_count = np.isinf(X_array).sum()
+neginf_count = np.sum(np.isinf(-X_array))
 if inf_count > 0 or neginf_count > 0:
     print(f"Found {inf_count} infinity values and {neginf_count} negative infinity values.")
     X_array = np.nan_to_num(X_array)  # Replace infinity values with NaN
