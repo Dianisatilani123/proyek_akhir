@@ -63,8 +63,10 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_
 X_train_array = X_train.to_numpy()
 print("X_train_array shape:", X_train_array.shape)
 print("X_train_array dtype:", X_train_array.dtype)
-print("X_train_array contains NaN:", np.isnan(X_train_array).any())
-print("X_train_array contains infinity:", np.isinf(X_train_array).any())
+
+X_train_num = X_train.select_dtypes(include=[np.number])  # Select only numeric columns
+print("X_train_num contains NaN:", np.isnan(X_train_num).any())
+print("X_train_num contains infinity:", np.isinf(X_train_num).any())
 
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train_array)
