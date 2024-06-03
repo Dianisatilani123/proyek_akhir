@@ -16,7 +16,7 @@ print(data.head())
 # 3. Standarisasi data
 # Pilih fitur yang relevan dan target
 features = ['gender', 'education_level', 'experience', 'city_development_index', 
-            'enrolled_university', 'last_new_job', 'training_hours']
+            'elevent_experience', 'enrolled_university', 'last_new_job', 'training_hours']
 target = 'target'
 
 # Menghapus baris dengan nilai yang hilang pada fitur yang dipilih dan target
@@ -88,6 +88,8 @@ report = classification_report(y_test, y_pred)
 # 7. Membuat model untuk aplikasi
 def predict_acceptance(input_data):
     input_data = np.array(input_data).reshape(1, -1)
+    relevent_experience = 1 if input_data[0, 4] == "Has relevent experience" else 0
+    input_data[0, 4] = relevent_experience
     input_data = scaler.transform(input_data)
     prediction = model.predict(input_data)
     return prediction
@@ -104,7 +106,6 @@ def main():
     experience = st.selectbox("Experience", list(experience_mapping.keys()))
     experience = experience_mapping[experience]
     relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
-    relevent_experience = 1 if relevent_experience == "Has relevent experience" else 0
     enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()))
     enrolled_university = enrolled_university_mapping[enrolled_university]
     last_new_job = st.selectbox("Last New Job", list(last_new_job_mapping.keys()))
@@ -115,8 +116,9 @@ def main():
     gender = 0 if gender == "Male" else 1
     
     if st.button("Prediksi"):
-        result = predict_acceptance([gender, education_level, experience, city_development_index,
-                                     relevent_experience, enrolled_university, last_new_job, training_hours])
+        input_data = [gender, education_level, experience, city_development_index, 
+                      relevent_experience, enrolled_university, last_new_job, training_hours]
+        result = predict_acceptance(input_data)
         if result == 1:
             st.success("Kandidat diterima")
         else:
