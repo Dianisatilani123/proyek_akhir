@@ -90,13 +90,12 @@ def main():
     training_hours = st.number_input("Training Hours", min_value=0, step=1)
 
     if st.button("Prediksi"):
-        for value in range(0, 101, 10):  # iterate over a range of values from 0 to 100 with a step of 10
-            input_data = [value, enrolled_university, last_new_job, training_hours]
-            result = predict_acceptance(input_data)
-            if result == 1:
-                st.write(f"Kandidat dengan City Development Index {value} diterima")
-            else:
-                st.write(f"Kandidat dengan City Development Index {value} ditolak")
+        input_data = [city_development_index, enrolled_university, last_new_job, training_hours]
+        result = predict_acceptance(input_data)
+        if result == 1:
+            st.write("Kandidat diterima")
+        else:
+            st.write("Kandidat ditolak")
                     
     st.write(f"Akurasi model: {accuracy * 100:.2f}%")
     st.write(report)
