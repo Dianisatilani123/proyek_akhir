@@ -15,7 +15,7 @@ print(data.head())
 print("Column names:", data.columns)
 
 features = ['city_development_index', 'enrolled_university', 
-            'last_new_job', 'training_hours', 'relevent_experience', 'education_level', 'ajor_discipline', 'experience']
+            'last_new_job', 'training_hours', 'relevent_experience', 'education_level', 'major_discipline', 'experience']
 target = 'target'
 
 for feature in features + [target]:
