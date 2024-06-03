@@ -82,21 +82,23 @@ def main():
     enrollee_id = st.text_input("Enrollee ID")
     gender = st.selectbox("Gender", ["Male", "Female"])
 
-    city_development_index = st.number_input("City Development Index", min_value=0.0, step=0.01)
+    city_development_index = st.text_area("City Development Index", height=5)
+    city_development_index_values = [float(x) for x in city_development_index.split()]
     enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()), index=0)
     enrolled_university = enrolled_university_mapping[enrolled_university]
     last_new_job = st.selectbox("Last New Job", list(last_new_job_mapping.keys()), index=0)
     last_new_job = last_new_job_mapping[last_new_job]
     training_hours = st.number_input("Training Hours", min_value=0, step=1)
 
-    if st.button("Prediksi"):
-        result = predict_acceptance([city_development_index, enrolled_university, 
-                                     last_new_job, training_hours])
+  if st.button("Prediksi"):
+    for value in city_development_index_values:
+        input_data = [value, enrolled_university, last_new_job, training_hours]
+        result = predict_acceptance(input_data)
         if result == 1:
-            st.write("Kandidat diterima")
+            st.write(f"Kandidat dengan City Development Index {value} diterima")
         else:
-            st.write("Kandidat ditolak")
-
+            st.write(f"Kandidat dengan City Development Index {value} ditolak")
+                    
     st.write(f"Akurasi model: {accuracy * 100:.2f}%")
     st.write(report)
 
