@@ -79,6 +79,9 @@ def main():
 
     st.write("Masukkan fitur-fitur untuk memprediksi apakah kandidat diterima:")
 
+    enrollee_id = st.text_input("Enrollee ID")
+    gender = st.selectbox("Gender", ["Male", "Female"])
+
     city_development_index = st.slider("City Development Index", min_value=0.0, max_value=1.0, step=0.001, format="%.3f")
     enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()), index=0)
     enrolled_university = enrolled_university_mapping[enrolled_university]
