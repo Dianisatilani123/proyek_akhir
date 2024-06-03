@@ -48,7 +48,7 @@ relevent_experience_mapping = {
     'Has relevent experience': 1,
     'No relevent experience': 0
 }
-data['relevant_experience'] = data['relevant_experience'].map(relevent_experience_mapping)
+data['relevent_experience'] = data['relevent_experience'].map(relevent_experience_mapping)
 
 # Encoding education_level menjadi numerik
 education_level_mapping = {
