@@ -62,10 +62,10 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_
 
 scaler = StandardScaler()
 X_train_array = X_train.to_numpy()
-X_train = scaler.fit_transform(X_train_array.reshape(-1, 4))  # Reshape to 2D array
+X_train = scaler.fit_transform(X_train_array)  # No need to reshape
 
 X_test_array = X_test.to_numpy()
-X_test = scaler.transform(X_test_array.reshape(-1, 4))  # Reshape to 2D array
+X_test = scaler.transform(X_test_array)  # No need to reshape
 
 # Membuat model menggunakan algoritma Logistic Regression
 model = LogisticRegression(max_iter=1000)
@@ -95,7 +95,7 @@ def predict_acceptance(input_data):
     input_data[1] = enrolled_university_mapping[input_data[1]]
     input_data[2] = education_level_mapping[input_data[2]]
     input_data = np.array(input_data, dtype=float)  # Convert to float array
-    input_data = scaler.transform([input_data])  # Reshape and transform
+    input_data = scaler.transform([input_data])  # Reshape to 2D array and transform
     prediction = model.predict(input_data)
     return prediction
 
