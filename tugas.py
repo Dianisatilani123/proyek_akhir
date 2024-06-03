@@ -82,7 +82,7 @@ def main():
     enrollee_id = st.text_input("Enrollee ID")
     gender = st.selectbox("Gender", ["Male", "Female"])
 
-    city_development_index = st.number_input("City Development Index", min_value=0.0, max_value=1.0, step=0.01)
+    city_development_index = st.number_input("City Development Index", min_value=0.0, step=0.01)
     enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()), index=0)
     enrolled_university = enrolled_university_mapping[enrolled_university]
     last_new_job = st.selectbox("Last New Job", list(last_new_job_mapping.keys()), index=0)
