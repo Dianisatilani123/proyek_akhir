@@ -10,14 +10,21 @@ import streamlit as st
 
 # 2. Load dataset
 data = pd.read_csv('aug_train.csv')
-# Tampilkan beberapa baris pertama dari dataset untuk memahami strukturnya
-print(data.head())
+
+# Check the column names
+print(data.columns)
 
 # 3. Standarisasi data
 # Pilih fitur yang relevan dan target
 features = ['gender', 'education_level', 'experience', 'city_development_index', 
             'elevent_experience', 'enrolled_university', 'last_new_job', 'training_hours']
 target = 'target'
+
+# Check if all columns exist in the dataset
+for column in features + [target]:
+    if column not in data.columns:
+        print(f"Column '{column}' does not exist in the dataset.")
+        exit()
 
 # Menghapus baris dengan nilai yang hilang pada fitur yang dipilih dan target
 data = data.dropna(subset=features + [target])
