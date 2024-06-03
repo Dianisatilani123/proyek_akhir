@@ -1,28 +1,23 @@
-# 1. Tentukan library yang digunakan
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
+from sklearn.impute import SimpleImputer
 import streamlit as st
 
-# 2. Load dataset
+# Load dataset
 data = pd.read_csv('aug_train.csv')
-# Tampilkan beberapa baris pertama dari dataset untuk memahami strukturnya
 print(data.head())
 
-# 3. Standarisasi data
-# Pilih fitur yang relevan dan target
-features = ['enrollee_id', 'city_development_index', 'experience', 
-            'enrolled_university', 'last_new_job', 'training_hours']
+# Standarisasi data
+features = ['city_development_index', 'enrolled_university', 
+            'last_new_job', 'training_hours']
 target = 'target'
 
 # Menghapus baris dengan nilai yang hilang pada fitur yang dipilih dan target
 data = data.dropna(subset=features + [target])
-
-# Encoding experience menjadi numerik
-data['experience'] = data['experience'].map({'Has relevent experience': 1, 'No relevent experience': 0})
 
 # Encoding enrolled_university menjadi numerik
 enrolled_university_mapping = {
@@ -39,71 +34,68 @@ last_new_job_mapping = {
 }
 data['last_new_job'] = data['last_new_job'].map(last_new_job_mapping)
 
-# 4. Split data train dan test
+# Split data train dan test
 X = data[features]
 y = data[target]
 
-X = X.replace([np.inf, -np.inf], np.nan).dropna()
-y = y[X.index]
+# Check for infinity values
+inf_count = np.isinf(X).sum().sum()
+neginf_count = np.isneginf(X).sum().sum()
+if inf_count > 0 or neginf_count > 0:
+    print(f"Found {inf_count} infinity values and {neginf_count} negative infinity values.")
+    X = X.replace([np.inf, -np.inf], np.nan)
 
-print("Shape of X after removing NaN values:", X.shape)
+# Check for missing values
+na_count = X.isna().sum().sum()
+if na_count > 0:
+    print(f"Found {na_count} missing values.")
+imputer = SimpleImputer(strategy='mean')
+X = imputer.fit_transform(X)
 
-if X.shape[0] == 0:
-    print("Error: X is empty after removing NaN values.")
-else:
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
+print("Shape of X after imputing NaN values:", X.shape)
 
-    # 5. Membuat model menggunakan algoritma Logistic Regression
-    model = LogisticRegression(max_iter=1000)
-    model.fit(X_train, y_train)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
-    # 6. Membuat model evaluasi untuk uji akurasi
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    report = classification_report(y_test, y_pred, zero_division=0)  # Set zero_division to 0
+# Membuat model menggunakan algoritma Logistic Regression
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train, y_train)
 
-    # 7. Membuat model untuk aplikasi
-    def predict_acceptance(input_data):
-        input_data = np.array(input_data).reshape(1, -1)
-        input_data = scaler.transform(input_data)
-        prediction = model.predict(input_data)
-        return prediction
+# Membuat model evaluasi untuk uji akurasi
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+report = classification_report(y_test, y_pred, zero_division=0)
 
-    # 8. Deploy aplikasi AI dengan streamlit
-    def main(accuracy, report):
-        st.title("AI Deteksi Bias Gender pada Perekrutan Kerja")
+def predict_acceptance(input_data):
+    input_data = np.array(input_data).reshape(1, -1)
+    input_data = scaler.transform(input_data)
+    prediction = model.predict(input_data)
+    return prediction
 
-        st.write("Masukkan fitur-fitur untuk memprediksi apakah kandidat diterima:")
+def main():
+    st.title("AI Deteksi Bias Gender pada Perekrutan Kerja")
 
-        enrollee_id = st.text_input("Enrollee ID")
-        city_development_index = st.number_input("City Development Index", min_value=0.0, max_value=1.0, step=0.001, format="%.3f")
-        relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
-        relevent_experience = 1 if relevent_experience == "Has relevent experience" else 0
-        enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()))
-        enrolled_university = enrolled_university_mapping[enrolled_university]
-        last_new_job = st.selectbox("Last New Job", list(last_new_job_mapping.keys()))
-        last_new_job = last_new_job_mapping[last_new_job]
-        training_hours = st.number_input("Training Hours", min_value=0, step=1)
+    st.write("Masukkan fitur-fitur untuk memprediksi apakah kandidat diterima:")
 
-        gender = st.selectbox("Gender", ["Male", "Female"])  # Inputan gender masih ada, tapi tidak mempengaruhi prediksi
+    city_development_index = st.slider("City Development Index", min_value=0.0, max_value=1.0, step=0.001, format="%.3f")
+    enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()), index=0)
+    enrolled_university = enrolled_university_mapping[enrolled_university]
+    last_new_job = st.selectbox("Last New Job", list(last_new_job_mapping.keys()), index=0)
+    last_new_job = last_new_job_mapping[last_new_job]
+    training_hours = st.slider("Training Hours", min_value=0, step=1)
 
-        if st.button("Prediksi"):
-            result = predict_acceptance([enrollee_id, city_development_index, relevent_experience, 
-                                         enrolled_university, last_new_job, training_hours])
-            if result == 1:
-                st.success("Kandidat diterima")
-            else:
-                st.error("Kandidat ditolak")
-
-        st.write(f"Akurasi model: {accuracy * 100:.2f}%")
-        st.write("Laporan Klasifikasi:")
-        st.text(report)
-
-    if __name__ == "__main__":
-        if X.shape[0]!= 0:
-            main(accuracy, report)
+    if st.button("Prediksi"):
+        result = predict_acceptance([city_development_index, enrolled_university, 
+                                     last_new_job, training_hours])
+        if result == 1:
+            st.write("Kandidat diterima")
         else:
-            st.write("Error: X is empty after removing NaN values.")
+            st.write("Kandidat ditolak")
+
+    st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+    st.write(report)
+
+if __name__ == "__main__":
+    main()
