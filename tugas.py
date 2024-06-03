@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.impute import SimpleImputer
@@ -11,18 +11,10 @@ import streamlit as st
 data = pd.read_csv('aug_train.csv')
 print(data.head())
 
-# Print column names
-print("Column names:", data.columns)
-
-features = ['city_development_index', 'enrolled_university', 
-            'last_new_job', 'training_hours', 'relevent_experience', 'education_level', 'major_discipline', 'experience']
-target = 'target'
-
-for feature in features + [target]:
-    if feature not in data.columns:
-        raise ValueError(f"Column '{feature}' does not exist in the dataset.")
-
 # Standarisasi data
+features = ['city_development_index', 'enrolled_university', 
+            'last_new_job', 'training_hours']
+target = 'target'
 
 # Menghapus baris dengan nilai yang hilang pada fitur yang dipilih dan target
 data = data.dropna(subset=features + [target])
@@ -42,63 +34,27 @@ last_new_job_mapping = {
 }
 data['last_new_job'] = data['last_new_job'].map(last_new_job_mapping)
 
-# Encoding relevent_experience menjadi numerik
-relevent_experience_mapping = {
-    'Has relevent experience': 1,
-    'No relevent experience': 0
-}
-data['relevent_experience'] = data['relevent_experience'].map(relevent_experience_mapping)
-
-# Encoding education_level menjadi numerik
-education_level_mapping = {
-    'Graduate': 1,
-    'Masters': 2,
-    'Phd': 3,
-    'High School': 0
-}
-data['education_level'] = data['education_level'].map(education_level_mapping)
-
-# Encoding major_discipline menjadi numerik
-major_discipline_mapping = {
-    'STEM': 1,
-    'Business': 2,
-    'Humanities': 3,
-    'Others': 0
-}
-data['major_discipline'] = data['major_discipline'].map(major_discipline_mapping)
-
-# Encoding experience menjadi numerik
-le = LabelEncoder()
-data['experience'] = le.fit_transform(data['experience'])
-
 # Split data train dan test
 X = data[features]
 y = data[target]
 
 # Check for infinity values
-inf_count = 0
-neginf_count = 0
-for col in X.columns:
-    if X[col].dtype.kind in 'bifc':  # Check if column is numeric
-        X_array = X[col].to_numpy()  # Convert column to a numpy array
-        inf_count += np.isinf(X_array).sum()
-        neginf_count += np.sum(np.isinf(-X_array))
+inf_count = np.isinf(X).sum().sum()
+neginf_count = np.isneginf(X).sum().sum()
 if inf_count > 0 or neginf_count > 0:
     print(f"Found {inf_count} infinity values and {neginf_count} negative infinity values.")
-    X = X.replace([np.inf, -np.inf], np.nan)  # Replace infinity values with NaN
+    X = X.replace([np.inf, -np.inf], np.nan)
 
 # Check for missing values
 na_count = X.isna().sum().sum()
 if na_count > 0:
     print(f"Found {na_count} missing values.")
-    imputer = SimpleImputer(strategy='mean')
-    X_array = imputer.fit_transform(X)  # Fit and transform
-else:
-    X_array = X.to_numpy()  # Convert to numpy array if no missing values.
+imputer = SimpleImputer(strategy='mean')
+X = imputer.fit_transform(X)
 
-print("Shape of X after imputing NaN values:", X_array.shape)
+print("Shape of X after imputing NaN values:", X.shape)
 
-X_train, X_test, y_train, y_test = train_test_split(X_array, y, test_size=0.1, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
@@ -114,11 +70,8 @@ report = classification_report(y_test, y_pred, zero_division=0)
 
 def predict_acceptance(input_data):
     input_data = np.array(input_data).reshape(1, -1)
-    print(f"Input data before scaling: {input_data}")
     input_data = scaler.transform(input_data)
-    print(f"Input data after scaling: {input_data}")
     prediction = model.predict(input_data)
-    print(f"Prediction: {prediction}")
     return prediction
 
 def main():
@@ -126,42 +79,23 @@ def main():
 
     st.write("Masukkan fitur-fitur untuk memprediksi apakah kandidat diterima:")
 
-    enrollee_id = st.text_input("Enrollee ID")
-    gender = st.selectbox("Gender", ["Male", "Female"])
-
-    city_development_index = st.text_input("City Development Index")
+    city_development_index = st.slider("City Development Index", min_value=0.0, max_value=1.0, step=0.001, format="%.3f")
     enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()), index=0)
     enrolled_university = enrolled_university_mapping[enrolled_university]
     last_new_job = st.selectbox("Last New Job", list(last_new_job_mapping.keys()), index=0)
     last_new_job = last_new_job_mapping[last_new_job]
-    training_hours = st.number_input("Training Hours", min_value=0, step=1)
-    relevent_experience = st.selectbox("Relevent Experience", list(relevent_experience_mapping.keys()), index=0)
-    relevent_experience = relevent_experience_mapping[relevent_experience]
-    education_level = st.selectbox("Education Level", list(education_level_mapping.keys()), index=0)
-    education_level = education_level_mapping[education_level]
-    major_discipline = st.selectbox("Major Discipline", list(major_discipline_mapping.keys()), index=0)
-    major_discipline = major_discipline_mapping[major_discipline]
-    experience = st.selectbox("Experience", le.classes_, index=0)
-    experience = le.transform([experience])[0]
+    training_hours = st.slider("Training Hours", min_value=0, step=1)
 
     if st.button("Prediksi"):
-        result = predict_acceptance([float(city_development_index), enrolled_university, 
-                                     last_new_job, training_hours, relevent_experience, education_level, major_discipline, experience])
+        result = predict_acceptance([city_development_index, enrolled_university, 
+                                     last_new_job, training_hours])
         if result == 1:
             st.write("Kandidat diterima")
         else:
             st.write("Kandidat ditolak")
-        print(f"Predicted result for the given input: {result}")
 
     st.write(f"Akurasi model: {accuracy * 100:.2f}%")
     st.write(report)
 
 if __name__ == "__main__":
-    # Check the prediction for the first row of the dataset
-    first_row = X.iloc[0].values.reshape(1, -1)
-    first_row_scaled = scaler.transform(first_row)
-    first_prediction = model.predict(first_row_scaled)
-    print(f"First row actual target: {y.iloc[0]}")
-    print(f"First row prediction: {first_prediction}")
-
     main()
