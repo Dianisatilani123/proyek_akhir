@@ -11,10 +11,16 @@ import streamlit as st
 data = pd.read_csv('aug_train.csv')
 print(data.head())
 
-# Standarisasi data
+# Check if all features and target exist in the dataset
 features = ['city_development_index', 'enrolled_university', 
-            'last_new_job', 'training_hours', 'elevent_experience', 'education_level', 'ajor_discipline', 'experience']
+            'last_new_job', 'training_hours', 'relevent_experience', 'education_level', 'major_discipline', 'experience']
 target = 'target'
+
+for feature in features + [target]:
+    if feature not in data.columns:
+        raise ValueError(f"Column '{feature}' does not exist in the dataset.")
+
+# Standarisasi data
 
 # Menghapus baris dengan nilai yang hilang pada fitur yang dipilih dan target
 data = data.dropna(subset=features + [target])
