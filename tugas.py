@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.impute import SimpleImputer
@@ -15,7 +15,7 @@ print(data.head())
 print("Column names:", data.columns)
 
 features = ['city_development_index', 'enrolled_university', 
-            'last_new_job', 'training_hours', 'relevent_experience', 'education_level', 'major_discipline', 'experience']
+            'last_new_job', 'training_hours', 'elevent_experience', 'education_level', 'ajor_discipline', 'experience']
 target = 'target'
 
 for feature in features + [target]:
@@ -67,6 +67,10 @@ major_discipline_mapping = {
 }
 data['major_discipline'] = data['major_discipline'].map(major_discipline_mapping)
 
+# Encoding experience menjadi numerik
+le = LabelEncoder()
+data['experience'] = le.fit_transform(data['experience'])
+
 # Split data train dan test
 X = data[features]
 y = data[target]
@@ -87,9 +91,8 @@ if inf_count > 0 or neginf_count > 0:
 na_count = X.isna().sum().sum()
 if na_count > 0:
     print(f"Found {na_count} missing values.")
-    X_array = X.to_numpy()  # Convert to numpy array
     imputer = SimpleImputer(strategy='mean')
-    X_array = imputer.fit_transform(X_array)  # Fit and transform
+    X_array = imputer.fit_transform(X)  # Fit and transform
 else:
     X_array = X.to_numpy()  # Convert to numpy array if no missing values.
 
@@ -135,7 +138,8 @@ def main():
     education_level = education_level_mapping[education_level]
     major_discipline = st.selectbox("Major Discipline", list(major_discipline_mapping.keys()), index=0)
     major_discipline = major_discipline_mapping[major_discipline]
-    experience = st.number_input("Experience", min_value=0, step=1)
+    experience = st.selectbox("Experience", le.classes_, index=0)
+    experience = le.transform([experience])[0]
 
     if st.button("Prediksi"):
         result = predict_acceptance([float(city_development_index), enrolled_university, 
