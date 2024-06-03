@@ -51,8 +51,10 @@ if inf_count > 0 or neginf_count > 0:
 na_count = X.isna().sum().sum()
 if na_count > 0:
     print(f"Found {na_count} missing values.")
-imputer = SimpleImputer(strategy='mean')
-X = imputer.fit_transform(X)
+    imputer = SimpleImputer(strategy='most_frequent')  # Use most frequent strategy
+    X[['relevent_experience', 'enrolled_university', 'education_level']] = imputer.fit_transform(X[['relevent_experience', 'enrolled_university', 'education_level']])
+    imputer = SimpleImputer(strategy='mean')  # Use mean strategy for numeric columns
+    X[['training_hours']] = imputer.fit_transform(X[['training_hours']])
 
 print("Shape of X after imputing NaN values:", X.shape)
 
@@ -71,6 +73,23 @@ accuracy = accuracy_score(y_test, y_pred)
 report = classification_report(y_test, y_pred, zero_division=0)
 
 def predict_acceptance(input_data):
+    relevent_experience_mapping = {
+        "Has relevent experience": 1,
+        "No relevent experience": 0
+    }
+    enrolled_university_mapping = {
+        'no_enrollment': 0,
+        'Full time course': 1,
+        'Part time course': 2
+    }
+    education_level_mapping = {
+        'Graduate': 0,
+        'Masters': 1,
+        'Phd': 2
+    }
+    input_data[0] = relevent_experience_mapping[input_data[0]]
+    input_data[1] = enrolled_university_mapping[input_data[1]]
+    input_data[2] = education_level_mapping[input_data[2]]
     input_data = np.array(input_data).reshape(1, -1)
     input_data = scaler.transform(input_data)
     prediction = model.predict(input_data)
