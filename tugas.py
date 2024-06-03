@@ -90,8 +90,8 @@ def predict_acceptance(input_data):
     input_data[0] = relevent_experience_mapping[input_data[0]]
     input_data[1] = enrolled_university_mapping[input_data[1]]
     input_data[2] = education_level_mapping[input_data[2]]
-    input_data = np.array(input_data).reshape(1, -1)
-    input_data = scaler.transform(input_data)
+    input_data = np.array(input_data, dtype=float)  # Convert to float array
+    input_data = scaler.transform([input_data])  # Reshape and transform
     prediction = model.predict(input_data)
     return prediction
 
@@ -106,12 +106,12 @@ def main():
 
     training_hours = st.slider("Training Hours", min_value=0, step=1)
 
-    if st.button("Prediksi"):
-        result = predict_acceptance([relevent_experience, enrolled_university, education_level, training_hours])
-        if result == 1:
-            st.write("Kandidat diterima")
-        else:
-            st.write("Kandidat ditolak")
+  if st.button("Prediksi"):
+    result = predict_acceptance([relevent_experience, enrolled_university, education_level, training_hours])
+    if result == 1:
+        st.write("Kandidat diterima")
+    else:
+        st.write("Kandidat ditolak")
 
     st.write(f"Akurasi model: {accuracy * 100:.2f}%")
     st.write(report)
