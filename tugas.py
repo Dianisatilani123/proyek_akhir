@@ -35,6 +35,13 @@ education_level_mapping = {
 }
 data['education_level'] = data['education_level'].map(education_level_mapping)
 
+# Convert relevent_experience to numeric (assuming it was 'Has relevent experience' and 'No relevent experience')
+relevent_experience_mapping = {
+    'Has relevent experience': 1,
+    'No relevent experience': 0
+}
+data['relevent_experience'] = data['relevent_experience'].map(relevent_experience_mapping)
+
 # Split data into train and test
 X = data[features]
 y = data[target]
@@ -57,6 +64,9 @@ if na_count > 0:
     X[['training_hours']] = imputer.fit_transform(X[['training_hours']])
 
 print("Shape of X after imputing NaN values:", X.shape)
+
+# Ensure all columns are numeric
+X = X.astype(float)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
 
