@@ -11,7 +11,11 @@ import streamlit as st
 data = pd.read_csv('aug_train.csv')
 print(data.head())
 
-# Standardize data
+# Define all features including gender and enrollee_id
+all_features = ['enrollee_id', 'relevent_experience', 'enrolled_university', 
+                'education_level', 'training_hours', 'gender']
+
+# Define features for model training
 features = ['relevent_experience', 'enrolled_university', 
             'education_level', 'training_hours']
 target = 'target'
@@ -41,6 +45,14 @@ relevent_experience_mapping = {
     'No relevent experience': 0
 }
 data['relevent_experience'] = data['relevent_experience'].map(relevent_experience_mapping)
+
+# Encode gender to numeric
+gender_mapping = {
+    'Male': 0,
+    'Female': 1,
+    'Other': 2
+}
+data['gender'] = data['gender'].map(gender_mapping)
 
 # Split data into train and test
 X = data[features]
@@ -117,13 +129,15 @@ def predict_acceptance(input_data):
         'Masters': 1,
         'Phd': 2
     }
-    input_data[0] = relevent_experience_mapping[input_data[0]]
-    input_data[1] = enrolled_university_mapping[input_data[1]]
-    input_data[2] = education_level_mapping[input_data[2]]
-    input_data = np.array(input_data, dtype=float)  # Convert to float array
-    input_data = input_data.reshape(1, -1)  # Reshape to 2D array
-    input_data = scaler.transform(input_data)  # Transform input data
-    prediction = model.predict(input_data)
+    input_data[1] = relevent_experience_mapping[input_data[1]]
+    input_data[2] = enrolled_university_mapping[input_data[2]]
+    input_data[3] = education_level_mapping[input_data[3]]
+    # Gender and enrollee_id are not used in prediction, so remove them
+    input_features = input_data[1:5]
+    input_features = np.array(input_features, dtype=float)  # Convert to float array
+    input_features = input_features.reshape(1, -1)  # Reshape to 2D array
+    input_features = scaler.transform(input_features)  # Transform input data
+    prediction = model.predict(input_features)
     return prediction
 
 def main():
@@ -134,15 +148,16 @@ def main():
 
     st.write("Masukkan fitur-fitur untuk memprediksi apakah kandidat diterima:")
 
+    enrollee_id = st.text_input("Enrollee ID", "")
     relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
     enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()), index=0)
     education_level = st.selectbox("Education Level", list(education_level_mapping.keys()), index=0)
-
+    gender = st.selectbox("Gender", list(gender_mapping.keys()), index=0)
     training_hours = st.slider("Training Hours", min_value=0, step=1)
 
     if st.button("Prediksi"):
         try:
-            result = predict_acceptance([relevent_experience, enrolled_university, education_level, training_hours])
+            result = predict_acceptance([enrollee_id, relevent_experience, enrolled_university, education_level, training_hours, gender])
             if result == 1:
                 st.write("Kandidat diterima")
             else:
