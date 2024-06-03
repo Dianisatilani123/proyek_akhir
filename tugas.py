@@ -5,26 +5,17 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
-from sklearn.impute import SimpleImputer
 import streamlit as st
 
 # 2. Load dataset
 data = pd.read_csv('aug_train.csv')
-
-# Check the column names
-print(data.columns)
+# Tampilkan beberapa baris pertama dari dataset untuk memahami strukturnya
+print(data.head())
 
 # 3. Standarisasi data
 # Pilih fitur yang relevan dan target
-features = ['gender', 'education_level', 'experience', 'city_development_index', 
-            'elevent_experience', 'enrolled_university', 'last_new_job', 'training_hours']
+features = ['gender', 'education_level', 'experience', 'city_development_index']
 target = 'target'
-
-# Check if all columns exist in the dataset
-for column in features + [target]:
-    if column not in data.columns:
-        print(f"Column '{column}' does not exist in the dataset.")
-        exit()
 
 # Menghapus baris dengan nilai yang hilang pada fitur yang dipilih dan target
 data = data.dropna(subset=features + [target])
@@ -50,29 +41,12 @@ experience_mapping = {
 }
 data['experience'] = data['experience'].map(experience_mapping)
 
-# Encoding relevent_experience menjadi numerik
-data['relevent_experience'] = data['relevent_experience'].map({'Has relevent experience': 1, 'No relevent experience': 0})
-
-# Encoding enrolled_university menjadi numerik
-enrolled_university_mapping = {
-    'no_enrollment': 0,
-    'Full time course': 1,
-    'Part time course': 2
-}
-data['enrolled_university'] = data['enrolled_university'].map(enrolled_university_mapping)
-
-# Encoding last_new_job menjadi numerik
-last_new_job_mapping = {
-    'never': 0,
-    '1': 1, '2': 2, '3': 3, '4': 4, '>4': 5
-}
-data['last_new_job'] = data['last_new_job'].map(last_new_job_mapping)
-
 # Memisahkan fitur dan target
 X = data[features]
 y = data[target]
 
-# Impute missing values
+# Impute missing values with mean
+from sklearn.impute import SimpleImputer
 imputer = SimpleImputer(strategy='mean')
 X_imputed = imputer.fit_transform(X)
 
@@ -95,8 +69,6 @@ report = classification_report(y_test, y_pred)
 # 7. Membuat model untuk aplikasi
 def predict_acceptance(input_data):
     input_data = np.array(input_data).reshape(1, -1)
-    relevent_experience = 1 if input_data[0, 4] == "Has relevent experience" else 0
-    input_data[0, 4] = relevent_experience
     input_data = scaler.transform(input_data)
     prediction = model.predict(input_data)
     return prediction
@@ -112,20 +84,12 @@ def main():
     education_level = education_level_mapping[education_level]
     experience = st.selectbox("Experience", list(experience_mapping.keys()))
     experience = experience_mapping[experience]
-    relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
-    enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()))
-    enrolled_university = enrolled_university_mapping[enrolled_university]
-    last_new_job = st.selectbox("Last New Job", list(last_new_job_mapping.keys()))
-    last_new_job = last_new_job_mapping[last_new_job]
-    training_hours = st.number_input("Training Hours", min_value=0, step=1)
     
     gender = st.selectbox("Gender", ["Male", "Female"])
     gender = 0 if gender == "Male" else 1
     
     if st.button("Prediksi"):
-        input_data = [gender, education_level, experience, city_development_index, 
-                      relevent_experience, enrolled_university, last_new_job, training_hours]
-        result = predict_acceptance(input_data)
+        result = predict_acceptance([gender, education_level, experience, city_development_index])
         if result == 1:
             st.success("Kandidat diterima")
         else:
