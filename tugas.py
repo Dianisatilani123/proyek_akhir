@@ -13,7 +13,7 @@ print(data.head())
 
 # Standarisasi data
 features = ['city_development_index', 'enrolled_university', 
-            'last_new_job', 'training_hours']
+            'last_new_job', 'training_hours', 'relevent_experience', 'education_level', 'major_discipline', 'experience']
 target = 'target'
 
 # Menghapus baris dengan nilai yang hilang pada fitur yang dipilih dan target
@@ -33,6 +33,31 @@ last_new_job_mapping = {
     '1': 1, '2': 2, '3': 3, '4': 4, '>4': 5
 }
 data['last_new_job'] = data['last_new_job'].map(last_new_job_mapping)
+
+# Encoding relevent_experience menjadi numerik
+relevent_experience_mapping = {
+    'Has relevent experience': 1,
+    'No relevent experience': 0
+}
+data['relevent_experience'] = data['relevent_experience'].map(relevent_experience_mapping)
+
+# Encoding education_level menjadi numerik
+education_level_mapping = {
+    'Graduate': 1,
+    'Masters': 2,
+    'Phd': 3,
+    'High School': 0
+}
+data['education_level'] = data['education_level'].map(education_level_mapping)
+
+# Encoding major_discipline menjadi numerik
+major_discipline_mapping = {
+    'STEM': 1,
+    'Business': 2,
+    'Humanities': 3,
+    'Others': 0
+}
+data['major_discipline'] = data['major_discipline'].map(major_discipline_mapping)
 
 # Split data train dan test
 X = data[features]
@@ -88,10 +113,17 @@ def main():
     last_new_job = st.selectbox("Last New Job", list(last_new_job_mapping.keys()), index=0)
     last_new_job = last_new_job_mapping[last_new_job]
     training_hours = st.number_input("Training Hours", min_value=0, step=1)
+    relevent_experience = st.selectbox("Relevent Experience", list(relevent_experience_mapping.keys()), index=0)
+    relevent_experience = relevent_experience_mapping[relevent_experience]
+    education_level = st.selectbox("Education Level", list(education_level_mapping.keys()), index=0)
+    education_level = education_level_mapping[education_level]
+    major_discipline = st.selectbox("Major Discipline", list(major_discipline_mapping.keys()), index=0)
+    major_discipline = major_discipline_mapping[major_discipline]
+    experience = st.number_input("Experience", min_value=0, step=1)
 
     if st.button("Prediksi"):
         result = predict_acceptance([float(city_development_index), enrolled_university, 
-                                     last_new_job, training_hours])
+                                     last_new_job, training_hours, relevent_experience, education_level, major_discipline, experience])
         if result == 1:
             st.write("Kandidat diterima")
         else:
