@@ -62,10 +62,10 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_
 
 scaler = StandardScaler()
 X_train_array = X_train.to_numpy()
-X_train = scaler.fit_transform(X_train_array)
+X_train = scaler.fit_transform(X_train_array.reshape(-1, 4))  # Reshape to 2D array
 
 X_test_array = X_test.to_numpy()
-X_test = scaler.transform(X_test_array)
+X_test = scaler.transform(X_test_array.reshape(-1, 4))  # Reshape to 2D array
 
 # Membuat model menggunakan algoritma Logistic Regression
 model = LogisticRegression(max_iter=1000)
