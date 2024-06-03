@@ -35,7 +35,7 @@ education_level_mapping = {
 }
 data['education_level'] = data['education_level'].map(education_level_mapping)
 
-# Convert relevent_experience to numeric (assuming it was 'Has relevent experience' and 'No relevent experience')
+# Convert relevent_experience to numeric
 relevent_experience_mapping = {
     'Has relevent experience': 1,
     'No relevent experience': 0
