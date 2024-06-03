@@ -11,9 +11,12 @@ import streamlit as st
 data = pd.read_csv('aug_train.csv')
 print(data.head())
 
+# Print column names
+print("Column names:", data.columns)
+
 # Check if all features and target exist in the dataset
 features = ['city_development_index', 'enrolled_university', 
-            'last_new_job', 'training_hours', 'elevent_experience', 'education_level', 'ajor_discipline', 'experience']
+            'last_new_job', 'training_hours', 'relevant_experience', 'education_level', 'major_discipline', 'experience']
 target = 'target'
 
 for feature in features + [target]:
@@ -45,7 +48,7 @@ relevent_experience_mapping = {
     'Has relevent experience': 1,
     'No relevent experience': 0
 }
-data['relevent_experience'] = data['relevent_experience'].map(relevent_experience_mapping)
+data['relevant_experience'] = data['relevant_experience'].map(relevent_experience_mapping)
 
 # Encoding education_level menjadi numerik
 education_level_mapping = {
