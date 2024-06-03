@@ -114,8 +114,11 @@ report = classification_report(y_test, y_pred, zero_division=0)
 
 def predict_acceptance(input_data):
     input_data = np.array(input_data).reshape(1, -1)
+    print(f"Input data before scaling: {input_data}")
     input_data = scaler.transform(input_data)
+    print(f"Input data after scaling: {input_data}")
     prediction = model.predict(input_data)
+    print(f"Prediction: {prediction}")
     return prediction
 
 def main():
@@ -148,9 +151,17 @@ def main():
             st.write("Kandidat diterima")
         else:
             st.write("Kandidat ditolak")
+        print(f"Predicted result for the given input: {result}")
 
     st.write(f"Akurasi model: {accuracy * 100:.2f}%")
     st.write(report)
 
 if __name__ == "__main__":
+    # Check the prediction for the first row of the dataset
+    first_row = X.iloc[0].values.reshape(1, -1)
+    first_row_scaled = scaler.transform(first_row)
+    first_prediction = model.predict(first_row_scaled)
+    print(f"First row actual target: {y.iloc[0]}")
+    print(f"First row prediction: {first_prediction}")
+
     main()
