@@ -12,8 +12,8 @@ data = pd.read_csv('aug_train.csv')
 print(data.head())
 
 # Standarisasi data
-features = ['city_development_index', 'enrolled_university', 
-            'last_new_job', 'training_hours']
+features = ['relevent_experience', 'enrolled_university', 
+            'education_level', 'training_hours']
 target = 'target'
 
 # Menghapus baris dengan nilai yang hilang pada fitur yang dipilih dan target
@@ -27,12 +27,13 @@ enrolled_university_mapping = {
 }
 data['enrolled_university'] = data['enrolled_university'].map(enrolled_university_mapping)
 
-# Encoding last_new_job menjadi numerik
-last_new_job_mapping = {
-    'never': 0,
-    '1': 1, '2': 2, '3': 3, '4': 4, '>4': 5
+# Encoding education_level menjadi numerik
+education_level_mapping = {
+    'Graduate': 0,
+    'Masters': 1,
+    'Phd': 2
 }
-data['last_new_job'] = data['last_new_job'].map(last_new_job_mapping)
+data['education_level'] = data['education_level'].map(education_level_mapping)
 
 # Split data train dan test
 X = data[features]
@@ -79,16 +80,18 @@ def main():
 
     st.write("Masukkan fitur-fitur untuk memprediksi apakah kandidat diterima:")
 
-    city_development_index = st.slider("City Development Index", min_value=0.0, max_value=1.0, step=0.001, format="%.3f")
+    enrollee_id = st.text_input("Enrollee ID")
+    relevent_experience = st.slider("Relevent Experience", min_value=0, max_value=10, step=1)
     enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()), index=0)
     enrolled_university = enrolled_university_mapping[enrolled_university]
-    last_new_job = st.selectbox("Last New Job", list(last_new_job_mapping.keys()), index=0)
-    last_new_job = last_new_job_mapping[last_new_job]
+    education_level = st.selectbox("Education Level", list(education_level_mapping.keys()), index=0)
+    education_level = education_level_mapping[education_level]
     training_hours = st.slider("Training Hours", min_value=0, step=1)
+    gender = st.selectbox("Gender", ["Male", "Female"])
 
     if st.button("Prediksi"):
-        result = predict_acceptance([city_development_index, enrolled_university, 
-                                     last_new_job, training_hours])
+        result = predict_acceptance([relevent_experience, enrolled_university, 
+                                     education_level, training_hours])
         if result == 1:
             st.write("Kandidat diterima")
         else:
