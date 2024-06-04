@@ -120,6 +120,7 @@ def predict_acceptance(input_data):
     input_features = input_features.reshape(1, -1)  # Reshape to 2D array
     input_features = scaler.transform(input_features)  # Transform input data
     prediction = svm.predict(input_features)
+    # Return prediction based on dataset target labels
     return prediction[0]
 
 def main():
