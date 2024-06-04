@@ -88,7 +88,8 @@ print(confusion_matrix(y_test, y_pred))
 st.title("Aplikasi Rekrutmen AI")
 st.write("Masukkan data kandidat untuk memprediksi kelayakan")
 
-city_development_index = st.slider("City Development Index", 0.0, 0.926001, 0.5, step=0.001)
+city_development_index = st.selectbox("City Development Index", [0.624, 0.762, 0.764, 0.767, 0.776, 0.789, 0.804, 0.827, 0.843, 0.913, 0.92, 0.926]
+)
 relevent_experience = st.selectbox("Relevent Experience", possible_relevent_experience)
 enrolled_university = st.selectbox("Enrolled University", possible_enrolled_university)
 education_level = st.selectbox("Education Level", possible_education_level)
