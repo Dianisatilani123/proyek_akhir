@@ -137,17 +137,18 @@ def main():
     education_level = st.selectbox("Education Level", ['Graduate', 'Masters', 'Phd'])
     training_hours = st.slider("Training Hours", min_value=0, step=1)
 
-    if st.button("Prediksi"):
-        try:
-            result = predict_acceptance([relevent_experience, enrolled_university, education_level, training_hours])
-            if result == 1:
-                st.write("Kandidat diterima")
-            else:
-                st.write("Kandidat ditolak")
-            st.write(f"Akurasi model: {accuracy * 100:.2f}%")
-            st.write(report)
-        except Exception as e:
-            st.write("Error:", str(e))
+if st.button("Prediksi"):
+    try:
+        result = predict_acceptance([relevent_experience, enrolled_university, education_level, gender, training_hours])
+        if result == 1:
+            st.write("Kandidat diterima")
+        else:
+            st.write("Kandidat ditolak")
+        st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+        st.write(report)
+    except Exception as e:
+        st.write("Error:", str(e))
+
 
 if __name__ == "__main__":
     main()
