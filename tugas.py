@@ -5,74 +5,53 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 import joblib
+import numpy as np
 
-# 1. Memuat data
+# 1. Load data
 data = pd.read_csv('aug_train.csv')
 print(data.head())
 
-# 2. Pra-pemrosesan data
-# Mengisi nilai yang hilang (jika ada)
-data.fillna('', inplace=True)
+# 2. Preprocess data
+# Fill missing values with mean
+data.fillna(data.mean(), inplace=True)
 
-# Encoder untuk fitur kategorikal
-label_encoders = {}
+# Encode categorical features
 categorical_features = ['city', 'gender', 'relevent_experience', 'enrolled_university', 'education_level', 'major_discipline', 'company_size', 'company_type', 'last_new_job']
-
+label_encoders = {}
 for feature in categorical_features:
     le = LabelEncoder()
     data[feature] = le.fit_transform(data[feature])
     label_encoders[feature] = le
 
-# Fitur dan target
+# Scale numerical features
+numeric_features = data.select_dtypes(include=['int', 'float']).columns
+scaler = StandardScaler()
+data[numeric_features] = scaler.fit_transform(data[numeric_features])
+
+# Split data into training and testing sets
 X = data.drop(['target', 'enrollee_id', 'gender'], axis=1)
 y = data['target']
-
-# Filter out non-numeric columns
-numeric_columns = X.select_dtypes(include=['int', 'float']).columns
-X_numeric = X[numeric_columns]
-
-# Standarisasi fitur numerik
-scaler = StandardScaler()
-X_numeric_scaled = scaler.fit_transform(X_numeric)
-
-# Reassign scaled numeric features to original DataFrame
-X[numeric_columns] = X_numeric_scaled
-
-# Membagi data menjadi set pelatihan dan pengujian
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# 3. Melatih model
+# 3. Train model
 model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train.values, y_train.values)
+model.fit(X_train, y_train)
 
-# 4. Membuat prediksi
+# 4. Make predictions
 def predict(data):
-    # Melakukan encoding untuk fitur kategorikal
+    # Encode categorical features
     for feature, le in label_encoders.items():
         data[feature] = le.transform([data[feature]])[0]
     
-    # Membuat dataframe dari input data
-    df = pd.DataFrame([data])
+    # Scale numerical features
+    numeric_features = data.select_dtypes(include=['int', 'float']).columns
+    data[numeric_features] = scaler.transform(data[numeric_features])
     
-    # Menghapus kolom yang tidak digunakan
-    df = df.drop(['enrollee_id', 'gender'], axis=1)
-    
-    # Filter out non-numeric columns
-    numeric_columns = df.select_dtypes(include=['int', 'float']).columns
-    df_numeric = df[numeric_columns]
-    
-    # Standarisasi fitur numerik
-    df_numeric_scaled = scaler.transform(df_numeric)
-    
-    # Reassign scaled numeric features to original DataFrame
-    df[numeric_columns] = df_numeric_scaled
-    
-    # Melakukan prediksi
-    prediction = model.predict(df)
-    
+    # Make prediction
+    prediction = model.predict(data)
     return prediction[0]
 
-# Streamlit antarmuka pengguna
+# Streamlit user interface
 st.title("Job Candidate Acceptance Prediction")
 
 enrollee_id = st.text_input("Enrollee ID")
@@ -108,7 +87,7 @@ if st.button("Predict"):
         'last_new_job': last_new_job,
         'training_hours': training_hours
     }
-    result = predict(data)
+    result = predict(pd.DataFrame([data]))
     if result == 1:
         st.success("The candidate is likely to be accepted.")
     else:
