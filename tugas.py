@@ -68,7 +68,7 @@ training_hours = st.number_input('Training Hours', min_value=0)
 input_data = pd.DataFrame({
     'city': [city],
     'city_development_index': [city_development_index],
-    'relevent_experience': [relevent_experience],
+    'elevent_experience': [relevent_experience],
     'enrolled_university': [enrolled_university],
     'education_level': [education_level],
     'experience': [experience],
@@ -79,7 +79,9 @@ input_data = pd.DataFrame({
 })
 
 # One-hot encoding untuk input data
-input_data = pd.get_dummies(input_data)
+input_data = pd.get_dummies(input_data, columns=['city', 'elevent_experience', 'enrolled_university', 'education_level', 'company_size', 'company_type', 'last_new_job'])
+
+# Reindexing untuk membuat kolom-kolom yang sama dengan kolom-kolom pada data training
 input_data = input_data.reindex(columns=X.columns, fill_value=0)
 
 # Prediksi
