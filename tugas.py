@@ -74,22 +74,25 @@ training_hours = st.number_input('Training Hours', min_value=0)
 # Create input data
 input_data = pd.DataFrame({
     'city_development_index': [city_development_index],
-    'relevent_experience': [1 if relevent_experience == 'Has relevent experience' else 0]
+    'elevent_experience': [1 if relevent_experience == 'Has relevent experience' else 0],
+    'experience': [experience],
+    'training_hours': [training_hours]
 }, index=[0])
 
-if 'enrolled_university' in df.columns:
-    input_data['enrolled_university_' + enrolled_university] = [1]
-if 'education_level' in df.columns:
-    input_data['education_level_' + education_level] = [1]
-if 'company_size' in df.columns:
-    input_data['company_size_' + company_size] = [1]
-if 'company_type' in df.columns:
-    input_data['company_type_' + company_type] = [1]
-if 'last_new_job' in df.columns:
-    input_data['last_new_job_' + last_new_job] = [1]
-
-input_data['experience'] = [experience]
-input_data['training_hours'] = [training_hours]
+# Add dummy columns for categorical variables
+for col in categorical_columns:
+    if col == 'enrolled_university':
+        input_data[f'enrolled_university_{enrolled_university}'] = [1]
+    elif col == 'education_level':
+        input_data[f'education_level_{education_level}'] = [1]
+    elif col == 'company_size':
+        input_data[f'company_size_{company_size}'] = [1]
+    elif col == 'company_type':
+        input_data[f'company_type_{company_type}'] = [1]
+    elif col == 'last_new_job':
+        input_data[f'last_new_job_{last_new_job}'] = [1]
+    else:
+        input_data[f'{col}_Unknown'] = [1]
 
 # Scale input data
 input_data[numeric_columns] = scaler.transform(input_data[numeric_columns])
