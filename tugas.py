@@ -83,9 +83,11 @@ X_test_scaled = scaler.transform(X_test)
 
 # Create and tune model using GridSearchCV
 param_grid = {
-    'n_estimators': [50, 100],
-    'max_depth': [5, 10, 20],
-    'min_samples_split': [2, 5, 10]
+    'n_estimators': [50, 100, 150],
+    'max_depth': [5, 10, 20, 30],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4],
+    'bootstrap': [True, False]
 }
 rf = RandomForestClassifier(random_state=42)
 grid_search = GridSearchCV(rf, param_grid, cv=5, n_jobs=-1, verbose=1)
