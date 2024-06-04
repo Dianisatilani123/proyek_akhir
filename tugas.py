@@ -112,17 +112,22 @@ def predict_acceptance(input_data):
         'Masters': 1,
         'Phd': 2
     }
+    gender_mapping = {
+        'Male': 0,
+        'Female': 1,
+        'Other': 2
+    }
+    
     input_data[1] = relevent_experience_mapping[input_data[1]]
     input_data[2] = enrolled_university_mapping[input_data[2]]
     input_data[3] = education_level_mapping[input_data[3]]
-    # Gender and enrollee_id are not used in prediction, so remove them
-    input_features = input_data[1:5]
-    input_features = np.array(input_features, dtype=float)  # Convert to float array
-    input_features = input_features.reshape(1, -1)  # Reshape to 2D array
+    input_data[5] = gender_mapping[input_data[5]]  # Update index to 5 for gender
+    input_features = input_data[1:5] + [input_data[5]]  # Include gender
+    input_features = np.array(input_features, dtype=float).reshape(1, -1)  # Convert to array and reshape
     input_features = scaler.transform(input_features)  # Transform input data
     prediction = svm.predict(input_features)
-    # Return prediction based on dataset target labels
     return prediction[0]
+
 
 def main():
     """
