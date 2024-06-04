@@ -93,8 +93,7 @@ input_data = pd.DataFrame({
 }, index=[0])
 
 # Add dummy columns for categorical variables
-input_data = pd.get_dummies(input_data, columns=['enrolled_university', 'education_level', 'ajor_discipline', 'last_new_job', 'gender'])
-
+input_data = pd.get_dummies(input_data, columns=['enrolled_university', 'education_level', 'major_discipline', 'last_new_job', 'gender'])
 # Ensure all columns are present
 for col in columns_after_dummies:
     if col not in input_data.columns:
