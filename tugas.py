@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import streamlit as st
 
 # Load dataset
@@ -30,67 +30,80 @@ else:
     X = data.drop('target', axis=1)
     y = data['target']
 
-    # Standardize the data
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
+    # Check if target variable is binary
+    if len(y.unique()) != 2:
+        st.error("Target variable is not binary. Please ensure it has only two unique values (0 and 1).")
+    else:
+        # Check for class imbalance
+        class_counts = y.value_counts()
+        st.write("Class distribution:")
+        st.write(class_counts)
+        if class_counts[0] / class_counts[1] > 5 or class_counts[1] / class_counts[0] > 5:
+            st.warning("Class imbalance detected. You may want to consider class weighting, oversampling, or undersampling.")
 
-    # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+        # Standardize the data
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
 
-    # Initialize the Random Forest Classifier
-    model = RandomForestClassifier()
+        # Split the data into training and testing sets
+        X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
-    # Train the model
-    model.fit(X_train, y_train)
+        # Initialize the Random Forest Classifier
+        model = RandomForestClassifier(n_estimators=100, random_state=42)
 
-    # Predict on the test set
-    y_pred = model.predict(X_test)
+        # Train the model
+        model.fit(X_train, y_train)
 
-    # Calculate accuracy
-    accuracy = accuracy_score(y_test, y_pred)
+        # Predict on the test set
+        y_pred = model.predict(X_test)
 
-    # Streamlit application
-    st.title("Rekrutmen Tanpa Bias")
+        # Calculate accuracy
+        accuracy = accuracy_score(y_test, y_pred)
+        st.write("Accuracy:", accuracy)
+        st.write("Classification Report:")
+        st.write(classification_report(y_test, y_pred))
+        st.write("Confusion Matrix:")
+        st.write(confusion_matrix(y_test, y_pred))
 
-    # Display model accuracy
-    st.write(f'Accuracy: {accuracy}')
+        # Streamlit application
+        st.title("Rekrutmen Tanpa Bias")
 
-    # Get unique values for categorical columns
-    unique_city = data['city'].unique() if 'city' in data.columns else []
-    unique_relevent_experience = data['relevent_experience'].unique() if 'relevent_experience' in data.columns else []
-    unique_enrolled_university = data['enrolled_university'].unique() if 'enrolled_university' in data.columns else []
-    unique_education_level = data['education_level'].unique() if 'education_level' in data.columns else []
-    unique_major_discipline = data['major_discipline'].unique() if 'major_discipline' in data.columns else []
-    unique_experience = data['experience'].unique() if 'experience' in data.columns else []
-    unique_company_size = data['company_size'].unique() if 'company_size' in data.columns else []
-    unique_company_type = data['company_type'].unique() if 'company_type' in data.columns else []
-    unique_last_new_job = data['last_new_job'].unique() if 'last_new_job' in data.columns else []
+        # Get unique values for categorical columns
+        unique_city = data['city'].unique() if 'city' in data.columns else []
+        unique_relevent_experience = data['relevent_experience'].unique() if 'relevent_experience' in data.columns else []
+        unique_enrolled_university = data['enrolled_university'].unique() if 'enrolled_university' in data.columns else []
+        unique_education_level = data['education_level'].unique() if 'education_level' in data.columns else []
+        unique_major_discipline = data['major_discipline'].unique() if 'major_discipline' in data.columns else []
+        unique_experience = data['experience'].unique() if 'experience' in data.columns else []
+        unique_company_size = data['company_size'].unique() if 'company_size' in data.columns else []
+        unique_company_type = data['company_type'].unique() if 'company_type' in data.columns else []
+        unique_last_new_job = data['last_new_job'].unique() if 'last_new_job' in data.columns else []
 
-    # Form input data kandidat
-    input_data = {
-        'city': st.selectbox('City', unique_city) if unique_city else 'Unknown',
-        'city_development_index': st.number_input('City Development Index'),
-        'relevent_experience': st.selectbox('Relevent Experience', unique_relevent_experience) if unique_relevent_experience else 'Unknown',
-        'enrolled_university': st.selectbox('Enrolled University', unique_enrolled_university) if unique_enrolled_university else 'Unknown',
-        'education_level': st.selectbox('Education Level', unique_education_level) if unique_education_level else 'Unknown',
-        'major_discipline': st.selectbox('Major Discipline', unique_major_discipline) if unique_major_discipline else 'Unknown',
-        'experience': st.selectbox('Experience', unique_experience) if unique_experience else 'Unknown',
-        'company_size': st.selectbox('Company Size', unique_company_size) if unique_company_size else 'Unknown',
-        'company_type': st.selectbox('Company Type', unique_company_type) if unique_company_type else 'Unknown',
-        'last_new_job': st.selectbox('Last New Job', unique_last_new_job) if unique_last_new_job else 'Unknown',
-        'training_hours': st.number_input('Training Hours')
-    }
+        # Form input data kandidat
+        input_data = {
+            'city': st.selectbox('City', unique_city) if unique_city else 'Unknown',
+            'city_development_index': st.number_input('City Development Index'),
+            'relevent_experience': st.selectbox('Relevent Experience', unique_relevent_experience) if unique_relevent_experience else 'Unknown',
+            'enrolled_university': st.selectbox('Enrolled University', unique_enrolled_university) if unique_enrolled_university else 'Unknown',
+            'education_level': st.selectbox('Education Level', unique_education_level) if unique_education_level else 'Unknown',
+            'major_discipline': st.selectbox('Major Discipline', unique_major_discipline) if unique_major_discipline else 'Unknown',
+            'experience': st.selectbox('Experience', unique_experience) if unique_experience else 'Unknown',
+            'company_size': st.selectbox('Company Size', unique_company_size) if unique_company_size else 'Unknown',
+            'company_type': st.selectbox('Company Type', unique_company_type) if unique_company_type else 'Unknown',
+            'last_new_job': st.selectbox('Last New Job', unique_last_new_job) if unique_last_new_job else 'Unknown',
+            'training_hours': st.number_input('Training Hours')
+        }
 
-    # Function to predict based on input data
-    def predict(input_data):
-        input_df = pd.DataFrame([input_data])
-        input_df = pd.get_dummies(input_df)
-        input_df = input_df.reindex(columns=X.columns, fill_value=0)
-        input_scaled = scaler.transform(input_df)
-        prediction = model.predict(input_scaled)
-        return prediction
+        # Function to predict based on input data
+        def predict(input_data):
+            input_df = pd.DataFrame([input_data])
+            input_df = pd.get_dummies(input_df)
+            input_df = input_df.reindex(columns=X.columns, fill_value=0)
+            input_scaled = scaler.transform(input_df)
+            prediction = model.predict(input_scaled)
+            return prediction
 
-    # Predict button
-    if st.button('Predict'):
-        result = predict(input_data)
-        st.write(f'Result: {result[0]}')
+        # Predict button
+        if st.button('Predict'):
+            result = predict(input_data)
+            st.write(f'Result: {result[0]}')
