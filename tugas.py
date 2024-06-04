@@ -1,165 +1,107 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score, classification_report
-from sklearn.impute import SimpleImputer
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+import joblib
 import streamlit as st
 
-# Load dataset
-data = pd.read_csv('aug_train.csv')
-print(data.head())
+# Langkah 2: Memuat Dataset
+df = pd.read_csv('aug_train.csv')
 
-# Define all features including gender and enrollee_id
-all_features = ['enrollee_id', 'relevent_experience', 'enrolled_university', 
-                'education_level', 'training_hours', 'gender']
+# Langkah 3: Standarisasi Data
+# Menghapus kolom yang tidak diperlukan
+df = df.drop(columns=['gender'])
 
-# Define features for model training
-features = ['relevent_experience', 'enrolled_university', 
-            'education_level', 'training_hours']
-target = 'target'
+# Mengisi nilai yang hilang untuk kolom numerik dengan median
+numeric_columns = df.select_dtypes(include=[np.number]).columns
+df[numeric_columns] = df[numeric_columns].fillna(df[numeric_columns].median())
 
-# Drop rows with missing values in selected features and target
-data = data.dropna(subset=features + [target])
+# Mengisi nilai yang hilang untuk kolom kategorikal dengan modus
+categorical_columns = df.select_dtypes(exclude=[np.number]).columns
+df[categorical_columns] = df[categorical_columns].fillna(df[categorical_columns].mode().iloc[0])
 
-# Check for missing values in original data
-na_count_original = data.isna().sum().sum()
-print(f"Number of missing values in original data: {na_count_original}")
+# Encode categorical variables
+df = pd.get_dummies(df, columns=categorical_columns)
 
-# Encode enrolled_university to numeric
-enrolled_university_mapping = {
-    'no_enrollment': 0,
-    'Full time course': 1,
-    'Part time course': 2
-}
-data['enrolled_university'] = data['enrolled_university'].map(enrolled_university_mapping)
+# Langkah 4: Split Data
+X = df.drop(columns=['target'])
+y = df['target']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Encode education_level to numeric
-education_level_mapping = {
-    'Graduate': 0,
-    'Masters': 1,
-    'Phd': 2
-}
-data['education_level'] = data['education_level'].map(education_level_mapping)
+# Langkah 5: Membuat Model
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
 
-# Convert relevent_experience to numeric
-relevent_experience_mapping = {
-    'Has relevent experience': 1,
-    'No relevent experience': 0
-}
-data['relevent_experience'] = data['relevent_experience'].map(relevent_experience_mapping)
-
-# Encode gender to numeric
-gender_mapping = {
-    'Male': 0,
-    'Female': 1,
-    'Other': 2
-}
-data['gender'] = data['gender'].map(gender_mapping)
-
-# Split data into train and test
-X = data[features]
-y = data[target]
-
-# Check for missing values
-na_count = X.isna().sum().sum()
-if na_count > 0:
-    print(f"Found {na_count} missing values.")
-    imputer = SimpleImputer(strategy='most_frequent')  # Use most frequent strategy
-    X = pd.DataFrame(imputer.fit_transform(X), columns=X.columns)  # Impute missing values
-    print("Missing values imputed.")
-
-print("Shape of X after imputing NaN values:", X.shape)
-
-# Ensure all columns are numeric
-X = X.astype(float)
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
-
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
-
-# Create and tune model using GridSearchCV
-param_grid = {
-    'n_estimators': [50, 100],
-    'max_depth': [5, 10, 20],
-    'min_samples_split': [2, 5, 10]
-}
-rf = RandomForestClassifier(random_state=42)
-grid_search = GridSearchCV(rf, param_grid, cv=5, n_jobs=-1, verbose=1)
-grid_search.fit(X_train_scaled, y_train)
-
-best_model = grid_search.best_estimator_
-print(f"Best parameters: {grid_search.best_params_}")
-
-# Evaluate model for accuracy
-y_pred = best_model.predict(X_test_scaled)
+# Langkah 6: Evaluasi Model
+y_pred = model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
-report = classification_report(y_test, y_pred, zero_division=0)
+report = classification_report(y_test, y_pred)
 
-def predict_acceptance(input_data):
-    """
-    Predict whether a candidate will be accepted based on input features.
+print(f"Accuracy: {accuracy}")
+print(f"Classification Report:\n{report}")
 
-    Args:
-    input_data (list): List of input features.
+# Langkah 7: Simpan Model
+joblib.dump(model, 'model_rekrutmen.pkl')
 
-    Returns:
-    int: 1 if the candidate will be accepted, 0 otherwise.
-    """
-    relevent_experience_mapping = {
-        "Has relevent experience": 1,
-        "No relevent experience": 0
-    }
-    enrolled_university_mapping = {
-        'no_enrollment': 0,
-        'Full time course': 1,
-        'Part time course': 2
-    }
-    education_level_mapping = {
-        'Graduate': 0,
-        'Masters': 1,
-        'Phd': 2
-    }
-    input_data[1] = relevent_experience_mapping[input_data[1]]
-    input_data[2] = enrolled_university_mapping[input_data[2]]
-    input_data[3] = education_level_mapping[input_data[3]]
-    # Gender and enrollee_id are not used in prediction, so remove them
-    input_features = input_data[1:5]
-    input_features = np.array(input_features, dtype=float)  # Convert to float array
-    input_features = input_features.reshape(1, -1)  # Reshape to 2D array
-    input_features = scaler.transform(input_features)  # Transform input data
-    prediction = best_model.predict(input_features)
-    return prediction[0]
+# Langkah 8: Deploy Aplikasi AI dengan Streamlit
 
-def main():
-    """
-    Main function to create a Streamlit app.
-    """
-    st.title("AI Deteksi Bias Gender pada Perekrutan Kerja")
+# Memuat model
+model = joblib.load('model_rekrutmen.pkl')
 
-    st.write("Masukkan fitur-fitur untuk memprediksi apakah kandidat diterima:")
+# Judul aplikasi
+st.title('Aplikasi Rekrutmen Tanpa Bias')
 
-    enrollee_id = st.text_input("Enrollee ID", "")
-    relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
-    enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()), index=0)
-    education_level = st.selectbox("Education Level", list(education_level_mapping.keys()), index=0)
-    gender = st.selectbox("Gender", list(gender_mapping.keys()), index=0)
-    training_hours = st.slider("Training Hours", min_value=0, step=1)
+# Input pengguna
+enrollee_id = st.text_input('Enrollee ID')
+city_development_index = st.number_input('City Development Index', min_value=0.0, max_value=1.0)
+relevent_experience = st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience'])
 
-    if st.button("Prediksi"):
-        try:
-            result = predict_acceptance([enrollee_id, relevent_experience, enrolled_university, education_level, training_hours, gender])
-            if result == 1:
-                st.write("Kandidat diterima")
-            else:
-                st.write("Kandidat ditolak")
-            st.write(f"Akurasi model: {accuracy * 100:.2f}%")
-            st.write(report)
-        except Exception as e:
-            st.write("Error:", str(e))
+enrolled_university = 'Unknown'
+if 'enrolled_university' in df.columns:
+    enrolled_university = st.selectbox('Enrolled University', df['enrolled_university'].unique())
 
-if __name__ == "__main__":
-    main()
+education_level = 'Unknown'
+if 'education_level' in df.columns:
+    education_level = st.selectbox('Education Level', df['education_level'].unique())
+
+company_size = 'Unknown'
+if 'company_size' in df.columns:
+    company_size = st.selectbox('Company Size', df['company_size'].unique())
+
+company_type = 'Unknown'
+if 'company_type' in df.columns:
+    company_type = st.selectbox('Company Type', df['company_type'].unique())
+
+last_new_job = 'Unknown'
+if 'last_new_job' in df.columns:
+    last_new_job = st.selectbox('Last New Job', df['last_new_job'].unique())
+
+experience = st.number_input('Experience', min_value=0, max_value=20)
+training_hours = st.number_input('Training Hours', min_value=0)
+
+# Menggabungkan input pengguna menjadi dataframe
+input_data = pd.DataFrame({
+    'enrollee_id': [enrollee_id],
+    'city_development_index': [city_development_index],
+    'relevent_experience': [relevent_experience],
+    'enrolled_university': [enrolled_university],
+    'education_level': [education_level],
+    'experience': [experience],
+    'company_size': [company_size],
+    'company_type': [company_type],
+    'last_new_job': [last_new_job],
+    'training_hours': [training_hours]
+})
+
+# Prediksi
+if st.button('Predict'):
+    prediction = model.predict(input_data)
+    if prediction == 1:
+        st.success('Kandidat Berpotensi Diterima')
+    else:
+        st.error('Kandidat Tidak Berpotensi Diterima')
+
+# Menjalankan aplikasi Streamlit
+if __name__ == '__main__':
+    st.run()
