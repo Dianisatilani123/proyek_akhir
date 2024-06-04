@@ -1,93 +1,96 @@
 import pandas as pd
-import numpy as np
+from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report
-import joblib
+from sklearn.metrics import accuracy_score
 import streamlit as st
 
-# Langkah 2: Memuat Dataset
-df = pd.read_csv('aug_train.csv')
+# Load dataset
+data = pd.read_csv('aug_train.csv')
 
-# Langkah 3: Standarisasi Data
-# Menghapus kolom yang dapat memicu bias
-df = df.drop(columns=['enrollee_id', 'gender', 'major_discipline'])
+# Display the dataset
+st.write("Dataset:")
+st.write(data.head())
 
-# Mengisi nilai yang hilang untuk kolom numerik dengan median
-numeric_columns = df.select_dtypes(include=[np.number]).columns
-df[numeric_columns] = df[numeric_columns].fillna(df[numeric_columns].median())
+# Ensure 'city' column exists
+if 'city' not in data.columns:
+    st.error("'city' column not found in the dataset.")
+else:
+    # Preprocessing
+    # Drop columns that may cause bias
+    data = data.drop(['enrollee_id', 'gender'], axis=1)
 
-# Mengisi nilai yang hilang untuk kolom kategorikal dengan modus
-categorical_columns = df.select_dtypes(exclude=[np.number]).columns
-df[categorical_columns] = df[categorical_columns].fillna(df[categorical_columns].mode().iloc[0])
+    # Handle missing values
+    data = data.dropna()
 
-# One-hot encoding untuk kolom kategorikal
-df = pd.get_dummies(df, columns=categorical_columns)
+    # Convert categorical data to numerical
+    data = pd.get_dummies(data)
 
-# Langkah 4: Split Data
-X = df.drop(columns=['target'])
-y = df['target']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    # Split features and target
+    X = data.drop('target', axis=1)
+    y = data['target']
 
-# Langkah 5: Membuat Model
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
+    # Standardize the data
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
 
-# Langkah 6: Evaluasi Model
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-report = classification_report(y_test, y_pred)
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
-print(f"Accuracy: {accuracy}")
-print(f"Classification Report:\n{report}")
+    # Initialize the Random Forest Classifier
+    model = RandomForestClassifier()
 
-# Langkah 7: Simpan Model
-joblib.dump(model, 'model_rekrutmen.pkl')
+    # Train the model
+    model.fit(X_train, y_train)
 
-# Langkah 8: Deploy Aplikasi AI dengan Streamlit
+    # Predict on the test set
+    y_pred = model.predict(X_test)
 
-# Memuat model
-model = joblib.load('model_rekrutmen.pkl')
+    # Calculate accuracy
+    accuracy = accuracy_score(y_test, y_pred)
 
-# Judul aplikasi
-st.title('Aplikasi Rekrutmen Tanpa Bias')
+    # Streamlit application
+    st.title("Rekrutmen Tanpa Bias")
 
-# Input pengguna
-city = st.selectbox('City', ['city_103', 'city_40', 'city_21', 'city_115', 'city_162', 'city_176', 'city_160'])
-city_development_index = st.number_input('City Development Index', min_value=0.0)
-relevant_experience = st.selectbox('Relevant Experience', ['Has relevant experience', 'No relevant experience'])
-enrolled_university = st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course'])
-education_level = st.selectbox('Education Level', ['Graduate', 'High School', 'Masters', 'Primary School'])
-experience = st.number_input('Experience', min_value=0, max_value=20)
-company_size = st.selectbox('Company Size', ['<10', '10-49', '50-99', '100-500', '500-999', '1000-4999', '5000-9999', '10000+'])
-company_type = st.selectbox('Company Type', ['Pvt Ltd', 'Funded Startup', 'Public Sector', 'Early Stage Startup'])
-last_new_job = st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4'])
-training_hours = st.number_input('Training Hours', min_value=0)
+    # Display model accuracy
+    st.write(f'Accuracy: {accuracy}')
 
-# Menggabungkan input pengguna menjadi dataframe
-input_data = pd.DataFrame({
-    'city': [city],
-    'city_development_index': [city_development_index],
-    'relevant_experience': [relevant_experience],
-    'enrolled_university': [enrolled_university],
-    'education_level': [education_level],
-    'experience': [experience],
-    'company_size': [company_size],
-    'company_type': [company_type],
-    'last_new_job': [last_new_job],
-    'training_hours': [training_hours]
-})
+    # Get unique values for categorical columns
+    unique_city = data['city'].unique() if 'city' in data.columns else []
+    unique_relevent_experience = data['relevent_experience'].unique() if 'relevent_experience' in data.columns else []
+    unique_enrolled_university = data['enrolled_university'].unique() if 'enrolled_university' in data.columns else []
+    unique_education_level = data['education_level'].unique() if 'education_level' in data.columns else []
+    unique_major_discipline = data['major_discipline'].unique() if 'major_discipline' in data.columns else []
+    unique_experience = data['experience'].unique() if 'experience' in data.columns else []
+    unique_company_size = data['company_size'].unique() if 'company_size' in data.columns else []
+    unique_company_type = data['company_type'].unique() if 'company_type' in data.columns else []
+    unique_last_new_job = data['last_new_job'].unique() if 'last_new_job' in data.columns else []
 
-# One-hot encoding untuk input data
-input_data = pd.get_dummies(input_data, columns=['city', 'relevant_experience', 'enrolled_university', 'education_level', 'company_size', 'company_type', 'last_new_job'])
+    # Form input data kandidat
+    input_data = {
+        'city': st.selectbox('City', unique_city) if unique_city else 'Unknown',
+        'city_development_index': st.number_input('City Development Index'),
+        'relevent_experience': st.selectbox('Relevent Experience', unique_relevent_experience) if unique_relevent_experience else 'Unknown',
+        'enrolled_university': st.selectbox('Enrolled University', unique_enrolled_university) if unique_enrolled_university else 'Unknown',
+        'education_level': st.selectbox('Education Level', unique_education_level) if unique_education_level else 'Unknown',
+        'major_discipline': st.selectbox('Major Discipline', unique_major_discipline) if unique_major_discipline else 'Unknown',
+        'experience': st.selectbox('Experience', unique_experience) if unique_experience else 'Unknown',
+        'company_size': st.selectbox('Company Size', unique_company_size) if unique_company_size else 'Unknown',
+        'company_type': st.selectbox('Company Type', unique_company_type) if unique_company_type else 'Unknown',
+        'last_new_job': st.selectbox('Last New Job', unique_last_new_job) if unique_last_new_job else 'Unknown',
+        'training_hours': st.number_input('Training Hours')
+    }
 
-# Reindexing untuk membuat kolom-kolom yang sama dengan kolom-kolom pada data training
-input_data = input_data.reindex(columns=X.columns, fill_value=0)
+    # Function to predict based on input data
+    def predict(input_data):
+        input_df = pd.DataFrame([input_data])
+        input_df = pd.get_dummies(input_df)
+        input_df = input_df.reindex(columns=X.columns, fill_value=0)
+        input_scaled = scaler.transform(input_df)
+        prediction = model.predict(input_scaled)
+        return prediction
 
-# Prediksi
-if st.button('Predict'):
-    prediction = model.predict(input_data)
-    if prediction == 1:
-        st.success('Kandidat Berpotensi Diterima')
-    else:
-        st.error('Kandidat Tidak Berpotensi Diterima')
+    # Predict button
+    if st.button('Predict'):
+        result = predict(input_data)
+        st.write(f'Result: {result[0]}')
