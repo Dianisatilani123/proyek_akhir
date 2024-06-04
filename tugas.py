@@ -93,12 +93,13 @@ input_data = pd.DataFrame({
 }, index=[0])
 
 # Add dummy columns for categorical variables
-input_data = pd.get_dummies(input_data, columns=['enrolled_university', 'education_level', 'major_discipline', 'last_new_job', 'gender'])
-# Ensure all columns are present
-for col in columns_after_dummies:
+columns_to_encode = ['enrolled_university', 'education_level', 'major_discipline', 'last_new_job', 'gender']
+for col in columns_to_encode:
     if col not in input_data.columns:
         input_data[col] = 0
 
+# Encode categorical variables
+input_data = pd.get_dummies(input_data, columns=columns_to_encode)
 # Reorder columns to match the training data
 input_data = input_data[columns_after_dummies]
 
