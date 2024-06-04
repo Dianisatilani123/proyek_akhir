@@ -7,9 +7,7 @@ from sklearn.metrics import accuracy_score
 import joblib
 
 # 1. Memuat data
-data = pd.read_csv('aug_train.csv')
-print(data.head())
-
+data = pd.read_csv('path_to_your_csv.csv')
 
 # 2. Pra-pemrosesan data
 # Mengisi nilai yang hilang (jika ada)
@@ -28,9 +26,16 @@ for feature in categorical_features:
 X = data.drop(['target', 'enrollee_id', 'gender'], axis=1)
 y = data['target']
 
+# Filter out non-numeric columns
+numeric_columns = X.select_dtypes(include=['int', 'float']).columns
+X_numeric = X[numeric_columns]
+
 # Standarisasi fitur numerik
 scaler = StandardScaler()
-X = scaler.fit_transform(X)
+X_numeric_scaled = scaler.fit_transform(X_numeric)
+
+# Reassign scaled numeric features to original DataFrame
+X[numeric_columns] = X_numeric_scaled
 
 # Membagi data menjadi set pelatihan dan pengujian
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -51,8 +56,15 @@ def predict(data):
     # Menghapus kolom yang tidak digunakan
     df = df.drop(['enrollee_id', 'gender'], axis=1)
     
+    # Filter out non-numeric columns
+    numeric_columns = df.select_dtypes(include=['int', 'float']).columns
+    df_numeric = df[numeric_columns]
+    
     # Standarisasi fitur numerik
-    df = scaler.transform(df)
+    df_numeric_scaled = scaler.transform(df_numeric)
+    
+    # Reassign scaled numeric features to original DataFrame
+    df[numeric_columns] = df_numeric_scaled
     
     # Melakukan prediksi
     prediction = model.predict(df)
@@ -81,6 +93,7 @@ if st.button("Predict"):
         'enrollee_id': enrollee_id,
         'city': city,
         'city_development_index': city_development_index,
+        'gender': gender,
         'relevent_experience': relevent_experience,
         'enrolled_university': enrolled_university,
         'education_level': education_level,
