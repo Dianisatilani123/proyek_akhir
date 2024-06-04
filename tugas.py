@@ -133,7 +133,7 @@ if company_size is not None:
     # Prediksi
     if st.button('Predict'):
         prediction = model.predict(input_data)
-        if prediction == 1:
-            st.success('Kandidat Berpotensi Diterima')
+        if prediction == 0:
+            st.success('Kandidat Tidak Berpotensi Diterima')
         else:
-            st.error('Kandidat Tidak Berpotensi Diterima')
+            st.error('Kandidat Berpotensi Diterima')
