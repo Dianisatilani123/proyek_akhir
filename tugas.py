@@ -65,6 +65,7 @@ if na_count > 0:
     imputer = SimpleImputer(strategy='most_frequent')  # Use most frequent strategy
     X = pd.DataFrame(imputer.fit_transform(X), columns=X.columns)  # Impute missing values
     print("Missing values imputed.")
+    X.columns = features  # Reset column names after imputation
 
 print("Shape of X after imputing NaN values:", X.shape)
 
