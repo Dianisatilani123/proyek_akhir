@@ -46,8 +46,8 @@ model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 
 # Save the model and scaler
-joblib.dump(model, 'odel.joblib')
-joblib.dump(scaler, 'caler.joblib')
+joblib.dump(model, 'model.joblib')
+joblib.dump(scaler, 'scaler.joblib')
 joblib.dump(columns_after_dummies, 'columns_after_dummies.joblib')
 joblib.dump(numeric_columns, 'numeric_columns.joblib')
 
@@ -87,19 +87,19 @@ training_hours = st.number_input('Training Hours', min_value=0)
 input_data = pd.DataFrame({
     'city': [city],
     'city_development_index': [city_development_index],
-    'elevent_experience': [1 if relevent_experience == 'Has relevent experience' else 0],
-    'experience': [int(experience.replace('>','')) if experience!= '>20' else 20],
+    'relevent_experience': [1 if relevent_experience == 'Has relevent experience' else 0],
+    'experience': [int(experience.replace('>','')) if experience != '>20' else 20],
     'training_hours': [training_hours]
 }, index=[0])
 
-# Add dummy columns for categorical variables
-columns_to_encode = ['enrolled_university', 'education_level', 'major_discipline', 'last_new_job', 'gender']
-for col in columns_to_encode:
+# Encode categorical variables
+input_data = pd.get_dummies(input_data, columns=['city', 'enrolled_university', 'education_level', 'major_discipline', 'last_new_job'])
+
+# Add missing columns with zeros
+for col in columns_after_dummies:
     if col not in input_data.columns:
         input_data[col] = 0
 
-# Encode categorical variables
-input_data = pd.get_dummies(input_data, columns=columns_to_encode)
 # Reorder columns to match the training data
 input_data = input_data[columns_after_dummies]
 
