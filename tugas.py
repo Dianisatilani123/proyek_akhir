@@ -102,17 +102,16 @@ training_hours = st.slider("Training Hours", 0, 100, 20)
 
 # Convert categorical data into numerical data using the same LabelEncoders
 input_data = pd.DataFrame({'city_development_index': [city_development_index],
-                           'elevent_experience': [le_relevent_experience.transform([relevent_experience])[0]],
+                           'relevent_experience': [le_relevent_experience.transform([relevent_experience])[0]],
                            'enrolled_university': [le_enrolled_university.transform([enrolled_university])[0]],
                            'education_level': [le_education_level.transform([education_level])[0]],
-                           'ajor_discipline': [le_major_discipline.transform([major_discipline])[0]],
+                           'major_discipline': [le_major_discipline.transform([major_discipline])[0]],
                            'experience': [experience],
                            'company_size': [le_company_size.transform([company_size])[0]],
                            'company_type': [le_company_type.transform([company_type])[0]],
                            'last_new_job': [le_last_new_job.transform([last_new_job])[0]],
                            'training_hours': [training_hours],
                            'experience_score': [le_relevent_experience.transform([relevent_experience])[0] * experience]})
-
 # Check if company_size is None before making a prediction
 if company_size is not None:
     # Prediksi
