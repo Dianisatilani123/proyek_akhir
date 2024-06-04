@@ -99,6 +99,11 @@ company_type = st.selectbox("Company Type", possible_company_type)
 last_new_job = st.selectbox("Last New Job", possible_last_new_job)
 training_hours = st.slider("Training Hours", 0, 100, 20)
 
+# Check if user-entered company_size is in the list of predefined categories
+if company_size not in possible_company_size:
+    st.error("Company size is not in the list of predefined categories. Please select a valid option.")
+    company_size = None
+
 input_data = pd.DataFrame({'city_development_index': [city_development_index],
                            'relevent_experience': [relevent_experience],
                            'enrolled_university': [enrolled_university],
@@ -123,5 +128,9 @@ input_data['last_new_job'] = le_last_new_job.transform([last_new_job])
 # Calculate 'experience_score' for input data
 input_data['experience_score'] = input_data['relevent_experience'] * input_data['experience']
 
-prediction = model.predict(input_data)
-st.write("Prediksi kelayakan:", prediction[0])
+# Check if company_size is None before making a prediction
+if company_size is not None:
+    prediction = model.predict(input_data)
+    st.write("Prediksi kelayakan:", prediction[0])
+else:
+    st.error("Company size is not in the list of predefined categories. Please select a valid option.")
