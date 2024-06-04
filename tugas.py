@@ -26,6 +26,7 @@ df = pd.get_dummies(df, columns=categorical_columns)
 
 # Save the list of columns for later use
 columns_after_dummies = df.columns.tolist()
+columns_after_dummies.remove('target')  # Remove target from columns list
 
 # Scale numeric columns
 scaler = StandardScaler()
@@ -60,7 +61,7 @@ print(f"Accuracy: {accuracy:.3f}")
 print(f"F1-score: {f1:.3f}")
 print(f"Classification Report:\n{report}")
 
-# Deploy application with Streamlit
+# Streamlit application
 st.title('Aplikasi Rekrutmen Tanpa Bias')
 
 # Load the saved model, scaler, and column names
@@ -91,19 +92,8 @@ input_data = pd.DataFrame({
 }, index=[0])
 
 # Add dummy columns for categorical variables
-for col in categorical_columns:
-    if col == 'enrolled_university':
-        input_data[f'enrolled_university_{enrolled_university}'] = [1]
-    elif col == 'education_level':
-        input_data[f'education_level_{education_level}'] = [1]
-    elif col == 'major_discipline':
-        input_data[f'major_discipline_{major_discipline}'] = [1]
-    elif col == 'last_new_job':
-        input_data[f'last_new_job_{last_new_job}'] = [1]
-    elif col == 'gender':
-        input_data[f'gender_{gender}'] = [1]
-    else:
-        input_data[f'{col}_Unknown'] = [1]
+for col in ['enrolled_university', 'education_level', 'major_discipline', 'last_new_job']:
+    input_data[f'{col}_{eval(col)}'] = 1
 
 # Ensure all columns are present
 for col in columns_after_dummies:
