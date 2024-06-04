@@ -31,7 +31,7 @@ else:
     y = data['target']
 
     # Check if target variable is binary
-    if len(y.unique()) != 2:
+    if len(y.unique())!= 2:
         st.error("Target variable is not binary. Please ensure it has only two unique values (0 and 1).")
     else:
         # Check for class imbalance
@@ -70,30 +70,30 @@ else:
 
         # Get unique values for categorical columns
         unique_city = data['city'].unique() if 'city' in data.columns else []
-        unique_relevent_experience = data['relevent_experience'].unique() if 'relevent_experience' in data.columns else []
+        unique_relevent_experience = data['relevent_experience'].unique() if 'elevent_experience' in data.columns else []
         unique_enrolled_university = data['enrolled_university'].unique() if 'enrolled_university' in data.columns else []
         unique_education_level = data['education_level'].unique() if 'education_level' in data.columns else []
-        unique_major_discipline = data['major_discipline'].unique() if 'major_discipline' in data.columns else []
+        unique_major_discipline = data['major_discipline'].unique() if 'ajor_discipline' in data.columns else []
         unique_experience = data['experience'].unique() if 'experience' in data.columns else []
         unique_company_size = data['company_size'].unique() if 'company_size' in data.columns else []
         unique_company_type = data['company_type'].unique() if 'company_type' in data.columns else []
         unique_last_new_job = data['last_new_job'].unique() if 'last_new_job' in data.columns else []
 
-       # Form input data kandidat
-input_data = {
-    'city': st.text_input('City'),
-    'city_development_index': st.number_input('City Development Index'),
-    'elevent_experience': st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience']),
-    'enrolled_university': st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course']),
-    'education_level': st.selectbox('Education Level', ['Graduate', 'Masters', 'High School', 'Primary School']),
-    'ajor_discipline': st.selectbox('Major Discipline', ['STEM', 'Business Degree', 'Humanities']),
-    'experience': st.selectbox('Experience', ['<1', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '>20']),
-    'company_size': st.selectbox('Company Size', ['50-99', '100-500', '500-999', 'Oct-49']),
-    'company_type': st.selectbox('Company Type', ['Pvt Ltd', 'Funded Startup', 'Public Sector']),
-    'last_new_job': st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4']),
-    'training_hours': st.number_input('Training Hours')
-}
-        # Function to predict based on input data
+        # Form input data kandidat
+        input_data = {
+            'city': st.text_input('City'),
+            'city_development_index': st.number_input('City Development Index'),
+            'elevent_experience': st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience']),
+            'enrolled_university': st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course']),
+            'education_level': st.selectbox('Education Level', ['Graduate', 'Masters', 'High School', 'Primary School']),
+            'ajor_discipline': st.selectbox('Major Discipline', ['STEM', 'Business Degree', 'Humanities']),
+            'experience': st.selectbox('Experience', ['<1', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '>20']),
+            'company_size': st.selectbox('Company Size', ['50-99', '100-500', '500-999', 'Oct-49']),
+            'company_type': st.selectbox('Company Type', ['Pvt Ltd', 'Funded Startup', 'Public Sector']),
+            'last_new_job': st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4']),
+            'training_hours': st.number_input('Training Hours')
+        }
+
         def predict(input_data):
             input_df = pd.DataFrame([input_data])
             input_df = pd.get_dummies(input_df)
