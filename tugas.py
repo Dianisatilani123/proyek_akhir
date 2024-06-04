@@ -70,17 +70,15 @@ relevent_experience = st.selectbox('Relevent Experience', ['Has relevent experie
 enrolled_university = st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course'])
 education_level = st.selectbox('Education Level', ['Graduate', 'Masters', 'High School', 'Primary School'])
 major_discipline = st.selectbox('Major Discipline', ['STEM', 'Business Degree', 'Humanities', 'Unknown'])
-company_size = st.selectbox('Company Size', ['Unknown', 'Small', 'Medium', 'Large'])
-company_type = st.selectbox('Company Type', ['Unknown', 'Pvt Ltd', 'Government', 'Self Owned'])
 last_new_job = st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4'])
-experience = st.number_input('Experience', min_value=0, max_value=20)
+experience = st.selectbox('Experience', ['>1', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '>20'])
 training_hours = st.number_input('Training Hours', min_value=0)
 
 # Create input data
 input_data = pd.DataFrame({
     'city_development_index': [city_development_index],
     'relevent_experience': [1 if relevent_experience == 'Has relevent experience' else 0],
-    'experience': [experience],
+    'experience': [int(experience.replace('>','')) if experience != '>20' else 20],
     'training_hours': [training_hours]
 }, index=[0])
 
@@ -92,10 +90,6 @@ for col in categorical_columns:
         input_data[f'education_level_{education_level}'] = [1]
     elif col == 'major_discipline':
         input_data[f'major_discipline_{major_discipline}'] = [1]
-    elif col == 'company_size':
-        input_data[f'company_size_{company_size}'] = [1]
-    elif col == 'company_type':
-        input_data[f'company_type_{company_type}'] = [1]
     elif col == 'last_new_job':
         input_data[f'last_new_job_{last_new_job}'] = [1]
     elif col == 'gender':
