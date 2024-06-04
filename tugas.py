@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix, f1_score, roc_auc_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 import streamlit as st
 
@@ -16,10 +16,10 @@ print(df.head())
 df.drop(['enrollee_id', 'city', 'gender'], axis=1, inplace=True)  # remove columns that can cause bias
 
 # Fill missing values in categorical columns with a placeholder
-df.loc[df['relevent_experience'].isna(), 'elevent_experience'] = 'Unknown'
+df.loc[df['relevent_experience'].isna(), 'relevent_experience'] = 'Unknown'
 df.loc[df['enrolled_university'].isna(), 'enrolled_university'] = 'Unknown'
 df.loc[df['education_level'].isna(), 'education_level'] = 'Unknown'
-df.loc[df['major_discipline'].isna(), 'ajor_discipline'] = 'Unknown'
+df.loc[df['major_discipline'].isna(), 'major_discipline'] = 'Unknown'
 df.loc[df['company_size'].isna(), 'company_size'] = 'Unknown'
 df.loc[df['company_type'].isna(), 'company_type'] = 'Unknown'
 df.loc[df['last_new_job'].isna(), 'last_new_job'] = 'Unknown'
@@ -64,7 +64,7 @@ df['company_size'] = le_company_size.transform(df['company_size'])
 df['company_type'] = le_company_type.transform(df['company_type'])
 df['last_new_job'] = le_last_new_job.transform(df['last_new_job'])
 
-# Create a new feature that combines 'elevent_experience' and 'experience'
+# Create a new feature that combines 'relevent_experience' and 'experience'
 df['experience_score'] = df['relevent_experience'] * df['experience']
 
 # Split data into training and testing sets
@@ -81,8 +81,6 @@ y_pred = model.predict(X_test)
 print("Akurasi:", accuracy_score(y_test, y_pred))
 print("Presisi:", precision_score(y_test, y_pred))
 print("Recall:", recall_score(y_test, y_pred))
-print("F1-score:", f1_score(y_test, y_pred))
-print("ROC-AUC:", roc_auc_score(y_test, y_pred))
 print("Confusion Matrix:")
 print(confusion_matrix(y_test, y_pred))
 
@@ -102,17 +100,15 @@ company_type = st.selectbox("Company Type", possible_company_type)
 last_new_job = st.selectbox("Last New Job", possible_last_new_job)
 training_hours = st.slider("Training Hours", 0, 100, 20)
 
-# Possible categories for company_size column
-possible_company_size = ['100-500', '1000-4999', '10000+', '50-99', '500-999', '5000-9999', '<10', 'Oct-49']
-
-# Fit LabelEncoder with updated categories
+# Check if user-entered company_size is in the list of predefined categories
+possible_company_size = ['<1', '1-49', '50-99', '100-500', '500-999', 'Unknown']
 le_company_size = LabelEncoder().fit(possible_company_size)
 
 input_data = pd.DataFrame({'city_development_index': [city_development_index],
-                           'elevent_experience': [relevent_experience],
+                           'relevent_experience': [relevent_experience],
                            'enrolled_university': [enrolled_university],
                            'education_level': [education_level],
-                           'ajor_discipline': [major_discipline],
+                           'major_discipline': [major_discipline],
                            'experience': [experience],
                            'company_size': [company_size],
                            'company_type': [company_type],
@@ -120,21 +116,22 @@ input_data = pd.DataFrame({'city_development_index': [city_development_index],
                            'training_hours': [training_hours],
                            'experience_score': [0]})  # Added 'experience_score' column
 
-try:
-    # Convert categorical data into numerical data using the same LabelEncoders
-    input_data['relevent_experience'] = le_relevent_experience.transform([relevent_experience])
-    input_data['enrolled_university'] = le_enrolled_university.transform([enrolled_university])
-    input_data['education_level'] = le_education_level.transform([education_level])
-    input_data['major_discipline'] = le_major_discipline.transform([major_discipline])
-    input_data['company_size'] = le_company_size.transform([company_size])
-    input_data['company_type'] = le_company_type.transform([company_type])
-    input_data['last_new_job'] = le_last_new_job.transform([last_new_job])
+# Convert categorical data into numerical data using the same LabelEncoders
+input_data['relevent_experience'] = le_relevent_experience.transform([relevent_experience])
+input_data['enrolled_university'] = le_enrolled_university.transform([enrolled_university])
+input_data['education_level'] = le_education_level.transform([education_level])
+input_data['major_discipline'] = le_major_discipline.transform([major_discipline])
+input_data['company_size'] = le_company_size.transform([company_size])
+input_data['company_type'] = le_company_type.transform([company_type])
+input_data['last_new_job'] = le_last_new_job.transform([last_new_job])
 
-    # Calculate 'experience_score' for input data
-    input_data['experience_score'] = input_data['relevent_experience'] * input_data['experience']
+# Calculate 'experience_score' for input data
+input_data['experience_score'] = input_data['relevent_experience'] * input_data['experience']
 
-    # Make a prediction
+# Check if company_size is None before making a prediction
+if company_size is not None:
     prediction = model.predict(input_data)
     st.write("Prediksi kelayakan:", prediction[0])
-except ValueError:
+else:
     st.error("Company size is not in the list of predefined categories. Please select a valid option.")
+
