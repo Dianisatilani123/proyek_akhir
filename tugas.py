@@ -7,7 +7,8 @@ from sklearn.metrics import accuracy_score
 import joblib
 
 # 1. Memuat data
-data = pd.read_csv('path_to_your_csv.csv')
+data = pd.read_csv('aug_train.csv')
+print(data.head())
 
 # 2. Pra-pemrosesan data
 # Mengisi nilai yang hilang (jika ada)
