@@ -87,19 +87,21 @@ input_data = pd.DataFrame({
 # Add dummy columns for categorical variables
 for col in categorical_columns:
     if col == 'enrolled_university':
-        input_data[f'enrolled_university_{enrolled_university}'] = [1]
+        input_data[f'{col}_{enrolled_university}'] = [1]
     elif col == 'education_level':
-        input_data[f'education_level_{education_level}'] = [1]
+        input_data[f'{col}_{education_level}'] = [1]
     elif col == 'major_discipline':
-        input_data[f'major_discipline_{major_discipline}'] = [1]
+        input_data[f'{col}_{major_discipline}'] = [1]
     elif col == 'company_size':
-        input_data[f'company_size_{company_size}'] = [1]
+        input_data[f'{col}_{company_size}'] = [1]
     elif col == 'company_type':
-        input_data[f'company_type_{company_type}'] = [1]
+        input_data[f'{col}_{company_type}'] = [1]
     elif col == 'last_new_job':
-        input_data[f'last_new_job_{last_new_job}'] = [1]
+        input_data[f'{col}_{last_new_job}'] = [1]
     elif col == 'gender':
-        input_data[f'gender_{gender}'] = [1]
+        input_data[f'{col}_{gender}'] = [1]
+    elif col == 'city':
+        input_data[f'{col}_{city}'] = [1]
     else:
         input_data[f'{col}_Unknown'] = [1]
 
