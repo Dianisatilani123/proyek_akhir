@@ -91,3 +91,4 @@ if st.button('Predict'):
         st.success('Kandidat Berpotensi Diterima')
     else:
         st.error('Kandidat Tidak Berpotensi Diterima')
+
