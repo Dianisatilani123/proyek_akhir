@@ -10,14 +10,15 @@ import streamlit as st
 
 # Load dataset
 data = pd.read_csv('aug_train.csv')
+print(data.head())
 
 # Define all features including gender and enrollee_id
 all_features = ['enrollee_id', 'relevent_experience', 'enrolled_university', 
-                'education_level', 'training_hours', 'gender', 'experience', 'company_size', 'company_type', 'last_new_job']
+                'education_level', 'training_hours', 'gender', 'city_development_index', 'major_discipline']
 
 # Define features for model training
 features = ['relevent_experience', 'enrolled_university', 
-            'education_level', 'training_hours', 'experience', 'company_size', 'company_type', 'last_new_job']
+            'education_level', 'training_hours', 'city_development_index', 'major_discipline']
 target = 'target'
 
 # Drop rows with missing values in selected features and target
@@ -44,18 +45,13 @@ mapping_dict = {
         'Female': 1,
         'Other': 2
     },
-    'experience': {
-        '>20': 21,
-        '<1': 0
-    },
-    'company_size': {
-        '<10': 0, '10-49': 1, '50-99': 2, '100-500': 3, '500-999': 4, '1000-4999': 5, '5000-9999': 6, '10000+': 7
-    },
-    'company_type': {
-        'Pvt Ltd': 0, 'Funded Startup': 1, 'Early Stage Startup': 2, 'Public Sector': 3, 'NGO': 4, 'Other': 5
-    },
-    'last_new_job': {
-        'never': 0, '1': 1, '2': 2, '3': 3, '4': 4, '>4': 5
+    'major_discipline': {
+        'STEM': 0,
+        'Business Degree': 1,
+        'Arts': 2,
+        'Humanities': 3,
+        'No Major': 4,
+        'Other': 5
     }
 }
 
@@ -115,10 +111,7 @@ def predict_acceptance(input_data):
     input_data[1] = mapping_dict['relevent_experience'][input_data[1]]
     input_data[2] = mapping_dict['enrolled_university'][input_data[2]]
     input_data[3] = mapping_dict['education_level'][input_data[3]]
-    input_data[5] = mapping_dict['experience'][input_data[5]]
-    input_data[6] = mapping_dict['company_size'][input_data[6]]
-    input_data[7] = mapping_dict['company_type'][input_data[7]]
-    input_data[8] = mapping_dict['last_new_job'][input_data[8]]
+    input_data[5] = mapping_dict['major_discipline'][input_data[5]]
     input_features = input_data[1:]
     input_features = np.array(input_features, dtype=float)  # Convert to float array
     input_features = input_features.reshape(1, -1)  # Reshape to 2D array
@@ -140,14 +133,12 @@ def main():
     education_level = st.selectbox("Education Level", list(mapping_dict['education_level'].keys()), index=0)
     gender = st.selectbox("Gender", list(mapping_dict['gender'].keys()), index=0)
     training_hours = st.slider("Training Hours", min_value=0, step=1)
-    experience = st.selectbox("Experience", list(mapping_dict['experience'].keys()), index=0)
-    company_size = st.selectbox("Company Size", list(mapping_dict['company_size'].keys()), index=0)
-    company_type = st.selectbox("Company Type", list(mapping_dict['company_type'].keys()), index=0)
-    last_new_job = st.selectbox("Last New Job", list(mapping_dict['last_new_job'].keys()), index=0)
+    city_development_index = st.slider("City Development Index", min_value=0.0, max_value=1.0, step=0.01)
+    major_discipline = st.selectbox("Major Discipline", list(mapping_dict['major_discipline'].keys()), index=0)
 
     if st.button("Prediksi"):
         try:
-            result = predict_acceptance([enrollee_id, relevent_experience, enrolled_university, education_level, training_hours, experience, company_size, company_type, last_new_job])
+            result = predict_acceptance([enrollee_id, relevent_experience, enrolled_university, education_level, training_hours, major_discipline, city_development_index, gender])
             if result == 1:
                 st.write("Kandidat diterima")
             else:
