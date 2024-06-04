@@ -40,48 +40,52 @@ report = classification_report(y_test, y_pred)
 print(f"Accuracy: {accuracy}")
 print(f"Classification Report:\n{report}")
 
-# Save model
-joblib.dump(model, 'model_rekrutmen.pkl')
+# Deploy application with Streamlit
 
-# Deploy AI application with Streamlit
-
-# Load model
-model = joblib.load('model_rekrutmen.pkl')
-
-# App title
+# Title
 st.title('Aplikasi Rekrutmen Tanpa Bias')
 
-# User input
+# Input fields
 enrollee_id = st.text_input('Enrollee ID')
 city_development_index = st.number_input('City Development Index', min_value=0.0, max_value=1.0)
 relevent_experience = st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience'])
 
-enrolled_university = st.selectbox('Enrolled University', df['enrolled_university'].unique())
-education_level = st.selectbox('Education Level', df['education_level'].unique())
-company_size = st.selectbox('Company Size', df['company_size'].unique())
-company_type = st.selectbox('Company Type', df['company_type'].unique())
-last_new_job = st.selectbox('Last New Job', df['last_new_job'].unique())
+enrolled_university = st.selectbox('Enrolled University', df.columns if 'enrolled_university' in df.columns else ['Unknown'])
+education_level = st.selectbox('Education Level', df.columns if 'education_level' in df.columns else ['Unknown'])
+company_size = st.selectbox('Company Size', df.columns if 'company_size' in df.columns else ['Unknown'])
+company_type = st.selectbox('Company Type', df.columns if 'company_type' in df.columns else ['Unknown'])
+last_new_job = st.selectbox('Last New Job', df.columns if 'last_new_job' in df.columns else ['Unknown'])
 
 experience = st.number_input('Experience', min_value=0, max_value=20)
 training_hours = st.number_input('Training Hours', min_value=0)
 
-# Combine user input into dataframe
+# Create input data
 input_data = pd.DataFrame({
     'city_development_index': [city_development_index],
-    'relevent_experience': [1 if relevent_experience == 'Has relevent experience' else 0],
-    'enrolled_university_' + enrolled_university: [1],
-    'education_level_' + education_level: [1],
-    'experience': [experience],
-    'company_size_' + company_size: [1],
-    'company_type_' + company_type: [1],
-    'last_new_job_' + last_new_job: [1],
-    'training_hours': [training_hours]
+    'relevent_experience': [1 if relevent_experience == 'Has relevent experience' else 0]
 }, index=[0])
+
+if 'enrolled_university' in df.columns:
+    input_data['enrolled_university_' + enrolled_university] = [1]
+if 'education_level' in df.columns:
+    input_data['education_level_' + education_level] = [1]
+if 'company_size' in df.columns:
+    input_data['company_size_' + company_size] = [1]
+if 'company_type' in df.columns:
+    input_data['company_type_' + company_type] = [1]
+if 'last_new_job' in df.columns:
+    input_data['last_new_job_' + last_new_job] = [1]
+
+input_data['experience'] = [experience]
+input_data['training_hours'] = [training_hours]
 
 # Predict
 if st.button('Predict'):
-    prediction = model.predict(input_data)
-    if prediction == 1:
-        st.success('Kandidat Berpotensi Diterima')
-    else:
-        st.error('Kandidat Tidak Berpotensi Diterima')
+    try:
+        prediction = model.predict(input_data)
+        if prediction == 1:
+            st.success('Kandidat Berpotensi Diterima')
+        else:
+            st.error('Kandidat Tidak Berpotensi Diterima')
+    except Exception as e:
+        st.error(f"Error: {str(e)}")
