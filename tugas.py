@@ -26,7 +26,6 @@ df = pd.get_dummies(df, columns=categorical_columns)
 
 # Save the list of columns for later use
 columns_after_dummies = df.columns.tolist()
-columns_after_dummies.remove('target')  # Remove target from columns list
 
 # Scale numeric columns
 scaler = StandardScaler()
@@ -47,9 +46,10 @@ model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 
 # Save the model and scaler
-joblib.dump(model, 'model.joblib')
-joblib.dump(scaler, 'scaler.joblib')
+joblib.dump(model, 'odel.joblib')
+joblib.dump(scaler, 'caler.joblib')
 joblib.dump(columns_after_dummies, 'columns_after_dummies.joblib')
+joblib.dump(numeric_columns, 'numeric_columns.joblib')
 
 # Evaluate model
 y_pred = model.predict(X_test)
@@ -61,16 +61,16 @@ print(f"Accuracy: {accuracy:.3f}")
 print(f"F1-score: {f1:.3f}")
 print(f"Classification Report:\n{report}")
 
-# Streamlit application
+# Deploy application with Streamlit
 st.title('Aplikasi Rekrutmen Tanpa Bias')
 
 # Load the saved model, scaler, and column names
 model = joblib.load('model.joblib')
 scaler = joblib.load('scaler.joblib')
 columns_after_dummies = joblib.load('columns_after_dummies.joblib')
+numeric_columns = joblib.load('numeric_columns.joblib')
 
 # Input fields
-enrollee_id = st.text_input('Enrollee ID')
 city = st.text_input('Kota')
 city_development_index = st.number_input('City Development Index', min_value=0.0, max_value=1.0)
 gender = st.selectbox('Jenis Kelamin', ['Male', 'Female', 'Unknown'])
@@ -85,15 +85,15 @@ training_hours = st.number_input('Training Hours', min_value=0)
 
 # Create input data
 input_data = pd.DataFrame({
+    'city': [city],
     'city_development_index': [city_development_index],
-    'relevent_experience': [1 if relevent_experience == 'Has relevent experience' else 0],
-    'experience': [int(experience.replace('>','')) if experience != '>20' else 20],
+    'elevent_experience': [1 if relevent_experience == 'Has relevent experience' else 0],
+    'experience': [int(experience.replace('>','')) if experience!= '>20' else 20],
     'training_hours': [training_hours]
 }, index=[0])
 
 # Add dummy columns for categorical variables
-for col in ['enrolled_university', 'education_level', 'major_discipline', 'last_new_job']:
-    input_data[f'{col}_{eval(col)}'] = 1
+input_data = pd.get_dummies(input_data, columns=['enrolled_university', 'education_level', 'ajor_discipline', 'last_new_job', 'gender'])
 
 # Ensure all columns are present
 for col in columns_after_dummies:
