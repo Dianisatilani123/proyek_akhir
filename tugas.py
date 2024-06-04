@@ -1,14 +1,8 @@
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report, f1_score
-from sklearn.preprocessing import StandardScaler, LabelEncoder
-import joblib
-import streamlit as st
-
 # Load dataset
 df = pd.read_csv('aug_train.csv')
+
+# Check if the columns exist
+print(df.columns)
 
 # Drop unnecessary columns
 df = df.drop(columns=['gender'])
@@ -29,8 +23,8 @@ scaler = StandardScaler()
 df[numeric_columns] = scaler.fit_transform(df[numeric_columns])
 
 # Split data
-X = df.drop(columns=['target'])
-y = df['target']
+X = df.drop(columns=['target'])  # Make sure 'target' column exists
+y = df['target']  # Make sure 'target' column exists
 
 # Convert y to a classification target
 le = LabelEncoder()
@@ -101,6 +95,7 @@ for col in numeric_columns:
 
 # Scale input data
 input_data[numeric_columns] = scaler.transform(input_data[numeric_columns])
+
 # Predict
 if st.button('Predict'):
     try:
