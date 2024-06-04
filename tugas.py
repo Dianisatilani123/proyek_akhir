@@ -54,11 +54,11 @@ st.title('Aplikasi Rekrutmen Tanpa Bias')
 
 # Input pengguna
 city = st.selectbox('City', ['city_103', 'city_40', 'city_21', 'city_115', 'city_162', 'city_176', 'city_160'])
-city_development_index = st.number_input('City Development Index', min_value=0.0)
+city_development_index = st.number_input('City Development Index', min_value=0.000)
 relevent_experience = st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience'])
 enrolled_university = st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course'])
 education_level = st.selectbox('Education Level', ['Graduate', 'High School', 'Masters', 'Primary School'])
-experience = st.number_input('Experience', min_value=0, max_value=20)
+experience = st.selectbox('Experience', ['>1','1','2','3','4','5','6','7')
 company_size = st.selectbox('Company Size', ['<10', '10-49', '50-99', '100-500', '500-999', '1000-4999', '5000-9999', '10000+'])
 company_type = st.selectbox('Company Type', ['Pvt Ltd', 'Funded Startup', 'Public Sector', 'Early Stage Startup'])
 last_new_job = st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4'])
