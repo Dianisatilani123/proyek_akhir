@@ -101,7 +101,7 @@ last_new_job = st.selectbox("Last New Job", possible_last_new_job)
 training_hours = st.slider("Training Hours", 0, 100, 20)
 
 # Check if user-entered company_size is in the list of predefined categories
-possible_company_size = ['100-500', '1000-4999', '10000+', '50-99', '500-999', '5000-9999', '<10', 'Oct-49']
+possible_company_size = ['<1', '1-49', '50-99', '100-500', '500-999', 'Unknown']
 le_company_size = LabelEncoder().fit(possible_company_size)
 
 input_data = pd.DataFrame({'city_development_index': [city_development_index],
