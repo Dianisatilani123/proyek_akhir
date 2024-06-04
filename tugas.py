@@ -94,7 +94,6 @@ relevent_experience = st.selectbox("Relevent Experience", possible_relevent_expe
 enrolled_university = st.selectbox("Enrolled University", possible_enrolled_university)
 education_level = st.selectbox("Education Level", possible_education_level)
 major_discipline = st.selectbox("Major Discipline", possible_major_discipline)
-possible_experience = ['0', '>20', '<1']  # Add this line
 experience = st.selectbox("Experience", possible_experience)
 company_size = st.selectbox("Company Size", possible_company_size)
 company_type = st.selectbox("Company Type", possible_company_type)
