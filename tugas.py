@@ -95,7 +95,7 @@ input_data = pd.DataFrame({
     'last_new_job': [last_new_job],
     'experience': [int(experience.replace('>','')) if experience!= '>20' else 20],
     'training_hours': [training_hours]
-}, index=[0])
+}, index=[0], columns=[col for col in columns_after_dummies if col!= 'target'])
 
 # Encode categorical variables
 input_data = pd.get_dummies(input_data, columns=['city', 'enrolled_university', 'education_level', 'ajor_discipline', 'last_new_job', 'gender'])
