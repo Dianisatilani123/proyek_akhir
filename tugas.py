@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, f1_score
+from sklearn.preprocessing import StandardScaler
 import joblib
 import streamlit as st
 
@@ -23,6 +24,10 @@ df[categorical_columns] = df[categorical_columns].fillna(df[categorical_columns]
 # Encode categorical variables
 df = pd.get_dummies(df, columns=categorical_columns)
 
+# Scale numeric columns
+scaler = StandardScaler()
+df[numeric_columns] = scaler.fit_transform(df[numeric_columns])
+
 # Split data
 X = df.drop(columns=['target'])
 y = df['target']
@@ -35,9 +40,11 @@ model.fit(X_train, y_train)
 # Evaluate model
 y_pred = model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred, average='macro')
 report = classification_report(y_test, y_pred)
 
-print(f"Accuracy: {accuracy}")
+print(f"Accuracy: {accuracy:.3f}")
+print(f"F1-score: {f1:.3f}")
 print(f"Classification Report:\n{report}")
 
 # Deploy application with Streamlit
@@ -78,6 +85,9 @@ if 'last_new_job' in df.columns:
 
 input_data['experience'] = [experience]
 input_data['training_hours'] = [training_hours]
+
+# Scale input data
+input_data[numeric_columns] = scaler.transform(input_data[numeric_columns])
 
 # Predict
 if st.button('Predict'):
