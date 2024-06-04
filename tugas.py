@@ -82,17 +82,16 @@ training_hours = st.number_input('Training Hours', min_value=0)
 
 # Menggabungkan input pengguna menjadi dataframe
 input_data = pd.DataFrame({
-    'enrollee_id': [enrollee_id],
     'city_development_index': [city_development_index],
-    'elevent_experience': [relevent_experience],
-    'enrolled_university': [enrolled_university],
-    'education_level': [education_level],
+    'relevent_experience': [1 if relevent_experience == 'Has relevent experience' else 0],
+    'enrolled_university_' + enrolled_university: [1],
+    'education_level_' + education_level: [1],
     'experience': [experience],
-    'company_size': [company_size],
-    'company_type': [company_type],
-    'last_new_job': [last_new_job],
+    'company_size_' + company_size: [1],
+    'company_type_' + company_type: [1],
+    'last_new_job_' + last_new_job: [1],
     'training_hours': [training_hours]
-})
+}, index=[0])
 
 # Prediksi
 if st.button('Predict'):
