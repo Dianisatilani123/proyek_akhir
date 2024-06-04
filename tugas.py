@@ -84,7 +84,7 @@ training_hours = st.number_input('Training Hours', min_value=0)
 input_data = pd.DataFrame({
     'enrollee_id': [enrollee_id],
     'city_development_index': [city_development_index],
-    'relevent_experience': [relevent_experience],
+    'elevent_experience': [relevent_experience],
     'enrolled_university': [enrolled_university],
     'education_level': [education_level],
     'experience': [experience],
@@ -101,7 +101,3 @@ if st.button('Predict'):
         st.success('Kandidat Berpotensi Diterima')
     else:
         st.error('Kandidat Tidak Berpotensi Diterima')
-
-# Menjalankan aplikasi Streamlit
-if __name__ == '__main__':
-    st.run()
