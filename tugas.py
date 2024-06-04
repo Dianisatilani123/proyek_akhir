@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
+from sklearn.model_selection import train_test_split, RandomizedSearchCV, StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.impute import SimpleImputer
@@ -77,8 +77,8 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-# Create and tune model using GridSearchCV
-param_grid = {
+# Create and tune model using RandomizedSearchCV
+param_dist = {
     'n_estimators': [50, 100, 150],
     'max_depth': [5, 10, 20, 30],
     'min_samples_split': [2, 5, 10],
@@ -87,11 +87,11 @@ param_grid = {
 }
 rf = RandomForestClassifier(random_state=42)
 cv = StratifiedKFold(n_splits=5)
-grid_search = GridSearchCV(rf, param_grid, cv=cv, n_jobs=-1, verbose=1)
-grid_search.fit(X_train_scaled, y_train)
+random_search = RandomizedSearchCV(rf, param_distributions=param_dist, n_iter=20, cv=cv, n_jobs=-1, verbose=1, random_state=42)
+random_search.fit(X_train_scaled, y_train)
 
-best_model = grid_search.best_estimator_
-print(f"Best parameters: {grid_search.best_params_}")
+best_model = random_search.best_estimator_
+print(f"Best parameters: {random_search.best_params_}")
 
 # Evaluate model for accuracy
 y_pred = best_model.predict(X_test_scaled)
