@@ -19,7 +19,7 @@ df.drop(['enrollee_id', 'city', 'gender'], axis=1, inplace=True)  # remove colum
 df.loc[df['relevent_experience'].isna(), 'elevent_experience'] = 'Unknown'
 df.loc[df['enrolled_university'].isna(), 'enrolled_university'] = 'Unknown'
 df.loc[df['education_level'].isna(), 'education_level'] = 'Unknown'
-df.loc[df['major_discipline'].isna(), 'ajor_discipline'] = 'Unknown'
+df.loc[df['major_discipline'].isna(), 'major_discipline'] = 'Unknown'
 df.loc[df['company_size'].isna(), 'company_size'] = 'Unknown'
 df.loc[df['company_type'].isna(), 'company_type'] = 'Unknown'
 df.loc[df['last_new_job'].isna(), 'last_new_job'] = 'Unknown'
