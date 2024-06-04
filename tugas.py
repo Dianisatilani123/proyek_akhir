@@ -139,7 +139,7 @@ def main():
 
 if st.button("Prediksi"):
     try:
-        result = predict_acceptance([relevent_experience, enrolled_university, education_level, gender, training_hours])
+        result = predict_acceptance([relevent_experience_input, enrolled_university, education_level, gender, training_hours])
         if result == 1:
             st.write("Kandidat diterima")
         else:
@@ -148,6 +148,7 @@ if st.button("Prediksi"):
         st.write(report)
     except Exception as e:
         st.write("Error:", str(e))
+
 
 
 if __name__ == "__main__":
