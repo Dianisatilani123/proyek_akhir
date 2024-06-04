@@ -4,20 +4,16 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.impute import SimpleImputer
-from sklearn.svm import SVC  # Menggunakan Support Vector Machine
+from sklearn.svm import SVC
 import streamlit as st
 
 # Load dataset
 data = pd.read_csv('aug_train.csv')
 print(data.head())
 
-# Define all features including gender and enrollee_id
-all_features = ['enrollee_id', 'relevent_experience', 'enrolled_university', 
-                'education_level', 'training_hours', 'gender']
-
 # Define features for model training
 features = ['relevent_experience', 'enrolled_university', 
-            'education_level', 'training_hours']
+            'education_level', 'training_hours', 'gender']
 target = 'target'
 
 # Drop rows with missing values in selected features and target
@@ -65,24 +61,25 @@ if na_count > 0:
     imputer = SimpleImputer(strategy='most_frequent')  # Use most frequent strategy
     X = pd.DataFrame(imputer.fit_transform(X), columns=X.columns)  # Impute missing values
     print("Missing values imputed.")
-    X.columns = features  # Reset column names after imputation
 
 print("Shape of X after imputing NaN values:", X.shape)
 
 # Ensure all columns are numeric
 X = X.astype(float)
 
+# Split data into train and test sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
 
+# Scale features
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-# Create and tune model using GridSearchCV
+# Train SVM model
 svm = SVC(random_state=42)
 svm.fit(X_train_scaled, y_train)
 
-# Evaluate model for accuracy
+# Evaluate model
 y_pred = svm.predict(X_test_scaled)
 accuracy = accuracy_score(y_test, y_pred)
 report = classification_report(y_test, y_pred, zero_division=0)
@@ -112,22 +109,20 @@ def predict_acceptance(input_data):
         'Masters': 1,
         'Phd': 2
     }
-    gender_mapping = {
-        'Male': 0,
-        'Female': 1,
-        'Other': 2
-    }
     
-    input_data[1] = relevent_experience_mapping[input_data[1]]
-    input_data[2] = enrolled_university_mapping[input_data[2]]
-    input_data[3] = education_level_mapping[input_data[3]]
-    input_data[5] = gender_mapping[input_data[5]]  # Update index to 5 for gender
-    input_features = input_data[1:5] + [input_data[5]]  # Include gender
-    input_features = np.array(input_features, dtype=float).reshape(1, -1)  # Convert to array and reshape
+    relevent_experience = input_data[0]
+    enrolled_university = input_data[1]
+    education_level = input_data[2]
+    training_hours = input_data[3]
+
+    relevent_experience = relevent_experience_mapping[relevent_experience]
+    enrolled_university = enrolled_university_mapping[enrolled_university]
+    education_level = education_level_mapping[education_level]
+
+    input_features = np.array([relevent_experience, enrolled_university, education_level, training_hours]).reshape(1, -1)
     input_features = scaler.transform(input_features)  # Transform input data
     prediction = svm.predict(input_features)
     return prediction[0]
-
 
 def main():
     """
@@ -137,16 +132,14 @@ def main():
 
     st.write("Masukkan fitur-fitur untuk memprediksi apakah kandidat diterima:")
 
-    enrollee_id = st.text_input("Enrollee ID", "")
     relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
-    enrolled_university = st.selectbox("Enrolled University", list(enrolled_university_mapping.keys()), index=0)
-    education_level = st.selectbox("Education Level", list(education_level_mapping.keys()), index=0)
-    gender = st.selectbox("Gender", list(gender_mapping.keys()), index=0)
+    enrolled_university = st.selectbox("Enrolled University", ['no_enrollment', 'Full time course', 'Part time course'])
+    education_level = st.selectbox("Education Level", ['Graduate', 'Masters', 'Phd'])
     training_hours = st.slider("Training Hours", min_value=0, step=1)
 
     if st.button("Prediksi"):
         try:
-            result = predict_acceptance([enrollee_id, relevent_experience, enrolled_university, education_level, training_hours, gender])
+            result = predict_acceptance([relevent_experience, enrolled_university, education_level, training_hours])
             if result == 1:
                 st.write("Kandidat diterima")
             else:
