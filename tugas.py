@@ -94,9 +94,13 @@ for col in categorical_columns:
     else:
         input_data[f'{col}_Unknown'] = [1]
 
+# Add missing numeric columns
+for col in numeric_columns:
+    if col not in input_data.columns:
+        input_data[col] = [0]
+
 # Scale input data
 input_data[numeric_columns] = scaler.transform(input_data[numeric_columns])
-
 # Predict
 if st.button('Predict'):
     try:
