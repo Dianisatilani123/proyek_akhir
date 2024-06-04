@@ -55,7 +55,7 @@ st.title('Aplikasi Rekrutmen Tanpa Bias')
 # Input pengguna
 city = st.selectbox('City', ['city_103', 'city_40', 'city_21', 'city_115', 'city_162', 'city_176', 'city_160'])
 city_development_index = st.number_input('City Development Index', min_value=0.0)
-relevent_experience = st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience'])
+relevant_experience = st.selectbox('Relevant Experience', ['Has relevant experience', 'No relevant experience'])
 enrolled_university = st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course'])
 education_level = st.selectbox('Education Level', ['Graduate', 'High School', 'Masters', 'Primary School'])
 experience = st.number_input('Experience', min_value=0, max_value=20)
@@ -68,7 +68,7 @@ training_hours = st.number_input('Training Hours', min_value=0)
 input_data = pd.DataFrame({
     'city': [city],
     'city_development_index': [city_development_index],
-    'elevent_experience': [relevent_experience],
+    'relevant_experience': [relevant_experience],
     'enrolled_university': [enrolled_university],
     'education_level': [education_level],
     'experience': [experience],
@@ -79,7 +79,7 @@ input_data = pd.DataFrame({
 })
 
 # One-hot encoding untuk input data
-input_data = pd.get_dummies(input_data, columns=['city', 'elevent_experience', 'enrolled_university', 'education_level', 'company_size', 'company_type', 'last_new_job'])
+input_data = pd.get_dummies(input_data, columns=['city', 'relevant_experience', 'enrolled_university', 'education_level', 'company_size', 'company_type', 'last_new_job'])
 
 # Reindexing untuk membuat kolom-kolom yang sama dengan kolom-kolom pada data training
 input_data = input_data.reindex(columns=X.columns, fill_value=0)
@@ -91,4 +91,3 @@ if st.button('Predict'):
         st.success('Kandidat Berpotensi Diterima')
     else:
         st.error('Kandidat Tidak Berpotensi Diterima')
-
