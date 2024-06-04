@@ -130,12 +130,10 @@ input_data['experience_score'] = input_data['relevent_experience'] * input_data[
 
 # Check if company_size is None before making a prediction
 if company_size is not None:
-   # Prediksi
-if st.button('Predict'):
-    prediction = model.predict(input_data)
-    if prediction == 1:
-        st.success('Kandidat Berpotensi Diterima')
-    else:
-        st.error('Kandidat Tidak Berpotensi Diterima')
-
-
+    # Prediksi
+    if st.button('Predict'):
+        prediction = model.predict(input_data)
+        if prediction == 1:
+            st.success('Kandidat Berpotensi Diterima')
+        else:
+            st.error('Kandidat Tidak Berpotensi Diterima')
