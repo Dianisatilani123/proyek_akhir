@@ -10,9 +10,6 @@ import streamlit as st
 # Load dataset
 df = pd.read_csv('aug_train.csv')
 
-# Check if the columns exist
-print(df.columns)
-
 # Drop unnecessary columns
 df = df.drop(columns=['gender'])
 
@@ -27,13 +24,16 @@ df[categorical_columns] = df[categorical_columns].fillna(df[categorical_columns]
 # Encode categorical variables
 df = pd.get_dummies(df, columns=categorical_columns)
 
+# Save the list of columns for later use
+columns_after_dummies = df.columns.tolist()
+
 # Scale numeric columns
 scaler = StandardScaler()
 df[numeric_columns] = scaler.fit_transform(df[numeric_columns])
 
 # Split data
-X = df.drop(columns=['target'])  # Make sure 'target' column exists
-y = df['target']  # Make sure 'target' column exists
+X = df.drop(columns=['target'])
+y = df['target']
 
 # Convert y to a classification target
 le = LabelEncoder()
@@ -44,6 +44,11 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 # Create model
 model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
+
+# Save the model and scaler
+joblib.dump(model, 'model.joblib')
+joblib.dump(scaler, 'scaler.joblib')
+joblib.dump(columns_after_dummies, 'columns_after_dummies.joblib')
 
 # Evaluate model
 y_pred = model.predict(X_test)
@@ -56,9 +61,12 @@ print(f"F1-score: {f1:.3f}")
 print(f"Classification Report:\n{report}")
 
 # Deploy application with Streamlit
-
-# Title
 st.title('Aplikasi Rekrutmen Tanpa Bias')
+
+# Load the saved model, scaler, and column names
+model = joblib.load('model.joblib')
+scaler = joblib.load('scaler.joblib')
+columns_after_dummies = joblib.load('columns_after_dummies.joblib')
 
 # Input fields
 enrollee_id = st.text_input('Enrollee ID')
@@ -97,10 +105,13 @@ for col in categorical_columns:
     else:
         input_data[f'{col}_Unknown'] = [1]
 
-# Add missing numeric columns
-for col in numeric_columns:
+# Ensure all columns are present
+for col in columns_after_dummies:
     if col not in input_data.columns:
-        input_data[col] = [0]
+        input_data[col] = 0
+
+# Reorder columns to match the training data
+input_data = input_data[columns_after_dummies]
 
 # Scale input data
 input_data[numeric_columns] = scaler.transform(input_data[numeric_columns])
