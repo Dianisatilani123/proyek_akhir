@@ -53,22 +53,24 @@ st.title('Aplikasi Rekrutmen Tanpa Bias')
 
 # Input fields
 enrollee_id = st.text_input('Enrollee ID')
+city = st.text_input('Kota')
 city_development_index = st.number_input('City Development Index', min_value=0.0, max_value=1.0)
+gender = st.selectbox('Jenis Kelamin', ['Male', 'Female', 'Unknown'])
 relevent_experience = st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience'])
 
-enrolled_university = st.selectbox('Enrolled University', df.columns if 'enrolled_university' in df.columns else ['Unknown'])
-education_level = st.selectbox('Education Level', df.columns if 'education_level' in df.columns else ['Unknown'])
-company_size = st.selectbox('Company Size', df.columns if 'company_size' in df.columns else ['Unknown'])
-company_type = st.selectbox('Company Type', df.columns if 'company_type' in df.columns else ['Unknown'])
-last_new_job = st.selectbox('Last New Job', df.columns if 'last_new_job' in df.columns else ['Unknown'])
-
+enrolled_university = st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course'])
+education_level = st.selectbox('Education Level', ['Graduate', 'Masters', 'High School', 'Primary School'])
+major_discipline = st.selectbox('Major Discipline', ['STEM', 'Business Degree', 'Humanities', 'Unknown'])
+company_size = st.selectbox('Company Size', ['Unknown', 'Small', 'Medium', 'Large'])
+company_type = st.selectbox('Company Type', ['Unknown', 'Pvt Ltd', 'Government', 'Self Owned'])
+last_new_job = st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4'])
 experience = st.number_input('Experience', min_value=0, max_value=20)
 training_hours = st.number_input('Training Hours', min_value=0)
 
 # Create input data
 input_data = pd.DataFrame({
     'city_development_index': [city_development_index],
-    'elevent_experience': [1 if relevent_experience == 'Has relevent experience' else 0],
+    'relevent_experience': [1 if relevent_experience == 'Has relevent experience' else 0],
     'experience': [experience],
     'training_hours': [training_hours]
 }, index=[0])
@@ -79,12 +81,16 @@ for col in categorical_columns:
         input_data[f'enrolled_university_{enrolled_university}'] = [1]
     elif col == 'education_level':
         input_data[f'education_level_{education_level}'] = [1]
+    elif col == 'major_discipline':
+        input_data[f'major_discipline_{major_discipline}'] = [1]
     elif col == 'company_size':
         input_data[f'company_size_{company_size}'] = [1]
     elif col == 'company_type':
         input_data[f'company_type_{company_type}'] = [1]
     elif col == 'last_new_job':
         input_data[f'last_new_job_{last_new_job}'] = [1]
+    elif col == 'gender':
+        input_data[f'gender_{gender}'] = [1]
     else:
         input_data[f'{col}_Unknown'] = [1]
 
