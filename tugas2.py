@@ -44,6 +44,14 @@ def evaluate_model(model, X_test, y_test):
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
     return accuracy
+          
+    # Calculate accuracy
+        accuracy = accuracy_score(y_test, y_pred)
+        st.write("Accuracy:", accuracy)
+        st.write("Classification Report:")
+        st.write(classification_report(y_test, y_pred))
+        st.write("Confusion Matrix:")
+        st.write(confusion_matrix(y_test, y_pred))
 
 # Langkah 7: Membuat model untuk aplikasi
 def main():
