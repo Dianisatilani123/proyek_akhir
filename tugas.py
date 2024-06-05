@@ -8,13 +8,9 @@ import streamlit as st
 # Load dataset
 data = pd.read_csv('aug_train.csv')
 
-# Buat dua kolom
-col1, col2 = st.columns(2)
-
-# Tampilkan dataset di kolom kanan
-    st.title("Rekrutmen Tanpa Bias")
-    st.write("Dataset:")
-    st.write(data.head())
+st.title("Rekrutmen Tanpa Bias")
+st.write("Dataset:")
+st.write(data.head())
 
 # Ensure 'city' column exists
 if 'city' not in data.columns:
@@ -69,6 +65,9 @@ else:
         st.write("Confusion Matrix:")
         st.write(confusion_matrix(y_test, y_pred))
 
+# Create two columns
+col1, col2 = st.columns(2)
+
 # Form input data kandidat di kolom kiri
 with col1:
     st.write("Form Input Data Kandidat:")
@@ -102,4 +101,3 @@ with col2:
         }
         result = predict(input_data)
         st.write(f'Result: {result}')
-
