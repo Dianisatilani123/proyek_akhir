@@ -75,32 +75,32 @@ st.write(f'Accuracy: {accuracy}')
 st.write(f'Classification Report: \n{report}')
 
 # Input form for new candidate data
-def user_input_features():
-    city_development_index = st.sidebar.slider('City Development Index', 0.0, 1.0, 0.5)
-    relevent_experience = st.sidebar.selectbox('Relevant Experience', ('No relevent experience', 'Has relevent experience'))
-    enrolled_university = st.sidebar.selectbox('Enrolled University', ('no_enrollment', 'Part time course', 'Full time course'))
-    education_level = st.sidebar.selectbox('Education Level', ('High School', 'Graduate', 'Masters', 'Phd'))
-    major_discipline = st.sidebar.selectbox('Major Discipline', ('STEM', 'Business Degree', 'Arts', 'Humanities', 'Other'))
-    experience = st.sidebar.slider('Experience (years)', 0, 20, 0)
-    company_size = st.sidebar.selectbox('Company Size', ('<10', '10-49', '50-99', '100-500', '500-999', '1000-4999', '5000-9999', '10000+'))
-    company_type = st.sidebar.selectbox('Company Type', ('Pvt Ltd', 'Funded Startup', 'Early Stage Startup', 'Public Sector', 'NGO', 'Other'))
-    last_new_job = st.sidebar.selectbox('Last New Job', ('never', '1', '2', '3', '4', '>4'))
-    training_hours = st.sidebar.slider('Training Hours', 0, 500, 0)
+st.sidebar.header('Input Data Kandidat')
+city_development_index = st.sidebar.slider('City Development Index', 0.0, 1.0, 0.5)
+relevent_experience = st.sidebar.selectbox('Relevant Experience', ('No relevent experience', 'Has relevent experience'))
+enrolled_university = st.sidebar.selectbox('Enrolled University', ('no_enrollment', 'Part time course', 'Full time course'))
+education_level = st.sidebar.selectbox('Education Level', ('High School', 'Graduate', 'Masters', 'Phd'))
+major_discipline = st.sidebar.selectbox('Major Discipline', ('STEM', 'Business Degree', 'Arts', 'Humanities', 'Other'))
+experience = st.sidebar.slider('Experience (years)', 0, 20, 0)
+company_size = st.sidebar.selectbox('Company Size', ('<10', '10-49', '50-99', '100-500', '500-999', '1000-4999', '5000-9999', '10000+'))
+company_type = st.sidebar.selectbox('Company Type', ('Pvt Ltd', 'Funded Startup', 'Early Stage Startup', 'Public Sector', 'NGO', 'Other'))
+last_new_job = st.sidebar.selectbox('Last New Job', ('never', '1', '2', '3', '4', '>4'))
+training_hours = st.sidebar.slider('Training Hours', 0, 500, 0)
+city = st.sidebar.selectbox('City', ('City A', 'City B', 'City C', 'Other'))
 
-    data = {'city_development_index': city_development_index,
-            'relevent_experience': relevent_experience,
-            'enrolled_university': enrolled_university,
-            'education_level': education_level,
-            'major_discipline': major_discipline,
-            'experience': experience,
-            'company_size': company_size,
-            'company_type': company_type,
-            'last_new_job': last_new_job,
-            'training_hours': training_hours}
-    features = pd.DataFrame(data, index=[0])
-    return features
-
-input_df = user_input_features()
+# Create input data frame
+input_data = {'city_development_index': [city_development_index],
+              'relevent_experience': [relevent_experience],
+              'enrolled_university': [enrolled_university],
+              'education_level': [education_level],
+              'major_discipline': [major_discipline],
+              'experience': [experience],
+              'company_size': [company_size],
+              'company_type': [company_type],
+              'last_new_job': [last_new_job],
+              'training_hours': [training_hours],
+              'city': [city]}
+input_df = pd.DataFrame(input_data)
 
 # Predict function with handling for missing 'city' column and encoding categorical columns
 def predict(data):
@@ -123,8 +123,9 @@ def predict(data):
     prediction = model.predict(data_encoded)
     return prediction
 
-# Predict
-prediction = predict(input_df)
-if prediction is not None:
-    st.subheader('Prediction')
-    st.write('Hired' if prediction == 1 else 'Not Hired')
+# Predict button
+if st.sidebar.button('Predict'):
+    prediction = predict(input_df)
+    if prediction is not None:
+        st.subheader('Prediction')
+        st.write('Hired' if prediction == 1 else 'Not Hired')
