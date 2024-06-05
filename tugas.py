@@ -80,29 +80,30 @@ else:
         unique_last_new_job = data['last_new_job'].unique() if 'last_new_job' in data.columns else []
 
         # Form input data kandidat
-        input_data = {
-            'city': st.text_input('City'),
-            'city_development_index': st.number_input('City Development Index'),
-            'elevent_experience': st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience']),
-            'enrolled_university': st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course']),
-            'education_level': st.selectbox('Education Level', ['Graduate', 'Masters', 'High School', 'Primary School']),
-            'ajor_discipline': st.selectbox('Major Discipline', ['STEM', 'Business Degree', 'Humanities']),
-            'experience': st.selectbox('Experience', ['<1', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '>20']),
-            'company_size': st.selectbox('Company Size', ['50-99', '100-500', '500-999', 'Oct-49']),
-            'company_type': st.selectbox('Company Type', ['Pvt Ltd', 'Funded Startup', 'Public Sector']),
-            'last_new_job': st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4']),
-            'training_hours': st.number_input('Training Hours')
-        }
+        with st.sidebar:
+            input_data = {
+                'city': st.text_input('City'),
+                'city_development_index': st.number_input('City Development Index'),
+                'elevent_experience': st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience']),
+                'enrolled_university': st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course']),
+                'education_level': st.selectbox('Education Level', ['Graduate', 'Masters', 'High School', 'Primary School']),
+                'ajor_discipline': st.selectbox('Major Discipline', ['STEM', 'Business Degree', 'Humanities']),
+                'experience': st.selectbox('Experience', ['<1', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '>20']),
+                'company_size': st.selectbox('Company Size', ['50-99', '100-500', '500-999', 'Oct-49']),
+                'company_type': st.selectbox('Company Type', ['Pvt Ltd', 'Funded Startup', 'Public Sector']),
+                'last_new_job': st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4']),
+                'training_hours': st.number_input('Training Hours')
+            }
 
-        def predict(input_data):
-            input_df = pd.DataFrame([input_data])
-            input_df = pd.get_dummies(input_df)
-            input_df = input_df.reindex(columns=X.columns, fill_value=0)
-            input_scaled = scaler.transform(input_df)
-            prediction = model.predict(input_scaled)
-            return prediction
+            def predict(input_data):
+                input_df = pd.DataFrame([input_data])
+                input_df = pd.get_dummies(input_df)
+                input_df = input_df.reindex(columns=X.columns, fill_value=0)
+                input_scaled = scaler.transform(input_df)
+                prediction = model.predict(input_scaled)
+                return prediction
 
-        # Predict button
-        if st.button('Predict'):
-            result = predict(input_data)
-            st.write(f'Result: {result[0]}')
+            # Predict button
+            if st.button('Predict'):
+                result = predict(input_data)
+                st.write(f'Result: {result[0]}')
