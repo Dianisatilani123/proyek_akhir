@@ -80,7 +80,7 @@ def main():
 
     # Menampilkan form input untuk memprediksi kelayakan kandidat
     st.subheader("Prediksi Kelayakan Kandidat")
-    with st.sidebar
+    with st.sidebar:
 
     enrollee_id = st.text_input("Enrollee ID", "")
     city = st.text_input("City", "")
