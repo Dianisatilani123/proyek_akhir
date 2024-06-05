@@ -76,6 +76,7 @@ st.write(f'Classification Report: \n{report}')
 
 # Input form for new candidate data
 st.sidebar.header('Input Data Kandidat')
+city = st.sidebar.selectbox('City', ('City A', 'City B', 'City C', 'Other'))
 city_development_index = st.sidebar.slider('City Development Index', 0.0, 1.0, 0.5)
 relevent_experience = st.sidebar.selectbox('Relevant Experience', ('No relevent experience', 'Has relevent experience'))
 enrolled_university = st.sidebar.selectbox('Enrolled University', ('no_enrollment', 'Part time course', 'Full time course'))
@@ -86,10 +87,11 @@ company_size = st.sidebar.selectbox('Company Size', ('<10', '10-49', '50-99', '1
 company_type = st.sidebar.selectbox('Company Type', ('Pvt Ltd', 'Funded Startup', 'Early Stage Startup', 'Public Sector', 'NGO', 'Other'))
 last_new_job = st.sidebar.selectbox('Last New Job', ('never', '1', '2', '3', '4', '>4'))
 training_hours = st.sidebar.slider('Training Hours', 0, 500, 0)
-city = st.sidebar.selectbox('City', ('City A', 'City B', 'City C', 'Other'))
+
 
 # Create input data frame
-input_data = {'city_development_index': [city_development_index],
+input_data = {'city': [city]
+              'city_development_index': [city_development_index],
               'relevent_experience': [relevent_experience],
               'enrolled_university': [enrolled_university],
               'education_level': [education_level],
@@ -98,8 +100,7 @@ input_data = {'city_development_index': [city_development_index],
               'company_size': [company_size],
               'company_type': [company_type],
               'last_new_job': [last_new_job],
-              'training_hours': [training_hours],
-              'city': [city]}
+              'training_hours': [training_hours]}
 input_df = pd.DataFrame(input_data)
 
 # Predict function with handling for missing 'city' column and encoding categorical columns
