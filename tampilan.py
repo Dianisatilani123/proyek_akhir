@@ -70,8 +70,8 @@ HTML_TEMPLATE = "SDG's : GENDER EQUALITY"
 def home():
     return render_template_string(HTML_TEMPLATE)
 
-@app.route("/rekrutmen")
-def rekrutmen():
+@app.route("/tugas.py")
+def tugas():
     return st_app()
 
 def st_app():
