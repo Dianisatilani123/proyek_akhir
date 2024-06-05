@@ -79,11 +79,14 @@ else:
         unique_company_type = data['company_type'].unique()
         unique_last_new_job = data['last_new_job'].unique()
 
-        # Form input data kandidat
-        input_data = {
-            'city': st.selectbox('City', unique_city),
-            'city_development_index': st.number_input('City Development Index'),
-            'elevent_experience': st.selectbox('Relevent Experience', unique_relevent_experience),
+      # Get unique values for categorical columns
+unique_city_cols = [col for col in data.columns if col.startswith('city_')]
+
+# Form input data kandidat
+input_data = {
+    'city_development_index': st.number_input('City Development Index'),
+    'city': st.selectbox('City', unique_city_cols),
+    'elevent_experience': st.selectbox('Relevent Experience', unique_relevent_experience),
             'enrolled_university': st.selectbox('Enrolled University', unique_enrolled_university),
             'education_level': st.selectbox('Education Level', unique_education_level),
             'ajor_discipline': st.selectbox('Major Discipline', unique_major_discipline),
