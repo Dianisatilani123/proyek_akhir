@@ -78,7 +78,6 @@ def main():
     st.write(f"Akurasi model: {accuracy * 100:.2f}%")
 
    # Menampilkan form input untuk memprediksi kelayakan kandidat
-st.subheader("Prediksi Kelayakan Kandidat")
 with st.sidebar:
     enrollee_id = st.text_input("Enrollee ID", "")
     city = st.text_input("City", "")
