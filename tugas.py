@@ -8,7 +8,7 @@ import streamlit as st
 # Load dataset
 data = pd.read_csv('aug_train.csv')
 
-st.title("Rekrutmen Tanpa Bias")
+# Display the dataset
 st.write("Dataset:")
 st.write(data.head())
 
@@ -65,39 +65,47 @@ else:
         st.write("Confusion Matrix:")
         st.write(confusion_matrix(y_test, y_pred))
 
-# Create two columns
-col1, col2 = st.columns(2)
+        # Streamlit application
+        st.title("Rekrutmen Tanpa Bias")
 
-# Form input data kandidat di kolom kiri
-with col1:
-    st.write("Form Input Data Kandidat:")
-    city = st.text_input('City')
-    city_development_index = st.number_input('City Development Index')
-    relevent_experience = st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience'])
-    enrolled_university = st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course'])
-    education_level = st.selectbox('Education Level', ['Graduate', 'Masters', 'High School', 'Primary School'])
-    major_discipline = st.selectbox('Major Discipline', ['STEM', 'Business Degree', 'Humanities'])
-    experience = st.selectbox('Experience', ['<1', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '>20'])
-    company_size = st.selectbox('Company Size', ['50-99', '100-500', '500-999', 'Oct-49'])
-    company_type = st.selectbox('Company Type', ['Pvt Ltd', 'Funded Startup', 'Public Sector'])
-    last_new_job = st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4'])
-    training_hours = st.number_input('Training Hours')
+        # Get unique values for categorical columns
+        unique_city = data['city'].unique() if 'city' in data.columns else []
+        unique_relevent_experience = data['relevent_experience'].unique() if 'elevent_experience' in data.columns else []
+        unique_enrolled_university = data['enrolled_university'].unique() if 'enrolled_university' in data.columns else []
+        unique_education_level = data['education_level'].unique() if 'education_level' in data.columns else []
+        unique_major_discipline = data['major_discipline'].unique() if 'ajor_discipline' in data.columns else []
+        unique_experience = data['experience'].unique() if 'experience' in data.columns else []
+        unique_company_size = data['company_size'].unique() if 'company_size' in data.columns else []
+        unique_company_type = data['company_type'].unique() if 'company_type' in data.columns else []
+        unique_last_new_job = data['last_new_job'].unique() if 'last_new_job' in data.columns else []
 
-# Button prediksi di kolom kanan
-with col2:
-    if st.button('Predict'):
+        # Form input data kandidat
         input_data = {
-            'city': city,
-            'city_development_index': city_development_index,
-            'elevent_experience': relevent_experience,
-            'enrolled_university': enrolled_university,
-            'education_level': education_level,
-            'ajor_discipline': major_discipline,
-            'experience': experience,
-            'company_size': company_size,
-            'company_type': company_type,
-            'last_new_job': last_new_job,
-            'training_hours': training_hours
+            'city': st.text_input('City'),
+            'city_development_index': st.number_input('City Development Index'),
+            'elevent_experience': st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience']),
+            'enrolled_university': st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course']),
+            'education_level': st.selectbox('Education Level', ['Graduate', 'Masters', 'High School', 'Primary School']),
+            'ajor_discipline': st.selectbox('Major Discipline', ['STEM', 'Business Degree', 'Humanities']),
+            'experience': st.selectbox('Experience', ['<1', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '>20']),
+            'company_size': st.selectbox('Company Size', ['50-99', '100-500', '500-999', 'Oct-49']),
+            'company_type': st.selectbox('Company Type', ['Pvt Ltd', 'Funded Startup', 'Public Sector']),
+            'last_new_job': st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4']),
+            'training_hours': st.number_input('Training Hours')
         }
-        result = predict(input_data)
-        st.write(f'Result: {result}')
+
+        def predict(input_data):
+            input_df = pd.DataFrame([input_data])
+            input_df = pd.get_dummies(input_df)
+            input_df = input_df.reindex(columns=X.columns, fill_value=0)
+            input_scaled = scaler.transform(input_df)
+            prediction = model.predict(input_scaled)
+            if prediction[0] == 1:
+                return "DITERIMA"
+            else:
+                return "DITOLAK"
+
+        # Predict button
+        if st.button('Predict'):
+            result = predict(input_data)
+            st.write(f'Result: {result}')
