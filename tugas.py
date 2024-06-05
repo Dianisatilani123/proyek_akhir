@@ -23,15 +23,11 @@ df = df.drop(columns=['enrollee_id', 'gender'])
 
 # Fill missing values for numerical columns with median
 numerical_cols = ['city_development_index', 'training_hours']
-for col in numerical_cols:
-    if col in df.columns:
-        df[col] = df[col].fillna(df[col].median())
+df[numerical_cols] = df[numerical_cols].fillna(df[numerical_cols].median())
 
 # Fill missing values for categorical columns with mode
-categorical_cols = ['city', 'elevent_experience', 'enrolled_university', 'education_level', 'ajor_discipline', 'experience', 'company_size', 'company_type', 'last_new_job']
-for col in categorical_cols:
-    if col in df.columns:
-        df[col] = df[col].fillna(df[col].mode().iloc[0])
+categorical_cols = ['city', 'relevent_experience', 'enrolled_university', 'education_level', 'major_discipline', 'experience', 'company_size', 'company_type', 'last_new_job']
+df[categorical_cols] = df[categorical_cols].fillna(df[categorical_cols].mode().iloc[0])
 
 # Separate features and target
 y = df['target']
@@ -80,10 +76,7 @@ st.write(f'Classification Report: \n{report}')
 
 # Input form for new candidate data
 def user_input_features():
-    city = st.sidebar.selectbox('City', ["city_103", "city_40", "city_21", "city_115", "city_162", 
-                                         "city_176", "city_160", "city_46", "city_61", "city_114", 
-                                         "city_13", "city_159", "city_102", "city_67", "city_100", 
-                                         "city_16", "city_71", "city_104", "city_64"])
+    city_development_index = st.sidebar.slider('City Development Index', 0.0, 1.0, 0.5)
     relevent_experience = st.sidebar.selectbox('Relevant Experience', ('No relevent experience', 'Has relevent experience'))
     enrolled_university = st.sidebar.selectbox('Enrolled University', ('no_enrollment', 'Part time course', 'Full time course'))
     education_level = st.sidebar.selectbox('Education Level', ('High School', 'Graduate', 'Masters', 'Phd'))
@@ -94,12 +87,11 @@ def user_input_features():
     last_new_job = st.sidebar.selectbox('Last New Job', ('never', '1', '2', '3', '4', '>4'))
     training_hours = st.sidebar.slider('Training Hours', 0, 500, 0)
 
-    data = {'city_development_index': 0.5,  # default value
-            'city': city,
-            'elevent_experience': relevent_experience,
+    data = {'city_development_index': city_development_index,
+            'relevent_experience': relevent_experience,
             'enrolled_university': enrolled_university,
             'education_level': education_level,
-            'ajor_discipline': major_discipline,
+            'major_discipline': major_discipline,
             'experience': experience,
             'company_size': company_size,
             'company_type': company_type,
@@ -112,6 +104,10 @@ input_df = user_input_features()
 
 # Predict function with handling for missing 'city' column and encoding categorical columns
 def predict(data):
+    if 'city' not in data.columns:
+        st.error("Please select a value for 'City'.")
+        return None
+    
     # Encode categorical columns
     data_encoded = pd.get_dummies(data, columns=categorical_cols)
     
