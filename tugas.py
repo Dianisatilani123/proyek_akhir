@@ -1,130 +1,108 @@
 import pandas as pd
-import numpy as np
+from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import streamlit as st
 
 # Load dataset
-df = pd.read_csv('aug_train.csv')
+data = pd.read_csv('aug_train.csv')
 
-# Check DataFrame structure
-print(df.columns)
+# Display the dataset
+st.write("Dataset:")
+st.write(data.head())
 
-# Check for the existence of the 'target' column
-if 'target' not in df.columns:
-    raise ValueError("The 'target' column does not exist in the DataFrame")
+# Ensure 'city' column exists
+if 'city' not in data.columns:
+    st.error("'city' column not found in the dataset.")
+else:
+    # Preprocessing
+    # Drop columns that may cause bias
+    data = data.drop(['enrollee_id', 'gender'], axis=1)
 
-# Drop columns that can cause bias
-df = df.drop(columns=['enrollee_id', 'gender'])
+    # Handle missing values
+    data = data.dropna()
 
-# Fill missing values for numerical columns with median
-numerical_cols = ['city_development_index', 'training_hours']
-df[numerical_cols] = df[numerical_cols].fillna(df[numerical_cols].median())
+    # Convert categorical data to numerical
+    data = pd.get_dummies(data)
 
-# Fill missing values for categorical columns with mode
-categorical_cols = ['city', 'relevent_experience', 'enrolled_university', 'education_level', 'major_discipline', 'experience', 'company_size', 'company_type', 'last_new_job']
-df[categorical_cols] = df[categorical_cols].fillna(df[categorical_cols].mode().iloc[0])
+    # Split features and target
+    X = data.drop('target', axis=1)
+    y = data['target']
 
-# Separate features and target
-y = df['target']
-X = df.drop(columns=['target'])
+    # Check if target variable is binary
+    if len(y.unique())!= 2:
+        st.error("Target variable is not binary. Please ensure it has only two unique values (0 and 1).")
+    else:
+        # Check for class imbalance
+        class_counts = y.value_counts()
+        st.write("Class distribution:")
+        st.write(class_counts)
+        if class_counts[0] / class_counts[1] > 5 or class_counts[1] / class_counts[0] > 5:
+            st.warning("Class imbalance detected. You may want to consider class weighting, oversampling, or undersampling.")
 
-# Preprocessing for numerical and categorical columns
-numeric_transformer = Pipeline(steps=[
-    ('scaler', StandardScaler())])
+        # Standardize the data
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
 
-categorical_transformer = Pipeline(steps=[
-    ('onehot', OneHotEncoder(handle_unknown='ignore'))])
+        # Split the data into training and testing sets
+        X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
-preprocessor = ColumnTransformer(
-    transformers=[
-        ('num', numeric_transformer, numerical_cols),
-        ('cat', categorical_transformer, categorical_cols)])
+        # Initialize the Random Forest Classifier
+        model = RandomForestClassifier(n_estimators=100, random_state=42)
 
-# Create pipeline for training
-model = Pipeline(steps=[('preprocessor', preprocessor),
-                        ('classifier', RandomForestClassifier())])
+        # Train the model
+        model.fit(X_train, y_train)
 
-# Split data into train and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        # Predict on the test set
+        y_pred = model.predict(X_test)
 
-# Train model
-model.fit(X_train, y_train)
+        # Calculate accuracy
+        accuracy = accuracy_score(y_test, y_pred)
+        st.write("Accuracy:", accuracy)
+        st.write("Classification Report:")
+        st.write(classification_report(y_test, y_pred))
+        st.write("Confusion Matrix:")
+        st.write(confusion_matrix(y_test, y_pred))
 
-# Predict test data
-y_pred = model.predict(X_test)
+        # Streamlit application
+        st.title("Rekrutmen Tanpa Bias")
 
-# Evaluate accuracy
-accuracy = accuracy_score(y_test, y_pred)
-report = classification_report(y_test, y_pred)
+        # Get unique values for categorical columns
+        unique_city = data['city'].unique() if 'city' in data.columns else []
+        unique_relevent_experience = data['relevent_experience'].unique() if 'elevent_experience' in data.columns else []
+        unique_enrolled_university = data['enrolled_university'].unique() if 'enrolled_university' in data.columns else []
+        unique_education_level = data['education_level'].unique() if 'education_level' in data.columns else []
+        unique_major_discipline = data['major_discipline'].unique() if 'ajor_discipline' in data.columns else []
+        unique_experience = data['experience'].unique() if 'experience' in data.columns else []
+        unique_company_size = data['company_size'].unique() if 'company_size' in data.columns else []
+        unique_company_type = data['company_type'].unique() if 'company_type' in data.columns else []
+        unique_last_new_job = data['last_new_job'].unique() if 'last_new_job' in data.columns else []
 
-# Streamlit for web interface
-st.title('Aplikasi AI Rekrutmen Tanpa Bias')
+        # Form input data kandidat
+        input_data = {
+            'city': st.text_input('City'),
+            'city_development_index': st.number_input('City Development Index'),
+            'elevent_experience': st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience']),
+            'enrolled_university': st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course']),
+            'education_level': st.selectbox('Education Level', ['Graduate', 'Masters', 'High School', 'Primary School']),
+            'ajor_discipline': st.selectbox('Major Discipline', ['STEM', 'Business Degree', 'Humanities']),
+            'experience': st.selectbox('Experience', ['<1', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '>20']),
+            'company_size': st.selectbox('Company Size', ['50-99', '100-500', '500-999', 'Oct-49']),
+            'company_type': st.selectbox('Company Type', ['Pvt Ltd', 'Funded Startup', 'Public Sector']),
+            'last_new_job': st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4']),
+            'training_hours': st.number_input('Training Hours')
+        }
 
-# Display some rows from the dataset
-st.subheader('Dataset')
-st.write(df.head())
+        def predict(input_data):
+            input_df = pd.DataFrame([input_data])
+            input_df = pd.get_dummies(input_df)
+            input_df = input_df.reindex(columns=X.columns, fill_value=0)
+            input_scaled = scaler.transform(input_df)
+            prediction = model.predict(input_scaled)
+            return prediction
 
-# Display model evaluation
-st.subheader('Model Evaluation')
-st.write(f'Accuracy: {accuracy}')
-st.write(f'Classification Report: \n{report}')
-
-# Input form for new candidate data
-def user_input_features():
-    city_development_index = st.sidebar.slider('City Development Index', 0.0, 1.0, 0.5)
-    relevent_experience = st.sidebar.selectbox('Relevant Experience', ('No relevent experience', 'Has relevent experience'))
-    enrolled_university = st.sidebar.selectbox('Enrolled University', ('no_enrollment', 'Part time course', 'Full time course'))
-    education_level = st.sidebar.selectbox('Education Level', ('High School', 'Graduate', 'Masters', 'Phd'))
-    major_discipline = st.sidebar.selectbox('Major Discipline', ('STEM', 'Business Degree', 'Arts', 'Humanities', 'Other'))
-    experience = st.sidebar.slider('Experience (years)', 0, 20, 0)
-    company_size = st.sidebar.selectbox('Company Size', ('<10', '10-49', '50-99', '100-500', '500-999', '1000-4999', '5000-9999', '10000+'))
-    company_type = st.sidebar.selectbox('Company Type', ('Pvt Ltd', 'Funded Startup', 'Early Stage Startup', 'Public Sector', 'NGO', 'Other'))
-    last_new_job = st.sidebar.selectbox('Last New Job', ('never', '1', '2', '3', '4', '>4'))
-    training_hours = st.sidebar.slider('Training Hours', 0, 500, 0)
-
-    data = {'city_development_index': city_development_index,
-            'relevent_experience': relevent_experience,
-            'enrolled_university': enrolled_university,
-            'education_level': education_level,
-            'major_discipline': major_discipline,
-            'experience': experience,
-            'company_size': company_size,
-            'company_type': company_type,
-            'last_new_job': last_new_job,
-            'training_hours': training_hours}
-    features = pd.DataFrame(data, index=[0])
-    return features
-
-input_df = user_input_features()
-
-# Predict function with handling for missing 'city' column and encoding categorical columns
-def predict(data):
-    if 'city' not in data.columns:
-        st.error("Please select a value for 'City'.")
-        return None
-    
-    # Encode categorical columns
-    data_encoded = pd.get_dummies(data, columns=categorical_cols)
-    
-    # Ensure all columns from the training data are present
-    missing_cols = set(X_train.columns) - set(data_encoded.columns)
-    for col in missing_cols:
-        data_encoded[col] = 0
-    
-    # Reorder columns to match the training data
-    data_encoded = data_encoded[X_train.columns]
-    
-    # Predict using the model
-    prediction = model.predict(data_encoded)
-    return prediction
-
-# Predict
-prediction = predict(input_df)
-if prediction is not None:
-    st.subheader('Prediction')
-    st.write('Hired' if prediction == 1 else 'Not Hired')
+        # Predict button
+        if st.button('Predict'):
+            result = predict(input_data)
+            st.write(f'Result: {result[0]}')
