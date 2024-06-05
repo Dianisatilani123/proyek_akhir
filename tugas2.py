@@ -43,8 +43,16 @@ def train_model(X_train, y_train):
 def evaluate_model(model, X_test, y_test):
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
+    report = classification_report(y_test, y_pred)
+    matrix = confusion_matrix(y_test, y_pred)
+    
+    st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+    st.write("Classification Report:")
+    st.write(report)
+    st.write("Confusion Matrix:")
+    st.write(matrix)
+    
     return accuracy
-
 # Langkah 7: Membuat model untuk aplikasi
 def main():
     st.title("Aplikasi Rekrutmen Tanpa Bias")
