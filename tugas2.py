@@ -6,11 +6,10 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 from sklearn.preprocessing import LabelEncoder
 
 # Langkah 2: Load dataset
-def load_data():
     data = pd.read_csv("dataset.csv")
     st.write("Dataset:")
     st.write(data.head())
-    return data
+
 
 # Langkah 3: Standarisasi data
 def preprocess_data(data):
