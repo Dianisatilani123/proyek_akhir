@@ -78,10 +78,9 @@ def main():
     st.subheader("10 Data Teratas dari Dataset")
     st.write(data.head(10))
 
-    # Menampilkan form input untuk memprediksi kelayakan kandidat
-    st.subheader("Prediksi Kelayakan Kandidat")
-    with st.sidebar:
-
+ # Menampilkan form input untuk memprediksi kelayakan kandidat
+st.subheader("Prediksi Kelayakan Kandidat")
+with st.sidebar:
     enrollee_id = st.text_input("Enrollee ID", "")
     city = st.text_input("City", "")
     city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
@@ -109,6 +108,5 @@ def main():
             st.write("Kandidat diterima.")
         else:
             st.write("Kandidat ditolak.")
-
 if __name__ == "__main__":
     main()
