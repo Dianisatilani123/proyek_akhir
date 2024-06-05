@@ -23,8 +23,8 @@ else:
     # Handle missing values
     data = data.dropna()
 
-    # One-hot encode categorical data
-    data = pd.get_dummies(data, columns=['city', 'elevent_experience', 'enrolled_university', 'education_level', 'ajor_discipline', 'company_size', 'company_type', 'last_new_job'])
+    # Convert categorical data to numerical
+    data = pd.get_dummies(data)
 
     # Split features and target
     X = data.drop('target', axis=1)
@@ -69,42 +69,40 @@ else:
         st.title("Rekrutmen Tanpa Bias")
 
         # Get unique values for categorical columns
-        unique_city = data['city'].unique()
-        unique_relevent_experience = data['relevent_experience'].unique()
-        unique_enrolled_university = data['enrolled_university'].unique()
-        unique_education_level = data['education_level'].unique()
-        unique_major_discipline = data['major_discipline'].unique()
-        unique_experience = data['experience'].unique()
-        unique_company_size = data['company_size'].unique()
-        unique_company_type = data['company_type'].unique()
-        unique_last_new_job = data['last_new_job'].unique()
-
-        # Get unique values for categorical columns
-        unique_city_cols = [col for col in data.columns if col.startswith('city_')]
+        unique_city = data['city'].unique() if 'city' in data.columns else []
+        unique_relevent_experience = data['relevent_experience'].unique() if 'elevent_experience' in data.columns else []
+        unique_enrolled_university = data['enrolled_university'].unique() if 'enrolled_university' in data.columns else []
+        unique_education_level = data['education_level'].unique() if 'education_level' in data.columns else []
+        unique_major_discipline = data['major_discipline'].unique() if 'ajor_discipline' in data.columns else []
+        unique_experience = data['experience'].unique() if 'experience' in data.columns else []
+        unique_company_size = data['company_size'].unique() if 'company_size' in data.columns else []
+        unique_company_type = data['company_type'].unique() if 'company_type' in data.columns else []
+        unique_last_new_job = data['last_new_job'].unique() if 'last_new_job' in data.columns else []
 
         # Form input data kandidat
         input_data = {
+            'city': st.text_input('City'),
             'city_development_index': st.number_input('City Development Index'),
-            'city': st.selectbox('City', unique_city_cols),
-            'elevent_experience': st.selectbox('Relevent Experience', unique_relevent_experience),
-            'enrolled_university': st.selectbox('Enrolled University', unique_enrolled_university),
-            'education_level': st.selectbox('Education Level', unique_education_level),
-            'ajor_discipline': st.selectbox('Major Discipline', unique_major_discipline),
-            'experience': st.selectbox('Experience', unique_experience),
-            'company_size': st.selectbox('Company Size', unique_company_size),
-            'company_type': st.selectbox('Company Type', unique_company_type),
-            'last_new_job': st.selectbox('Last New Job', unique_last_new_job),
+            'elevent_experience': st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience']),
+            'enrolled_university': st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course']),
+            'education_level': st.selectbox('Education Level', ['Graduate', 'Masters', 'High School', 'Primary School']),
+            'ajor_discipline': st.selectbox('Major Discipline', ['STEM', 'Business Degree', 'Humanities']),
+            'experience': st.selectbox('Experience', ['<1', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '>20']),
+            'company_size': st.selectbox('Company Size', ['50-99', '100-500', '500-999', 'Oct-49']),
+            'company_type': st.selectbox('Company Type', ['Pvt Ltd', 'Funded Startup', 'Public Sector']),
+            'last_new_job': st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4']),
             'training_hours': st.number_input('Training Hours')
         }
 
-def predict(input_data):
-    input_df = pd.DataFrame([input_data])
-    input_df = pd.get_dummies(input_df, columns=['city', 'elevent_experience', 'enrolled_university', 'education_level', 'ajor_discipline', 'company_size', 'company_type', 'last_new_job'])
-    input_scaled = scaler.transform(input_df)
-    prediction = model.predict(input_scaled)
-    return prediction
+        def predict(input_data):
+            input_df = pd.DataFrame([input_data])
+            input_df = pd.get_dummies(input_df)
+            input_df = input_df.reindex(columns=X.columns, fill_value=0)
+            input_scaled = scaler.transform(input_df)
+            prediction = model.predict(input_scaled)
+            return prediction
 
-# Predict button
-if st.button('Predict'):
-    result = predict(input_data)
-    st.write(f'Result: {result[0]}')
+        # Predict button
+        if st.button('Predict'):
+            result = predict(input_data)
+            st.write(f'Result: {result[0]}')
