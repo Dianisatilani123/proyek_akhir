@@ -90,7 +90,7 @@ training_hours = st.sidebar.slider('Training Hours', 0, 500, 0)
 
 
 # Create input data frame
-input_data = {'city': [city]
+input_data = {'city': [city],
               'city_development_index': [city_development_index],
               'relevent_experience': [relevent_experience],
               'enrolled_university': [enrolled_university],
