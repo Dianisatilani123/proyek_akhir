@@ -95,6 +95,18 @@ def main():
         gender = st.selectbox("Gender", ["Male", "Female", "Other"])
 
         if st.button("Predict"):
+             # Input validation
+        if not enrollee_id:
+            st.error("Enrollee ID is required")
+        elif not city:
+            st.error("City is required")
+        elif city_development_index < 0:
+            st.error("City Development Index must be a non-negative value")
+        elif experience < 0:
+            st.error("Experience must be a non-negative value")
+        elif training_hours < 0:
+            st.error("Training Hours must be a non-negative value")
+        else:
             # Menerapkan logika prediksi
             if (relevent_experience == "Has relevent experience" and
                 (education_level == "Graduate" or education_level == "Masters") and
