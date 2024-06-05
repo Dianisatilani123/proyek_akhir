@@ -76,19 +76,21 @@ st.write(f'Classification Report: \n{report}')
 
 # Input form for new candidate data
 def user_input_features():
-    city_development_index = st.sidebar.slider('City Development Index', 0.0, 1.0, 0.5)
-    city = st.sidebar.selectbox('City', df['city'].unique())
-    relevent_experience = st.sidebar.selectbox('Relevant Experience', ['No relevent experience', 'Has relevent experience'])
-    enrolled_university = st.sidebar.selectbox('Enrolled University', ['no_enrollment', 'Part time course', 'Full time course'])
-    education_level = st.sidebar.selectbox('Education Level', ['High School', 'Graduate', 'Masters', 'Phd'])
-    major_discipline = st.sidebar.selectbox('Major Discipline', ['STEM', 'Business Degree', 'Arts', 'Humanities', 'Other'])
+    city = st.sidebar.selectbox('City', ["city_103", "city_40", "city_21", "city_115", "city_162", 
+                                         "city_176", "city_160", "city_46", "city_61", "city_114", 
+                                         "city_13", "city_159", "city_102", "city_67", "city_100", 
+                                         "city_16", "city_71", "city_104", "city_64"])
+    relevent_experience = st.sidebar.selectbox('Relevant Experience', ('No relevent experience', 'Has relevent experience'))
+    enrolled_university = st.sidebar.selectbox('Enrolled University', ('no_enrollment', 'Part time course', 'Full time course'))
+    education_level = st.sidebar.selectbox('Education Level', ('High School', 'Graduate', 'Masters', 'Phd'))
+    major_discipline = st.sidebar.selectbox('Major Discipline', ('STEM', 'Business Degree', 'Arts', 'Humanities', 'Other'))
     experience = st.sidebar.slider('Experience (years)', 0, 20, 0)
-    company_size = st.sidebar.selectbox('Company Size', ['<10', '10-49', '50-99', '100-500', '500-999', '1000-4999', '5000-9999', '10000+'])
-    company_type = st.sidebar.selectbox('Company Type', ['Pvt Ltd', 'Funded Startup', 'Early Stage Startup', 'Public Sector', 'NGO', 'Other'])
-    last_new_job = st.sidebar.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4'])
+    company_size = st.sidebar.selectbox('Company Size', ('<10', '10-49', '50-99', '100-500', '500-999', '1000-4999', '5000-9999', '10000+'))
+    company_type = st.sidebar.selectbox('Company Type', ('Pvt Ltd', 'Funded Startup', 'Early Stage Startup', 'Public Sector', 'NGO', 'Other'))
+    last_new_job = st.sidebar.selectbox('Last New Job', ('never', '1', '2', '3', '4', '>4'))
     training_hours = st.sidebar.slider('Training Hours', 0, 500, 0)
 
-    data = {'city_development_index': city_development_index,
+    data = {'city_development_index': 0.5,  # default value
             'city': city,
             'elevent_experience': relevent_experience,
             'enrolled_university': enrolled_university,
