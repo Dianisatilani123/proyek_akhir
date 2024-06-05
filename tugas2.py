@@ -58,7 +58,7 @@ def evaluate_model(model, X_test, y_test):
 
 # Langkah 7: Membuat model untuk aplikasi
 def main():
-    st.title("Aplikasi Rekrutmen Tanpa Bias Gender")
+    st.title("Aplikasi Rekrutmen Tanpa Bias Gender", anchor=True)
 
     # Load data
     data = load_data()
