@@ -11,8 +11,8 @@ data = pd.read_csv('aug_train.csv')
 # Buat dua kolom
 col1, col2 = st.columns(2)
 
-# Tampilkan dataset di kolom kiri
-with col1:
+# Tampilkan dataset di kolom kanan
+with col2:
     st.title("Rekrutmen Tanpa Bias")
     st.write("Dataset:")
     st.write(data.head())
@@ -70,8 +70,8 @@ else:
         st.write("Confusion Matrix:")
         st.write(confusion_matrix(y_test, y_pred))
 
-     # Tampilkan form input data kandidat dan button prediksi di kolom kanan
-with col2:
+     # Tampilkan form input data kandidat dan button prediksi di kolom kiri
+with col1:
     st.write("Form Input Data Kandidat:")
     city = st.text_input('City')
     city_development_index = st.number_input('City Development Index')
