@@ -9,6 +9,10 @@ from sklearn.preprocessing import LabelEncoder
 def load_data():
     data = pd.read_csv("dataset.csv")
     return data
+    
+    # Display top 10 rows of the dataset
+    st.subheader("10 Data Teratas dari Dataset")
+    st.write(data.head(10))
 
 # Langkah 3: Standarisasi data
 def preprocess_data(data):
@@ -73,10 +77,6 @@ def main():
     # Evaluate model
     accuracy = evaluate_model(model, X_test, y_test)
     st.write(f"Akurasi model: {accuracy * 100:.2f}%")
-
-    # Display top 10 rows of the dataset
-    st.subheader("10 Data Teratas dari Dataset")
-    st.write(data.head(10))
 
  # Menampilkan form input untuk memprediksi kelayakan kandidat
 st.subheader("Prediksi Kelayakan Kandidat")
