@@ -10,9 +10,9 @@ def load_data():
     data = pd.read_csv("dataset.csv")
     return data
     
-    # Display top 10 rows of the dataset
-    st.subheader("10 Data Teratas dari Dataset")
-    st.write(data.head(10))
+    # Display the dataset
+      st.write("Dataset:")
+      st.write(data.head())
 
 # Langkah 3: Standarisasi data
 def preprocess_data(data):
