@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 
 # Langkah 2: Load dataset
 def load_data():
-    data = pd.read_csv("dataset_rec.csv")  # Ganti "nama_dataset.csv" dengan nama file dataset yang sesuai
+    data = pd.read_csv("dataset_rec.csv")  # Ganti "dataset_rec.csv" dengan nama file dataset yang sesuai
     st.write("Dataset:")
     st.write(data.head(14))  # Menampilkan 14 baris pertama dari dataset
     return data
@@ -28,7 +28,7 @@ def preprocess_data(data):
 
 # Langkah 4: Split data train dan test
 def split_data(data):
-    X = data.drop(columns=["gender", "enrollee_id"])  # Hapus kolom "gender" dan "enrollee_id"
+    X = data.drop(columns=["gender", "enrollee_id", "city"])  # Hapus kolom "gender", "enrollee_id", dan "city"
     y = data["target"]  # Gunakan kolom "target" sebagai target
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -107,7 +107,7 @@ def main():
             else:
                 # Menerapkan logika prediksi
                 if (relevent_experience == "Has relevent experience" and
-                    city_development_index > 0.9 and
+                    city_development_index > 0.920 and
                     enrolled_university == "no_enrollment" and
                     company_size in ["50-99", "100-500"] and
                     company_type == "Pvt Ltd" and
