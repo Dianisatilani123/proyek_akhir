@@ -100,12 +100,9 @@ else:
             input_df = input_df.reindex(columns=X.columns, fill_value=0)
             input_scaled = scaler.transform(input_df)
             prediction = model.predict(input_scaled)
-            if prediction[0] == 1:
-                return "DITERIMA"
-            else:
-                return "DITOLAK"
+            return prediction
 
         # Predict button
         if st.button('Predict'):
             result = predict(input_data)
-            st.write(f'Result: {result}')
+            st.write(f'Result: {result[0]}')
