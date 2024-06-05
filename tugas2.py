@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 
 # Langkah 2: Load dataset
@@ -14,14 +14,14 @@ def load_data():
 def preprocess_data(data):
     # Ubah nilai "<1" menjadi 0 dan nilai ">20" menjadi 25
     data['experience'] = data['experience'].apply(lambda x: 0 if x == '<1' else (25 if x == '>20' else int(x)))
-    
+
     # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
     label_encoder = LabelEncoder()
     categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
                         'major_discipline', 'company_size', 'company_type', 'last_new_job']
     for col in categorical_cols:
         data[col] = label_encoder.fit_transform(data[col])
-    
+
     return data
 
 # Langkah 4: Split data train dan test
@@ -44,14 +44,6 @@ def evaluate_model(model, X_test, y_test):
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
     return accuracy
-          
-    # Calculate accuracy
-        accuracy = accuracy_score(y_test, y_pred)
-        st.write("Accuracy:", accuracy)
-        st.write("Classification Report:")
-        st.write(classification_report(y_test, y_pred))
-        st.write("Confusion Matrix:")
-        st.write(confusion_matrix(y_test, y_pred))
 
 # Langkah 7: Membuat model untuk aplikasi
 def main():
