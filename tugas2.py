@@ -58,7 +58,7 @@ def evaluate_model(model, X_test, y_test):
 
 # Langkah 7: Membuat model untuk aplikasi
 def main():
-    st.title("Aplikasi Rekrutmen Tanpa Bias Gender", anchor=True)
+   st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
 
     # Load data
     data = load_data()
