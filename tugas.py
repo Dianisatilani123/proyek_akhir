@@ -23,11 +23,15 @@ df = df.drop(columns=['enrollee_id', 'gender'])
 
 # Fill missing values for numerical columns with median
 numerical_cols = ['city_development_index', 'training_hours']
-df[numerical_cols] = df[numerical_cols].fillna(df[numerical_cols].median())
+for col in numerical_cols:
+    if col in df.columns:
+        df[col] = df[col].fillna(df[col].median())
 
 # Fill missing values for categorical columns with mode
 categorical_cols = ['city', 'elevent_experience', 'enrolled_university', 'education_level', 'ajor_discipline', 'experience', 'company_size', 'company_type', 'last_new_job']
-df[categorical_cols] = df[categorical_cols].fillna(df[categorical_cols].mode().iloc[0])
+for col in categorical_cols:
+    if col in df.columns:
+        df[col] = df[col].fillna(df[col].mode().iloc[0])
 
 # Separate features and target
 y = df['target']
