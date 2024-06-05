@@ -79,14 +79,14 @@ else:
         unique_company_type = data['company_type'].unique()
         unique_last_new_job = data['last_new_job'].unique()
 
-      # Get unique values for categorical columns
-unique_city_cols = [col for col in data.columns if col.startswith('city_')]
+        # Get unique values for categorical columns
+        unique_city_cols = [col for col in data.columns if col.startswith('city_')]
 
-# Form input data kandidat
-input_data = {
-    'city_development_index': st.number_input('City Development Index'),
-    'city': st.selectbox('City', unique_city_cols),
-    'elevent_experience': st.selectbox('Relevent Experience', unique_relevent_experience),
+        # Form input data kandidat
+        input_data = {
+            'city_development_index': st.number_input('City Development Index'),
+            'city': st.selectbox('City', unique_city_cols),
+            'elevent_experience': st.selectbox('Relevent Experience', unique_relevent_experience),
             'enrolled_university': st.selectbox('Enrolled University', unique_enrolled_university),
             'education_level': st.selectbox('Education Level', unique_education_level),
             'ajor_discipline': st.selectbox('Major Discipline', unique_major_discipline),
@@ -97,14 +97,14 @@ input_data = {
             'training_hours': st.number_input('Training Hours')
         }
 
-        def predict(input_data):
-            input_df = pd.DataFrame([input_data])
-            input_df = pd.get_dummies(input_df, columns=['city', 'elevent_experience', 'enrolled_university', 'education_level', 'ajor_discipline', 'company_size', 'company_type', 'last_new_job'])
-            input_scaled = scaler.transform(input_df)
-            prediction = model.predict(input_scaled)
-            return prediction
+def predict(input_data):
+    input_df = pd.DataFrame([input_data])
+    input_df = pd.get_dummies(input_df, columns=['city', 'elevent_experience', 'enrolled_university', 'education_level', 'ajor_discipline', 'company_size', 'company_type', 'last_new_job'])
+    input_scaled = scaler.transform(input_df)
+    prediction = model.predict(input_scaled)
+    return prediction
 
-        # Predict button
-        if st.button('Predict'):
-            result = predict(input_data)
-            st.write(f'Result: {result[0]}')
+# Predict button
+if st.button('Predict'):
+    result = predict(input_data)
+    st.write(f'Result: {result[0]}')
