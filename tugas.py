@@ -8,6 +8,9 @@ import streamlit as st
 # Load dataset
 data = pd.read_csv('aug_train.csv')
 
+# Streamlit application
+st.title("Rekrutmen Tanpa Bias")
+
 # Display the dataset
 st.write("Dataset:")
 st.write(data.head())
@@ -65,8 +68,6 @@ else:
         st.write("Confusion Matrix:")
         st.write(confusion_matrix(y_test, y_pred))
 
-        # Streamlit application
-        st.title("Rekrutmen Tanpa Bias")
 
         # Get unique values for categorical columns
         unique_city = data['city'].unique() if 'city' in data.columns else []
