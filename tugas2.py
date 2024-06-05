@@ -18,7 +18,7 @@ def preprocess_data(data):
     # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
     label_encoder = LabelEncoder()
     categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
-                        'ajor_discipline', 'company_size', 'company_type', 'last_new_job']
+                        'major_discipline', 'company_size', 'company_type', 'last_new_job']
     for col in categorical_cols:
         data[col] = label_encoder.fit_transform(data[col])
     
@@ -70,36 +70,38 @@ def main():
     st.subheader("10 Data Teratas dari Dataset")
     st.write(data.head(10))
 
-    # Create a sidebar for user input
-    with st.sidebar:
-        st.header("Input Kandidat")
-        enrollee_id = st.text_input("Enrollee ID", "")
-        city = st.text_input("City", "")
-        city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
-        relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
-        enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
-        education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
-        major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
-        experience = st.number_input("Experience", value=0)
-        company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
-        company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
-        last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
-        training_hours = st.number_input("Training Hours", value=0)
-        gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+  # Menampilkan form input untuk memprediksi kelayakan kandidat
+st.subheader("Prediksi Kelayakan Kandidat")
 
-        if st.button("Predict"):
-            # Menerapkan logika prediksi
-            if (relevent_experience == "Has relevent experience" and
-                (education_level == "Graduate" or education_level == "Masters") and
-                major_discipline == "STEM" and
-                (experience > 5 or experience > 10) and
-                company_size in ["100-500", "500-999", "1000-4999", "5000-9999", "10000+"] and
-                enrolled_university == "no_enrollment" and
-                training_hours > 50 and
-                last_new_job in ["1", "2", "3", "4", ">4"]):
-                st.write("Kandidat diterima.")
-            else:
-                st.write("Kandidat ditolak.")
+col1, col2 = st.columns(2)  # Membuat 2 kolom
 
-if __name__ == "__main__":
-    main()
+with col1:
+    enrollee_id = st.text_input("Enrollee ID", "")
+    city = st.text_input("City", "")
+    city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
+    relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
+    enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
+
+with col2:
+    education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
+    major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
+    experience = st.number_input("Experience", value=0)
+    company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
+    company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
+    last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
+    training_hours = st.number_input("Training Hours", value=0)
+    gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+
+    if st.button("Predict"):
+        # Menerapkan logika prediksi
+        if (relevent_experience == "Has relevent experience" and
+            (education_level == "Graduate" or education_level == "Masters") and
+            major_discipline == "STEM" and
+            (experience > 5 or experience > 10) and
+            company_size in ["100-500", "500-999", "1000-4999", "5000-9999", "10000+"] and
+            enrolled_university == "no_enrollment" and
+            training_hours > 50 and
+            last_new_job in ["1", "2", "3", "4", ">4"]):
+            st.write("Kandidat diterima.")
+        else:
+            st.write("Kandidat ditolak.")
