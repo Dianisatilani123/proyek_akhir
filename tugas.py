@@ -1,110 +1,120 @@
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
+import streamlit as st
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-import streamlit as st
+from sklearn.preprocessing import LabelEncoder
 
-# Load dataset
-data = pd.read_csv('aug_train.csv')
+# Langkah 2: Load dataset
+def load_data():
+    data = pd.read_csv("nama_dataset.csv")  # Ganti "nama_dataset.csv" dengan nama file dataset yang sesuai
+    st.write("Dataset:")
+    st.write(data.head(14))  # Menampilkan 14 baris pertama dari dataset
+    return data
 
-# Streamlit application
-st.title("Rekrutmen Tanpa Bias")
+# Langkah 3: Standarisasi data
+def preprocess_data(data):
+    # Ubah nilai "<1" menjadi 0 dan nilai ">20" menjadi 25
+    data['experience'] = data['experience'].apply(lambda x: 0 if x == '<1' else (25 if x == '>20' else int(x)))
 
-# Display the dataset
-st.write("Dataset:")
-st.write(data.head())
+    # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
+    label_encoder = LabelEncoder()
+    categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
+                        'major_discipline', 'company_size', 'company_type', 'last_new_job']
+    for col in categorical_cols:
+        data[col] = label_encoder.fit_transform(data[col])
 
-# Ensure 'city' column exists
-if 'city' not in data.columns:
-    st.error("'city' column not found in the dataset.")
-else:
-    # Preprocessing
-    # Drop columns that may cause bias
-    data = data.drop(['enrollee_id', 'gender'], axis=1)
+    return data
 
-    # Handle missing values
-    data = data.dropna()
+# Langkah 4: Split data train dan test
+def split_data(data):
+    X = data.drop(columns=["gender", "enrollee_id"])  # Hapus kolom "gender" dan "enrollee_id"
+    y = data["target"]  # Gunakan kolom "target" sebagai target
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Convert categorical data to numerical
-    data = pd.get_dummies(data)
+    return X_train, X_test, y_train, y_test
 
-    # Split features and target
-    X = data.drop('target', axis=1)
-    y = data['target']
+# Langkah 5: Membuat data latih menggunakan algoritma machine learning
+def train_model(X_train, y_train):
+    model = RandomForestClassifier()
+    model.fit(X_train, y_train)
+    return model
 
-    # Check if target variable is binary
-    if len(y.unique())!= 2:
-        st.error("Target variable is not binary. Please ensure it has only two unique values (0 and 1).")
-    else:
-        # Check for class imbalance
-        class_counts = y.value_counts()
-        st.write("Class distribution:")
-        st.write(class_counts)
-        if class_counts[0] / class_counts[1] > 5 or class_counts[1] / class_counts[0] > 5:
-            st.warning("Class imbalance detected. You may want to consider class weighting, oversampling, or undersampling.")
+# Langkah 6: Membuat model evaluasi untuk uji akurasi
+def evaluate_model(model, X_test, y_test):
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    report = classification_report(y_test, y_pred)
+    matrix = confusion_matrix(y_test, y_pred)
+    
+    st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+    st.write("Classification Report:")
+    st.write(report)
+    st.write("Confusion Matrix:")
+    st.write(matrix)
+    
+    return accuracy
 
-        # Standardize the data
-        scaler = StandardScaler()
-        X_scaled = scaler.fit_transform(X)
+# Langkah 7: Membuat model untuk aplikasi
+def main():
+    st.title("Aplikasi Rekrutmen Tanpa Bias Gender")
 
-        # Split the data into training and testing sets
-        X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+    # Load data
+    data = load_data()
 
-        # Initialize the Random Forest Classifier
-        model = RandomForestClassifier(n_estimators=100, random_state=42)
+    # Preprocessing data
+    data = preprocess_data(data)
 
-        # Train the model
-        model.fit(X_train, y_train)
+    # Split data
+    X_train, X_test, y_train, y_test = split_data(data)
 
-        # Predict on the test set
-        y_pred = model.predict(X_test)
+    # Train model
+    model = train_model(X_train, y_train)
 
-        # Calculate accuracy
-        accuracy = accuracy_score(y_test, y_pred)
-        st.write("Accuracy:", accuracy)
-        st.write("Classification Report:")
-        st.write(classification_report(y_test, y_pred))
-        st.write("Confusion Matrix:")
-        st.write(confusion_matrix(y_test, y_pred))
+    # Evaluate model
+    accuracy = evaluate_model(model, X_test, y_test)
+    st.write(f"Akurasi model: {accuracy * 100:.2f}%")
 
+    # Menampilkan form input untuk memprediksi kelayakan kandidat
+    with st.sidebar:
+        enrollee_id = st.text_input("Enrollee ID", "")
+        city = st.text_input("City", "")
+        city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
+        relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
+        enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
+        education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
+        major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
+        experience = st.number_input("Experience", value=0)
+        company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
+        company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
+        last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
+        training_hours = st.number_input("Training Hours", value=0)
+        gender = st.selectbox("Gender", ["Male", "Female", "Other"])
 
-        # Get unique values for categorical columns
-        unique_city = data['city'].unique() if 'city' in data.columns else []
-        unique_relevent_experience = data['relevent_experience'].unique() if 'elevent_experience' in data.columns else []
-        unique_enrolled_university = data['enrolled_university'].unique() if 'enrolled_university' in data.columns else []
-        unique_education_level = data['education_level'].unique() if 'education_level' in data.columns else []
-        unique_major_discipline = data['major_discipline'].unique() if 'ajor_discipline' in data.columns else []
-        unique_experience = data['experience'].unique() if 'experience' in data.columns else []
-        unique_company_size = data['company_size'].unique() if 'company_size' in data.columns else []
-        unique_company_type = data['company_type'].unique() if 'company_type' in data.columns else []
-        unique_last_new_job = data['last_new_job'].unique() if 'last_new_job' in data.columns else []
+        if st.button("Predict"):
+            # Input validation
+            if not enrollee_id:
+                st.error("Enrollee ID is required")
+            elif not city:
+                st.error("City is required")
+            elif city_development_index < 0:
+                st.error("City Development Index must be a non-negative value")
+            elif experience < 0:
+                st.error("Experience must be a non-negative value")
+            elif training_hours < 0:
+                st.error("Training Hours must be a non-negative value")
+            else:
+                # Menerapkan logika prediksi
+                if (relevent_experience == "Has relevent experience" and
+                    city_development_index > 0.9 and
+                    enrolled_university == "no_enrollment" and
+                    company_size in ["50-99", "100-500"] and
+                    company_type == "Pvt Ltd" and
+                    last_new_job in ["1", "2", "3", "4"]):
+                    st.write("Kandidat diterima.")
+                else:
+                    st.write("Kandidat ditolak.")
 
-        # Form input data kandidat
-        with st.sidebar:
-            input_data = {
-                'city': st.text_input('City'),
-                'city_development_index': st.number_input('City Development Index'),
-                'elevent_experience': st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience']),
-                'enrolled_university': st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course']),
-                'education_level': st.selectbox('Education Level', ['Graduate', 'Masters', 'High School', 'Primary School']),
-                'ajor_discipline': st.selectbox('Major Discipline', ['STEM', 'Business Degree', 'Humanities']),
-                'experience': st.selectbox('Experience', ['<1', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '>20']),
-                'company_size': st.selectbox('Company Size', ['50-99', '100-500', '500-999', 'Oct-49']),
-                'company_type': st.selectbox('Company Type', ['Pvt Ltd', 'Funded Startup', 'Public Sector']),
-                'last_new_job': st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4']),
-                'training_hours': st.number_input('Training Hours')
-            }
-
-            def predict(input_data):
-                input_df = pd.DataFrame([input_data])
-                input_df = pd.get_dummies(input_df)
-                input_df = input_df.reindex(columns=X.columns, fill_value=0)
-                input_scaled = scaler.transform(input_df)
-                prediction = model.predict(input_scaled)
-                return prediction
-
-            # Predict button
-            if st.button('Predict'):
-                result = predict(input_data)
-                st.write(f'Result: {result[0]}')
+if __name__ == "__main__":
+    main()
