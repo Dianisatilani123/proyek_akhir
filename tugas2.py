@@ -33,8 +33,7 @@ def split_data(data):
 
     return X_train, X_test, y_train, y_test
 
-
-# Langkah 5: Membuat data latih menggunakan algoritma mechine learning
+# Langkah 5: Membuat data latih menggunakan algoritma machine learning
 def train_model(X_train, y_train):
     model = RandomForestClassifier()
     model.fit(X_train, y_train)
@@ -62,6 +61,14 @@ def main():
 
     # Train model
     model = train_model(X_train, y_train)
+
+    # Evaluate model
+    accuracy = evaluate_model(model, X_test, y_test)
+    st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+
+    # Display top 10 rows of the dataset
+    st.subheader("10 Data Teratas dari Dataset")
+    st.write(data.head(10))
 
     # Menampilkan form input untuk memprediksi kelayakan kandidat
     st.subheader("Prediksi Kelayakan Kandidat")
