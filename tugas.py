@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 
 # Langkah 2: Load dataset
 def load_data():
-    data = pd.read_csv("nama_dataset.csv")  # Ganti "nama_dataset.csv" dengan nama file dataset yang sesuai
+    data = pd.read_csv("dataset_rec.csv")  # Ganti "nama_dataset.csv" dengan nama file dataset yang sesuai
     st.write("Dataset:")
     st.write(data.head(14))  # Menampilkan 14 baris pertama dari dataset
     return data
