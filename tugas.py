@@ -81,7 +81,7 @@ else:
 
         # Form input data kandidat
         input_data = {
-            'city': st.text_input('City'),
+            'city': st.selectbox('City', unique_city),
             'city_development_index': st.number_input('City Development Index'),
             'elevent_experience': st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience']),
             'enrolled_university': st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course']),
