@@ -12,7 +12,6 @@ data = pd.read_csv('aug_train.csv')
 col1, col2 = st.columns(2)
 
 # Tampilkan dataset di kolom kanan
-with col2:
     st.title("Rekrutmen Tanpa Bias")
     st.write("Dataset:")
     st.write(data.head())
@@ -70,7 +69,7 @@ else:
         st.write("Confusion Matrix:")
         st.write(confusion_matrix(y_test, y_pred))
 
-     # Tampilkan form input data kandidat dan button prediksi di kolom kiri
+# Form input data kandidat di kolom kiri
 with col1:
     st.write("Form Input Data Kandidat:")
     city = st.text_input('City')
@@ -85,6 +84,8 @@ with col1:
     last_new_job = st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4'])
     training_hours = st.number_input('Training Hours')
 
+# Button prediksi di kolom kanan
+with col2:
     if st.button('Predict'):
         input_data = {
             'city': city,
@@ -101,3 +102,4 @@ with col1:
         }
         result = predict(input_data)
         st.write(f'Result: {result}')
+
