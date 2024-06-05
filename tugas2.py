@@ -8,6 +8,8 @@ from sklearn.preprocessing import LabelEncoder
 # Langkah 2: Load dataset
 def load_data():
     data = pd.read_csv("dataset.csv")
+    st.write("Dataset:")
+    st.write(data.head(30))  # Show the first 13 rows
     return data
 
 # Langkah 3: Standarisasi data
@@ -53,6 +55,7 @@ def evaluate_model(model, X_test, y_test):
     st.write(matrix)
     
     return accuracy
+
 # Langkah 7: Membuat model untuk aplikasi
 def main():
     st.title("Aplikasi Rekrutmen Tanpa Bias")
@@ -74,13 +77,9 @@ def main():
     accuracy = evaluate_model(model, X_test, y_test)
     st.write(f"Akurasi model: {accuracy * 100:.2f}%")
 
-    # Display top 10 rows of the dataset
-    st.subheader("10 Data Teratas dari Dataset")
-    st.write(data.head(10))
-
-    # Menampilkan form input untuk memprediksi kelayakan kandidat
-    st.subheader("Prediksi Kelayakan Kandidat")
-
+   # Menampilkan form input untuk memprediksi kelayakan kandidat
+st.subheader("Prediksi Kelayakan Kandidat")
+with st.sidebar:
     enrollee_id = st.text_input("Enrollee ID", "")
     city = st.text_input("City", "")
     city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
@@ -96,18 +95,30 @@ def main():
     gender = st.selectbox("Gender", ["Male", "Female", "Other"])
 
     if st.button("Predict"):
-        # Menerapkan logika prediksi
-        if (relevent_experience == "Has relevent experience" and
-            (education_level == "Graduate" or education_level == "Masters") and
-            major_discipline == "STEM" and
-            (experience > 5 or experience > 10) and
-            company_size in ["100-500", "500-999", "1000-4999", "5000-9999", "10000+"] and
-            enrolled_university == "no_enrollment" and
-            training_hours > 50 and
-            last_new_job in ["1", "2", "3", "4", ">4"]):
-            st.write("Kandidat diterima.")
+        # Input validation
+        if not enrollee_id:
+            st.error("Enrollee ID is required")
+        elif not city:
+            st.error("City is required")
+        elif city_development_index < 0:
+            st.error("City Development Index must be a non-negative value")
+        elif experience < 0:
+            st.error("Experience must be a non-negative value")
+        elif training_hours < 0:
+            st.error("Training Hours must be a non-negative value")
         else:
-            st.write("Kandidat ditolak.")
+            # Menerapkan logika prediksi
+            if (relevent_experience == "Has relevent experience" and
+                (education_level == "Graduate" or education_level == "Masters") and
+                major_discipline == "STEM" and
+                (experience > 5 or experience > 10) and
+                company_size in ["100-500", "500-999", "1000-4999", "5000-9999", "10000+"] and
+                enrolled_university == "no_enrollment" and
+                training_hours > 50 and
+                last_new_job in ["1", "2", "3", "4", ">4"]):
+                st.write("Kandidat diterima.")
+            else:
+                st.write("Kandidat ditolak.")
 
 if __name__ == "__main__":
     main()
