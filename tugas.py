@@ -8,10 +8,14 @@ import streamlit as st
 # Load dataset
 data = pd.read_csv('aug_train.csv')
 
-# Display the dataset
-st.title("Rekrutmen Tanpa Bias")
-st.write("Dataset:")
-st.write(data.head())
+# Buat dua kolom
+col1, col2 = st.columns(2)
+
+# Tampilkan dataset di kolom kiri
+with col1:
+    st.title("Rekrutmen Tanpa Bias")
+    st.write("Dataset:")
+    st.write(data.head())
 
 # Ensure 'city' column exists
 if 'city' not in data.columns:
@@ -66,45 +70,34 @@ else:
         st.write("Confusion Matrix:")
         st.write(confusion_matrix(y_test, y_pred))
 
-        # Form input data kandidat
-        st.write("Form Input Data Kandidat:")
-        city = st.text_input('City')
-        city_development_index = st.number_input('City Development Index')
-        relevent_experience = st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience'])
-        enrolled_university = st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course'])
-        education_level = st.selectbox('Education Level', ['Graduate', 'Masters', 'High School', 'Primary School'])
-        major_discipline = st.selectbox('Major Discipline', ['STEM', 'Business Degree', 'Humanities'])
-        experience = st.selectbox('Experience', ['<1', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '>20'])
-        company_size = st.selectbox('Company Size', ['50-99', '100-500', '500-999', 'Oct-49'])
-        company_type = st.selectbox('Company Type', ['Pvt Ltd', 'Funded Startup', 'Public Sector'])
-        last_new_job = st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4'])
-        training_hours = st.number_input('Training Hours')
+     # Tampilkan form input data kandidat dan button prediksi di kolom kanan
+with col2:
+    st.write("Form Input Data Kandidat:")
+    city = st.text_input('City')
+    city_development_index = st.number_input('City Development Index')
+    relevent_experience = st.selectbox('Relevent Experience', ['Has relevent experience', 'No relevent experience'])
+    enrolled_university = st.selectbox('Enrolled University', ['no_enrollment', 'Full time course', 'Part time course'])
+    education_level = st.selectbox('Education Level', ['Graduate', 'Masters', 'High School', 'Primary School'])
+    major_discipline = st.selectbox('Major Discipline', ['STEM', 'Business Degree', 'Humanities'])
+    experience = st.selectbox('Experience', ['<1', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '>20'])
+    company_size = st.selectbox('Company Size', ['50-99', '100-500', '500-999', 'Oct-49'])
+    company_type = st.selectbox('Company Type', ['Pvt Ltd', 'Funded Startup', 'Public Sector'])
+    last_new_job = st.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4'])
+    training_hours = st.number_input('Training Hours')
 
-        def predict(input_data):
-            input_df = pd.DataFrame([input_data])
-            input_df = pd.get_dummies(input_df)
-            input_df = input_df.reindex(columns=X.columns, fill_value=0)
-            input_scaled = scaler.transform(input_df)
-            prediction = model.predict(input_scaled)
-            if prediction[0] == 1:
-                return "DITERIMA"
-            else:
-                return "DITOLAK"
-
-        # Predict button
-        if st.button('Predict'):
-            input_data = {
-                'city': city,
-                'city_development_index': city_development_index,
-                'elevent_experience': relevent_experience,
-                'enrolled_university': enrolled_university,
-                'education_level': education_level,
-                'ajor_discipline': major_discipline,
-                'experience': experience,
-                'company_size': company_size,
-                'company_type': company_type,
-                'last_new_job': last_new_job,
-                'training_hours': training_hours
-            }
-            result = predict(input_data)
-            st.write(f'Result: {result}')
+    if st.button('Predict'):
+        input_data = {
+            'city': city,
+            'city_development_index': city_development_index,
+            'elevent_experience': relevent_experience,
+            'enrolled_university': enrolled_university,
+            'education_level': education_level,
+            'ajor_discipline': major_discipline,
+            'experience': experience,
+            'company_size': company_size,
+            'company_type': company_type,
+            'last_new_job': last_new_job,
+            'training_hours': training_hours
+        }
+        result = predict(input_data)
+        st.write(f'Result: {result}')
