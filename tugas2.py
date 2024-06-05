@@ -8,11 +8,9 @@ from sklearn.preprocessing import LabelEncoder
 # Langkah 2: Load dataset
 def load_data():
     data = pd.read_csv("dataset.csv")
+    st.write("Dataset:")
+    st.write(data.head())
     return data
-    
-    # Display the dataset
-      st.write("Dataset:")
-      st.write(data.head())
 
 # Langkah 3: Standarisasi data
 def preprocess_data(data):
