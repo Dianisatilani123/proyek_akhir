@@ -26,7 +26,7 @@ numerical_cols = ['city_development_index', 'training_hours']
 df[numerical_cols] = df[numerical_cols].fillna(df[numerical_cols].median())
 
 # Fill missing values for categorical columns with mode
-categorical_cols = ['city', 'relevent_experience', 'enrolled_university', 'education_level', 'major_discipline', 'experience', 'company_size', 'company_type', 'last_new_job']
+categorical_cols = ['city', 'elevent_experience', 'enrolled_university', 'education_level', 'ajor_discipline', 'experience', 'company_size', 'company_type', 'last_new_job']
 df[categorical_cols] = df[categorical_cols].fillna(df[categorical_cols].mode().iloc[0])
 
 # Separate features and target
@@ -75,40 +75,37 @@ st.write(f'Accuracy: {accuracy}')
 st.write(f'Classification Report: \n{report}')
 
 # Input form for new candidate data
-st.sidebar.header('Input Data Kandidat')
-city = st.sidebar.selectbox('City', ('City A', 'City B', 'City C', 'Other'))
-city_development_index = st.sidebar.slider('City Development Index', 0.0, 1.0, 0.5)
-relevent_experience = st.sidebar.selectbox('Relevant Experience', ('No relevent experience', 'Has relevent experience'))
-enrolled_university = st.sidebar.selectbox('Enrolled University', ('no_enrollment', 'Part time course', 'Full time course'))
-education_level = st.sidebar.selectbox('Education Level', ('High School', 'Graduate', 'Masters', 'Phd'))
-major_discipline = st.sidebar.selectbox('Major Discipline', ('STEM', 'Business Degree', 'Arts', 'Humanities', 'Other'))
-experience = st.sidebar.slider('Experience (years)', 0, 20, 0)
-company_size = st.sidebar.selectbox('Company Size', ('<10', '10-49', '50-99', '100-500', '500-999', '1000-4999', '5000-9999', '10000+'))
-company_type = st.sidebar.selectbox('Company Type', ('Pvt Ltd', 'Funded Startup', 'Early Stage Startup', 'Public Sector', 'NGO', 'Other'))
-last_new_job = st.sidebar.selectbox('Last New Job', ('never', '1', '2', '3', '4', '>4'))
-training_hours = st.sidebar.slider('Training Hours', 0, 500, 0)
+def user_input_features():
+    city_development_index = st.sidebar.slider('City Development Index', 0.0, 1.0, 0.5)
+    city = st.sidebar.selectbox('City', df['city'].unique())
+    relevent_experience = st.sidebar.selectbox('Relevant Experience', ['No relevent experience', 'Has relevent experience'])
+    enrolled_university = st.sidebar.selectbox('Enrolled University', ['no_enrollment', 'Part time course', 'Full time course'])
+    education_level = st.sidebar.selectbox('Education Level', ['High School', 'Graduate', 'Masters', 'Phd'])
+    major_discipline = st.sidebar.selectbox('Major Discipline', ['STEM', 'Business Degree', 'Arts', 'Humanities', 'Other'])
+    experience = st.sidebar.slider('Experience (years)', 0, 20, 0)
+    company_size = st.sidebar.selectbox('Company Size', ['<10', '10-49', '50-99', '100-500', '500-999', '1000-4999', '5000-9999', '10000+'])
+    company_type = st.sidebar.selectbox('Company Type', ['Pvt Ltd', 'Funded Startup', 'Early Stage Startup', 'Public Sector', 'NGO', 'Other'])
+    last_new_job = st.sidebar.selectbox('Last New Job', ['never', '1', '2', '3', '4', '>4'])
+    training_hours = st.sidebar.slider('Training Hours', 0, 500, 0)
 
+    data = {'city_development_index': city_development_index,
+            'city': city,
+            'elevent_experience': relevent_experience,
+            'enrolled_university': enrolled_university,
+            'education_level': education_level,
+            'ajor_discipline': major_discipline,
+            'experience': experience,
+            'company_size': company_size,
+            'company_type': company_type,
+            'last_new_job': last_new_job,
+            'training_hours': training_hours}
+    features = pd.DataFrame(data, index=[0])
+    return features
 
-# Create input data frame
-input_data = {'city': [city],
-              'city_development_index': [city_development_index],
-              'relevent_experience': [relevent_experience],
-              'enrolled_university': [enrolled_university],
-              'education_level': [education_level],
-              'major_discipline': [major_discipline],
-              'experience': [experience],
-              'company_size': [company_size],
-              'company_type': [company_type],
-              'last_new_job': [last_new_job],
-              'training_hours': [training_hours]}
-input_df = pd.DataFrame(input_data)
+input_df = user_input_features()
 
 # Predict function with handling for missing 'city' column and encoding categorical columns
 def predict(data):
-    if 'city' not in data.columns:
-        st.error("Please select a value for 'City'.")
-        return None
-    
     # Encode categorical columns
     data_encoded = pd.get_dummies(data, columns=categorical_cols)
     
@@ -124,9 +121,8 @@ def predict(data):
     prediction = model.predict(data_encoded)
     return prediction
 
-# Predict button
-if st.sidebar.button('Predict'):
-    prediction = predict(input_df)
-    if prediction is not None:
-        st.subheader('Prediction')
-        st.write('Hired' if prediction == 1 else 'Not Hired')
+# Predict
+prediction = predict(input_df)
+if prediction is not None:
+    st.subheader('Prediction')
+    st.write('Hired' if prediction == 1 else 'Not Hired')
