@@ -78,7 +78,7 @@ def main():
 
 # Menampilkan form input untuk memprediksi kelayakan kandidat
 with st.sidebar:
-    st.markdown("<h3>Masukkan Biodata Kandidat</h3>", unsafe_allow_html=True)
+    st.markdown("<h1>MASUKAN BIODATA KANDIDAT</h1>", unsafe_allow_html=True)
     
     enrollee_id = st.text_input("Enrollee ID", "")
     city = st.text_input("City", "")
