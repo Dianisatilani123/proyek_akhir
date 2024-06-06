@@ -136,9 +136,6 @@ def main():
                 else:
                     st.write("Kandidat ditolak dengan presentase kelayakan 20%.")
 
-                # Menambahkan inputan ke dataset
-                data = data.append(input_data, ignore_index=True)
-                data.to_csv("dataset_recruitment.csv", index=False)
 
 if __name__ == "__main__":
     main()
