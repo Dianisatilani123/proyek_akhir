@@ -22,7 +22,10 @@ def preprocess_data(data):
     categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
                         'ajor_discipline', 'company_size', 'company_type', 'last_new_job']
     for col in categorical_cols:
-        data[col] = label_encoder.fit_transform(data[col])
+        if col in data.columns:
+            data[col] = label_encoder.fit_transform(data[col])
+        else:
+            st.error(f"Column '{col}' does not exist in the DataFrame.")
 
     return data
 
