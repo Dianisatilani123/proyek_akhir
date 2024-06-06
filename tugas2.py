@@ -94,36 +94,35 @@ with st.sidebar:
     last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
     training_hours = st.number_input("Training Hours", value=0)
 
- if st.button("Predict"):
-    # Input validation
-    if not enrollee_id:
-        st.error("Enrollee ID is required")
-    elif not city:
-        st.error("City is required")
-    elif city_development_index < 0:
-        st.error("City Development Index must be a non-negative value")
-    elif experience < 0:
-        st.error("Experience must be a non-negative value")
-    elif training_hours < 0:
-        st.error("Training Hours must be a non-negative value")
-    else:
-        # Menerapkan logika prediksi
-        if (relevent_experience == "Has relevent experience" and
-            (education_level == "Graduate" or education_level == "Masters") and
-            major_discipline == "STEM" and
-            (experience > 3 ) and
-            enrolled_university == "no_enrollment" and
-            training_hours > 50 and
-            last_new_job in ["1", "2", "3", "4", ">4"]):
-            kelayakan = 90  # Presentase kelayakan jika kandidat diterima
+    if st.button("Predict"):
+        # Input validation
+        if not enrollee_id:
+            st.error("Enrollee ID is required")
+        elif not city:
+            st.error("City is required")
+        elif city_development_index < 0:
+            st.error("City Development Index must be a non-negative value")
+        elif experience < 0:
+            st.error("Experience must be a non-negative value")
+        elif training_hours < 0:
+            st.error("Training Hours must be a non-negative value")
         else:
-            kelayakan = 10  # Presentase kelayakan jika kandidat ditolak
+            # Menerapkan logika prediksi
+            if (relevent_experience == "Has relevent experience" and
+                (education_level == "Graduate" or education_level == "Masters") and
+                major_discipline == "STEM" and
+                (experience > 3 ) and
+                enrolled_university == "no_enrollment" and
+                training_hours > 50 and
+                last_new_job in ["1", "2", "3", "4", ">4"]):
+                kelayakan = 90  # Presentase kelayakan jika kandidat diterima
+            else:
+                kelayakan = 10  # Presentase kelayakan jika kandidat ditolak
 
-        st.write(f"Presentase kelayakan: {kelayakan}%")
-        if kelayakan >= 80:
-            st.write("Kandidat diterima.")
-        else:
-            st.write("Kandidat ditolak.")
-
+            st.write(f"Presentase kelayakan: {kelayakan}%")
+            if kelayakan >= 80:
+                st.write("Kandidat diterima.")
+            else:
+                st.write("Kandidat ditolak.")
 if __name__ == "__main__":
     main()
