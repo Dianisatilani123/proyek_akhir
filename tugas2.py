@@ -32,6 +32,10 @@ def split_data(data):
     X = data.drop(columns=["gender", "city"])  # Hapus fitur "City"
     y = data["gender"]
 
+    # Label encode the gender column
+    le = LabelEncoder()
+    y = le.fit_transform(y)
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     return X_train, X_test, y_train, y_test
