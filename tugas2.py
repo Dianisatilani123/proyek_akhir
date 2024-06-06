@@ -58,81 +58,67 @@ def evaluate_model(model, X_test, y_test):
 
 # Langkah 7: Membuat model untuk aplikasi
 def main():
-    st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
+   st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
 
-    # Load data
-    data = load_data()
+   # Load data
+   data = load_data()
 
-    # Preprocessing data
-    data = preprocess_data(data)
+   # Preprocessing data
+   data = preprocess_data(data)
 
-    # Split data
-    X_train, X_test, y_train, y_test = split_data(data)
+   # Split data
+   X_train, X_test, y_train, y_test = split_data(data)
 
-    # Train model
-    model = train_model(X_train, y_train)
+   # Train model
+   model = train_model(X_train, y_train)
 
-    # Evaluate model
-    accuracy = evaluate_model(model, X_test, y_test)
-    st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+   # Evaluate model
+   accuracy = evaluate_model(model, X_test, y_test)
+   st.write(f"Akurasi model: {accuracy * 100:.2f}%")
 
-    # Menampilkan form input untuk memprediksi kelayakan kandidat
-    with st.sidebar:
-        st.markdown("<h3>Masukkan Biodata Kandidat</h3>", unsafe_allow_html=True)
-        
-        enrollee_id = st.text_input("Enrollee ID", "")
-        city = st.text_input("City", "")
-        city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
-        gender = st.selectbox("Gender", ["Male", "Female", "Other"])
-        relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
-        enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
-        education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
-        major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
-        experience = st.number_input("Experience", value=0)
-        company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
-        company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
-        last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
-        training_hours = st.number_input("Training Hours", value=0)
-if st.button("Predict"):
-    # Input validation
-    if not enrollee_id:
-        st.error("Enrollee ID is required")
-    elif not city:
-        st.error("City is required")
-    elif city_development_index < 0:
-        st.error("City Development Index must be a non-negative value")
-    elif experience < 0:
-        st.error("Experience must be a non-negative value")
-    elif training_hours < 0:
-        st.error("Training Hours must be a non-negative value")
-    else:
-        # Menerapkan logika prediksi
-        input_data = pd.DataFrame({
-            'enrollee_id': [enrollee_id],
-            'city': [city],
-            'city_development_index': [city_development_index],
-            'elevent_experience': [relevent_experience],
-            'enrolled_university': [enrolled_university],
-            'education_level': [education_level],
-            'ajor_discipline': [major_discipline],
-            'experience': [experience],
-            'company_size': [company_size],
-            'company_type': [company_type],
-            'last_new_job': [last_new_job],
-            'training_hours': [training_hours]
-        }, columns=data.columns)  # Ensure the column order matches the original dataset
+# Menampilkan form input untuk memprediksi kelayakan kandidat
+with st.sidebar:
+    st.markdown("<h3>Masukkan Biodata Kandidat</h3>", unsafe_allow_html=True)
+    
+    enrollee_id = st.text_input("Enrollee ID", "")
+    city = st.text_input("City", "")
+    city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
+    gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+    relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
+    enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
+    education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
+    major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
+    experience = st.number_input("Experience", value=0)
+    company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
+    company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
+    last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
+    training_hours = st.number_input("Training Hours", value=0)
 
-        # Preprocessing input data
-        input_data = preprocess_data(input_data)
-
-        # Predict kelayakan kandidat
-        prediction = model.predict(input_data)
-
-        # Tampilkan presentase kelayakan kandidat
-        if prediction[0] == 1:
-            st.write("Kandidat diterima dengan presentase kelayakan 80%.")
+    if st.button("Predict"):
+        # Input validation
+        if not enrollee_id:
+            st.error("Enrollee ID is required")
+        elif not city:
+            st.error("City is required")
+        elif city_development_index < 0:
+            st.error("City Development Index must be a non-negative value")
+        elif experience < 0:
+            st.error("Experience must be a non-negative value")
+        elif training_hours < 0:
+            st.error("Training Hours must be a non-negative value")
         else:
-            st.write("Kandidat ditolak dengan presentase kelayakan 20%.")
+            # Menerapkan logika prediksi
+            if (relevent_experience == "Has relevent experience" and
+                (education_level == "Graduate" or education_level == "Masters") and
+                major_discipline == "STEM" and
+                (experience > 5 or experience > 10) and
+                company_size in ["100-500", "500-999", "1000-4999", "5000-9999", "10000+"] and
+                enrolled_university == "no_enrollment" and
+                training_hours > 50 and
+                last_new_job in ["1", "2", "3", "4", ">4"]):
+                st.write("Kandidat diterima.")
+            else:
+                st.write("Kandidat ditolak.")
 
 if __name__ == "__main__":
     main()
