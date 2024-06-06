@@ -80,7 +80,7 @@ def main():
     # Menampilkan form input untuk memprediksi kelayakan kandidat
     with st.sidebar:
         st.markdown("<h3>Masukkan Biodata Kandidat</h3>", unsafe_allow_html=True)
-        
+        training_hours = st.number_input("Training Hours", value=0)
         enrollee_id = st.text_input("Enrollee ID", "")
         city = st.text_input("City", "")
         city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
