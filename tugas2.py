@@ -127,8 +127,7 @@ def main():
                 st.write("Kandidat diterima.")
             else:
                 st.write("Kandidat ditolak.")
-
-            # Membuat file PDF hasil prediksi
+    # Membuat file PDF hasil prediksi
             pdf = FPDF()
             pdf.add_page()
             pdf.set_font("Arial", size=12)
@@ -164,10 +163,14 @@ def main():
             else:
                 pdf.cell(200, 10, txt="Kandidat tidak memenuhi salah satu atau lebih dari kriteria di atas.", ln=True)
 
-            pdf.output(f"hasil_prediksi_{enrollee_id}.pdf", "F")
+            pdf_output = pdf.output(dest="S").encode("latin-1")
 
-            st.write("File hasil prediksi telah dibuat. Silakan download di bawah ini:")
-            st.markdown(f"[Download File](hasil_prediksi_{enrollee_id}.pdf)", unsafe_allow_html=True)
+            st.download_button(
+                label="Download File",
+                data=pdf_output,
+                file_name=f"hasil_prediksi_{enrollee_id}.pdf",
+                mime="application/pdf"
+            )
 
 if __name__ == "__main__":
     main()
