@@ -133,7 +133,7 @@ def main():
                 pdf.set_font("Arial", size=12)
                 pdf.cell(200, 10, txt=f"Hasil Prediksi Kelayakan Kandidat", ln=True, align="C")
                 pdf.ln(10)
-                pdf.cell(200, 10, txt=f"Nama Kandidat: {enrollee_id}", ln=True)
+                pdf.cell(200, 10, txt=f"ID Kandidat: {enrollee_id}", ln=True)
                 pdf.cell(200, 10, txt=f"Presentase Kelayakan: {kelayakan}%", ln=True)
                 pdf.ln(10)
                 pdf.cell(200, 10, txt="Biodata Kandidat:", ln=True)
