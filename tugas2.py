@@ -78,64 +78,45 @@ def main():
 
 # Menampilkan form input untuk memprediksi kelayakan kandidat
 with st.sidebar:
-    enrollee_id = st.text_input("Enrollee ID", "")
-    city = st.text_input("City", "")
-    city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
-    relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
-    enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
-    education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
-    major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
-    experience = st.number_input("Experience", value=0)
-    company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
-    company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
-    last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
-    training_hours = st.number_input("Training Hours", value=0)
-    gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+   enrollee_id = st.text_input("Enrollee ID", "")
+   city = st.text_input("City", "")
+   city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
+   relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
+   enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
+   education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
+   major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
+   experience = st.number_input("Experience", value=0)
+   company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
+   company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
+   last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
+   training_hours = st.number_input("Training Hours", value=0)
+   gender = st.selectbox("Gender", ["Male", "Female", "Other"])
 
-    if st.button("Predict"):
-        # Input validation
-        if not enrollee_id:
-            st.error("Enrollee ID is required")
-        elif not city:
-            st.error("City is required")
-        elif city_development_index < 0:
-            st.error("City Development Index must be a non-negative value")
-        elif experience < 0:
-            st.error("Experience must be a non-negative value")
-        elif training_hours < 0:
-            st.error("Training Hours must be a non-negative value")
-        else:
-            # Menerapkan logika prediksi
-            if (relevent_experience == "Has relevent experience" and
-                (education_level == "Graduate" or education_level == "Masters") and
-                major_discipline == "STEM" and
-                (experience > 5 or experience > 10) and
-                company_size in ["100-500", "500-999", "1000-4999", "5000-9999", "10000+"] and
-                enrolled_university == "no_enrollment" and
-                training_hours > 50 and
-                last_new_job in ["1", "2", "3", "4", ">4"]):
-                result = "Diterima"
-                percentage = 80  # Persentase kandidat yang diterima
-            else:
-                result = "Ditolak"
-                percentage = 20  # Persentase kandidat yang ditolak
-
-            st.write(f"Hasil Prediksi: {result}")
-            st.write(f"Persentase Kelayakan: {percentage}%")
-
-            # Download hasil prediksi
-            output = {"Enrollee ID": [enrollee_id], "Hasil Prediksi": [result], "Persentase Kelayakan": [percentage]}
-            df = pd.DataFrame(output)
-            st.markdown(get_table_download_link(df), unsafe_allow_html=True)
-
-def get_table_download_link(df):
-    csv = df.to_csv(index=False)
-    b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
-    href = f'<a href="data:file/csv;base64,{b64}" download="hasil_prediksi.csv">Download Hasil Prediksi</a>'
-    return href
-
-if __name__ == "__main__":
-    main()
+   if st.button("Predict"):
+       # Input validation
+       if not enrollee_id:
+           st.error("Enrollee ID is required")
+       elif not city:
+           st.error("City is required")
+       elif city_development_index < 0:
+           st.error("City Development Index must be a non-negative value")
+       elif experience < 0:
+           st.error("Experience must be a non-negative value")
+       elif training_hours < 0:
+           st.error("Training Hours must be a non-negative value")
+       else:
+           # Menerapkan logika prediksi
+           if (relevent_experience == "Has relevent experience" and
+               (education_level == "Graduate" or education_level == "Masters") and
+               major_discipline == "STEM" and
+               (experience > 5 or experience > 10) and
+               company_size in ["100-500", "500-999", "1000-4999", "5000-9999", "10000+"] and
+               enrolled_university == "no_enrollment" and
+               training_hours > 50 and
+               last_new_job in ["1", "2", "3", "4", ">4"]):
+               st.write("Kandidat diterima.")
+           else:
+               st.write("Kandidat ditolak.")
 
 if __name__ == "__main__":
     main()
