@@ -111,10 +111,10 @@ with st.sidebar:
             if (relevent_experience == "Has relevent experience" and
                 (education_level == "Graduate" or education_level == "Masters") and
                 major_discipline == "STEM" and
-                (experience > 5 or experience > 10) and
+                (experience > 3 or experience > 5) and
                 company_size in ["100-500", "500-999", "1000-4999", "5000-9999", "10000+"] and
                 enrolled_university == "no_enrollment" and
-                training_hours > 50 and
+                training_hours > 30 and
                 last_new_job in ["1", "2", "3", "4", ">4"]):
                 kelayakan = 90  # Presentase kelayakan jika kandidat diterima
             else:
