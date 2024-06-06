@@ -20,7 +20,7 @@ def preprocess_data(data):
     # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
     label_encoder = LabelEncoder()
     categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
-                        'major_discipline', 'company_size', 'company_type', 'last_new_job']
+                        'ajor_discipline', 'company_size', 'company_type', 'last_new_job']
     for col in categorical_cols:
         data[col] = label_encoder.fit_transform(data[col])
 
@@ -111,7 +111,7 @@ with st.sidebar:
             if (relevent_experience == "Has relevent experience" and
                 (education_level == "Graduate" or education_level == "Masters") and
                 major_discipline == "STEM" and
-                (experience > 3 or experience > 5) and
+                experience > 3 and
                 company_size in ["100-500", "500-999", "1000-4999", "5000-9999", "10000+"] and
                 enrolled_university == "no_enrollment" and
                 training_hours > 30 and
