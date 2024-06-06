@@ -5,15 +5,15 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-# Langkah 2: Load dataset
+# Langkah 1: Load data
 def load_data():
     data = pd.read_csv("dataset_recruitment.csv")
-    st.write("Dataset:")
-    st.write(data.head(14))  # Show the first 14 rows
     return data
 
-# Langkah 3: Standarisasi data
+# Langkah 2: Standarisasi data
 def preprocess_data(data):
     # Ubah nilai "<1" menjadi 0 dan nilai ">20" menjadi 25
     data['experience'] = data['experience'].apply(lambda x: 0 if x == '<1' else (25 if x == '>20' else int(x)))
@@ -27,7 +27,7 @@ def preprocess_data(data):
 
     return data
 
-# Langkah 4: Split data train dan test
+# Langkah 3: Split data train dan test
 def split_data(data):
     X = data.drop(columns=["gender", "city"])  # Hapus fitur "City"
     y = data["gender"]
@@ -36,13 +36,13 @@ def split_data(data):
 
     return X_train, X_test, y_train, y_test
 
-# Langkah 5: Membuat data latih menggunakan algoritma machine learning
+# Langkah 4: Membuat data latih menggunakan algoritma machine learning
 def train_model(X_train, y_train):
     model = RandomForestClassifier()
     model.fit(X_train, y_train)
     return model
 
-# Langkah 6: Membuat model evaluasi untuk uji akurasi
+# Langkah 5: Membuat model evaluasi untuk uji akurasi
 def evaluate_model(model, X_test, y_test):
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
@@ -57,7 +57,7 @@ def evaluate_model(model, X_test, y_test):
     
     return accuracy
 
-# Langkah 7: Membuat model untuk aplikasi
+# Langkah 6: Membuat model untuk aplikasi
 def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
 
@@ -127,77 +127,129 @@ def main():
                 st.write("Kandidat diterima.")
             else:
                 st.write("Kandidat ditolak.")
+    
     # Membuat file PDF hasil prediksi
-                pdf = FPDF()
-                pdf.add_page()
-                pdf.set_font("Arial", size=12)
-                pdf.cell(200, 10, txt=f"Hasil Prediksi Kelayakan Kandidat", ln=True, align="C")
-                pdf.ln(10)
-                pdf.cell(200, 10, txt=f"ID Kandidat: {enrollee_id}", ln=True)
-                pdf.cell(200, 10, txt=f"Presentase Kelayakan: {kelayakan}%", ln=True)
-                pdf.ln(10)
-                pdf.cell(200, 10, txt="Biodata Kandidat:", ln=True)
-                pdf.ln(5)
-                pdf.cell(100, 10, txt="City:", ln=False)
-                pdf.cell(100, 10, txt=f"{city}", ln=True)
-                pdf.cell(100, 10, txt="City Development Index:", ln=False)
-                pdf.cell(100, 10, txt=f"{city_development_index:.3f}", ln=True)
-                pdf.cell(100, 10, txt="Gender:", ln=False)
-                pdf.cell(100, 10, txt=f"{gender}", ln=True)
-                pdf.cell(100, 10, txt="Relevent Experience:", ln=False)
-                pdf.cell(100, 10, txt=f"{relevent_experience}", ln=True)
-                pdf.cell(100, 10, txt="Enrolled University:", ln=False)
-                pdf.cell(100, 10, txt=f"{enrolled_university}", ln=True)
-                pdf.cell(100, 10, txt="Education Level:", ln=False)
-                pdf.cell(100, 10, txt=f"{education_level}", ln=True)
-                pdf.cell(100, 10, txt="Major Discipline:", ln=False)
-                pdf.cell(100, 10, txt=f"{major_discipline}", ln=True)
-                pdf.cell(100, 10, txt="Experience:", ln=False)
-                pdf.cell(100, 10, txt=f"{experience}", ln=True)
-                pdf.cell(100, 10, txt="Company Size:", ln=False)
-                pdf.cell(100, 10, txt=f"{company_size}", ln=True)
-                pdf.cell(100, 10, txt="Company Type:", ln=False)
-                pdf.cell(100, 10, txt=f"{company_type}", ln=True)
-                pdf.cell(100, 10, txt="Last New Job:", ln=False)
-                pdf.cell(100, 10, txt=f"{last_new_job}", ln=True)
-                pdf.cell(100, 10, txt="Training Hours:", ln=False)
-                pdf.cell(100, 10, txt=f"{training_hours}", ln=True)
-          
-            if kelayakan == 90:
-                pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
-                pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
-                pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
-                pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
-                pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 3 tahun.", ln=True)
-                pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
-                pdf.cell(200, 10, txt="- Jam Pelatihan: Kandidat memiliki lebih dari 50 jam pelatihan.", ln=True)
-                pdf.cell(200, 10, txt="- Durasi Pekerjaan Terakhir: Kandidat telah bekerja dalam durasi tertentu pada pekerjaan terakhir mereka (1-4 tahun atau lebih).", ln=True)
-            elif kelayakan == 70:
-                pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
-                pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
-                pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
-                pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
-                pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 2 tahun.", ln=True)
-                pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
-                pdf.cell(200, 10, txt="- Jam Pelatihan: Kandidat memiliki lebih dari 30 jam pelatihan.", ln=True)
-            elif kelayakan == 50:
-                pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
-                pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
-                pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
-                pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
-                pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 1 tahun.", ln=True)
-                pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
-            else:
-                pdf.cell(200, 10, txt="Kandidat tidak memenuhi salah satu atau lebih dari kriteria di atas.", ln=True)
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    pdf.cell(200, 10, txt=f"Hasil Prediksi Kelayakan Kandidat", ln=True, align="C")
+    pdf.ln(10)
+    pdf.cell(200, 10, txt=f"ID Kandidat: {enrollee_id}", ln=True)
+    pdf.cell(200, 10, txt=f"Presentase Kelayakan: {kelayakan}%", ln=True)
+    pdf.ln(10)
+    pdf.cell(200, 10, txt="Biodata Kandidat:", ln=True)
+    pdf.ln(5)
+    pdf.cell(100, 10, txt="City:", ln=False)
+    pdf.cell(100, 10, txt=f"{city}", ln=True)
+    pdf.cell(100, 10, txt="City Development Index:", ln=False)
+    pdf.cell(100, 10, txt=f"{city_development_index:.3f}", ln=True)
+    pdf.cell(100, 10, txt="Gender:", ln=False)
+    pdf.cell(100, 10, txt=f"{gender}", ln=True)
+    pdf.cell(100, 10, txt="Relevent Experience:", ln=False)
+    pdf.cell(100, 10, txt=f"{relevent_experience}", ln=True)
+    pdf.cell(100, 10, txt="Enrolled University:", ln=False)
+    pdf.cell(100, 10, txt=f"{enrolled_university}", ln=True)
+    pdf.cell(100, 10, txt="Education Level:", ln=False)
+    pdf.cell(100, 10, txt=f"{education_level}", ln=True)
+    pdf.cell(100, 10, txt="Major Discipline:", ln=False)
+    pdf.cell(100, 10, txt=f"{major_discipline}", ln=True)
+    pdf.cell(100, 10, txt="Experience:", ln=False)
+    pdf.cell(100, 10, txt=f"{experience}", ln=True)
+    pdf.cell(100, 10, txt="Company Size:", ln=False)
+    pdf.cell(100, 10, txt=f"{company_size}", ln=True)
+    pdf.cell(100, 10, txt="Company Type:", ln=False)
+    pdf.cell(100, 10, txt=f"{company_type}", ln=True)
+    pdf.cell(100, 10, txt="Last New Job:", ln=False)
+    pdf.cell(100, 10, txt=f"{last_new_job}", ln=True)
+    pdf.cell(100, 10, txt="Training Hours:", ln=False)
+    pdf.cell(100, 10, txt=f"{training_hours}", ln=True)
+    
+    if kelayakan == 90:
+        pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
+        pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
+        pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
+        pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
+        pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 3 tahun.", ln=True)
+        pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
+        pdf.cell(200, 10, txt="- Jam Pelatihan: Kandidat memiliki lebih dari 50 jam pelatihan.", ln=True)
+        pdf.cell(200, 10, txt="- Durasi Pekerjaan Terakhir: Kandidat telah bekerja dalam durasi tertentu pada pekerjaan terakhir mereka (1-4 tahun atau lebih).", ln=True)
+    elif kelayakan == 70:
+        pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
+        pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
+        pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
+        pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
+        pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 2 tahun.", ln=True)
+        pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
+        pdf.cell(200, 10, txt="- Jam Pelatihan: Kandidat memiliki lebih dari 30 jam pelatihan.", ln=True)
+    elif kelayakan == 50:
+        pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
+        pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
+        pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
+        pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
+        pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 1 tahun.", ln=True)
+        pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
+    else:
+        pdf.cell(200, 10, txt="Kandidat tidak memenuhi salah satu atau lebih dari kriteria di atas.", ln=True)
 
-            pdf_output = pdf.output(dest="S").encode("latin-1")
+    pdf_output = pdf.output(dest="S").encode("latin-1")
 
-            st.download_button(
-                label="Download File",
-                data=pdf_output,
-                file_name=f"hasil_prediksi_{enrollee_id}.pdf",
-                mime="application/pdf"
-            )
+    st.download_button(
+        label="Download File",
+        data=pdf_output,
+        file_name=f"hasil_prediksi_{enrollee_id}.pdf",
+        mime="application/pdf"
+    )
+
+# Langkah 7: Membuat dashboard analitik
+def create_analytics_dashboard(data):
+    st.markdown("<h1 style='text-align: center'>Dashboard Analitik Perekrutan</h1>", unsafe_allow_html=True)
+
+    # Membuat grafik jumlah kandidat berdasarkan latar belakang
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.countplot(x="education_level", data=data, ax=ax)
+    ax.set_title("Jumlah Kandidat berdasarkan Tingkat Pendidikan")
+    st.pyplot(fig)
+
+    # Membuat grafik tingkat keberhasilan kandidat berdasarkan latar belakang
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.countplot(x="education_level", hue="gender", data=data, ax=ax)
+    ax.set_title("Tingkat Keberhasilan Kandidat berdasarkan Tingkat Pendidikan dan Gender")
+    st.pyplot(fig)
+
+    # Membuat tabel untuk menampilkan data perekrutan
+    st.write("Data Perekrutan:")
+    st.write(data.head(10))
+
+# Langkah 8: Mengadakan laporan berkala
+def generate_report(data):
+    st.markdown("<h1 style='text-align: center'>Laporan Perekrutan</h1>", unsafe_allow_html=True)
+
+    # Membuat ringkasan data perekrutan
+    st.write("Ringkasan Data Perekrutan:")
+    st.write(data.describe())
+
+    # Membuat rekomendasi untuk meningkatkan inklusi
+    st.write("Rekomendasi untuk Meningkatkan Inklusi:")
+    st.write("1. Meningkatkan kesadaran tentang pentingnya keberagaman dan inklusi dalam proses perekrutan.")
+    st.write("2. Mengembangkan strategi perekrutan yang lebih inklusif dan beragam.")
+    st.write("3. Meningkatkan pelatihan dan pengembangan untuk meningkatkan kesadaran dan kemampuan dalam menghadapi keberagaman.")
+
+# Langkah 9: Menggunakan data untuk meningkatkan inklusi
+def use_data_to_improve_inclusion(data):
+    st.markdown("<h1 style='text-align: center'>Menggunakan Data untuk Meningkatkan Inklusi</h1>", unsafe_allow_html=True)
+
+    # Membuat analisis data untuk mengidentifikasi area yang perlu ditingkatkan
+    st.write("Analisis Data untuk Meningkatkan Inklusi:")
+    st.write(data.groupby("education_level")["gender"].value_counts())
+
+    # Membuat rekomendasi untuk meningkatkan inklusi berdasarkan analisis data
+    st.write("Rekomendasi untuk Meningkatkan Inklusi berdasarkan Analisis Data:")
+    st.write("1. Meningkatkan perekrutan kandidat dari latar belakang yang kurang terwakili.")
+    st.write("2. Mengembangkan program pelatihan dan pengembangan yang lebih inklusif.")
 
 if __name__ == "__main__":
+    data = load_data()
     main()
+    create_analytics_dashboard(data)
+    generate_report(data)
+    use_data_to_improve_inclusion(data)
