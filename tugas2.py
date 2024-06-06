@@ -109,24 +109,21 @@ def main():
             elif (relevent_experience == "Has relevent experience" and
                   (education_level == "Graduate" or education_level == "Masters") and
                   major_discipline == "STEM" and
-                  (experience = 2 ) and
+                  (experience > 2 ) and
                   enrolled_university == "no_enrollment" and
-                  training_hours >= 30) and
-                  last_new_job in ["1", "2", "3", "4", ">4"]):
+                  training_hours > 30):
                 kelayakan = 70  # Presentase kelayakan jika kandidat memiliki beberapa kriteria
             elif (relevent_experience == "Has relevent experience" and
                   (education_level == "Graduate" or education_level == "Masters") and
                   major_discipline == "STEM" and
-                  (experience = 1 ) and
-                  enrolled_university == "no_enrollment") and
-                  training_hours >= 20) and
-                  last_new_job in ["1", "2", "3", "4", ">4"]):
+                  (experience > 1 ) and
+                  enrolled_university == "no_enrollment"):
                 kelayakan = 50  # Presentase kelayakan jika kandidat memiliki beberapa kriteria
             else:
-                kelayakan = 30  # Presentase kelayakan jika kandidat ditolak
+                kelayakan = 10  # Presentase kelayakan jika kandidat ditolak
 
             st.write(f"Presentase kelayakan: {kelayakan}%")
-            if kelayakan >= 70:
+            if kelayakan >= 80:
                 st.write("Kandidat diterima.")
             else:
                 st.write("Kandidat ditolak.")
