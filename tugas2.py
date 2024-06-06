@@ -127,18 +127,17 @@ def main():
                 st.write("Kandidat diterima.")
             else:
                 st.write("Kandidat ditolak.")
- # Membuat file PDF hasil prediksi
-pdf = FPDF()
-pdf.add_page()
-pdf.set_font("Arial", size=12)
-pdf.cell(200, 10, txt=f"Hasil Prediksi Kelayakan Kandidat", ln=True, align="C")
-pdf.ln(10)
-pdf.cell(200, 10, txt=f"Nama Kandidat: {enrollee_id}", ln=True)
-pdf.cell(200, 10, txt=f"Presentase Kelayakan: {kelayakan}%", ln=True)
-pdf.ln(10)
-
-pdf.cell(200, 10, txt="Biodata Kandidat:", ln=True)
-pdf.ln(5)
+    # Membuat file PDF hasil prediksi
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
+            pdf.cell(200, 10, txt=f"Hasil Prediksi Kelayakan Kandidat", ln=True, align="C")
+            pdf.ln(10)
+            pdf.cell(200, 10, txt=f"Nama Kandidat: {enrollee_id}", ln=True)
+            pdf.cell(200, 10, txt=f"Presentase Kelayakan: {kelayakan}%", ln=True)
+            pdf.ln(10)
+            pdf.cell(200, 10, txt="Biodata Kandidat:", ln=True)
+            pdf.ln(5)
 pdf.cell(100, 10, txt="City:", ln=False)
 pdf.cell(100, 10, txt=f"{city}", ln=True)
 pdf.cell(100, 10, txt="City Development Index:", ln=False)
@@ -164,19 +163,43 @@ pdf.cell(100, 10, txt=f"{last_new_job}", ln=True)
 pdf.cell(100, 10, txt="Training Hours:", ln=False)
 pdf.cell(100, 10, txt=f"{training_hours}", ln=True)
 
-if kelayakan >= 80:
-    pdf.cell(200, 10, txt="Kandidat diterima.", ln=True)
-else:
-    pdf.cell(200, 10, txt="Kandidat ditolak.", ln=True)
 
-pdf_output = pdf.output(dest="S").encode("latin-1")
+            
+            if kelayakan == 90:
+                pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
+                pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
+                pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
+                pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
+                pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 3 tahun.", ln=True)
+                pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
+                pdf.cell(200, 10, txt="- Jam Pelatihan: Kandidat memiliki lebih dari 50 jam pelatihan.", ln=True)
+                pdf.cell(200, 10, txt="- Durasi Pekerjaan Terakhir: Kandidat telah bekerja dalam durasi tertentu pada pekerjaan terakhir mereka (1-4 tahun atau lebih).", ln=True)
+            elif kelayakan == 70:
+                pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
+                pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
+                pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
+                pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
+                pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 2 tahun.", ln=True)
+                pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
+                pdf.cell(200, 10, txt="- Jam Pelatihan: Kandidat memiliki lebih dari 30 jam pelatihan.", ln=True)
+            elif kelayakan == 50:
+                pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
+                pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
+                pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
+                pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
+                pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 1 tahun.", ln=True)
+                pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
+            else:
+                pdf.cell(200, 10, txt="Kandidat tidak memenuhi salah satu atau lebih dari kriteria di atas.", ln=True)
 
-st.download_button(
-    label="Download File",
-    data=pdf_output,
-    file_name=f"hasil_prediksi_{enrollee_id}.pdf",
-    mime="application/pdf"
-)
+            pdf_output = pdf.output(dest="S").encode("latin-1")
+
+            st.download_button(
+                label="Download File",
+                data=pdf_output,
+                file_name=f"hasil_prediksi_{enrollee_id}.pdf",
+                mime="application/pdf"
+            )
 
 if __name__ == "__main__":
     main()
