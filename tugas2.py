@@ -20,7 +20,7 @@ def preprocess_data(data):
     # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
     label_encoder = LabelEncoder()
     categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
-                        'major_discipline', 'company_size', 'company_type', 'last_new_job']
+                        'ajor_discipline', 'company_size', 'company_type', 'last_new_job']
     for col in categorical_cols:
         data[col] = label_encoder.fit_transform(data[col])
 
@@ -48,11 +48,14 @@ def evaluate_model(model, X_test, y_test):
     report = classification_report(y_test, y_pred)
     matrix = confusion_matrix(y_test, y_pred)
     
-    st.write(f"Akurasi model: {accuracy * 100:.2f}%")
-    st.write("Classification Report:")
-    st.write(report)
-    st.write("Confusion Matrix:")
-    st.write(matrix)
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+        st.write("Confusion Matrix:")
+        st.write(matrix)
+    with col2:
+        st.write("Classification Report:")
+        st.write(report)
     
     return accuracy
 
