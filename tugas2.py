@@ -20,10 +20,9 @@ def preprocess_data(data):
     # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
     label_encoder = LabelEncoder()
     categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
-                        'ajor_discipline', 'company_size', 'company_type', 'last_new_job']
+                        'major_discipline', 'company_size', 'company_type', 'last_new_job']
     for col in categorical_cols:
-        if col in data.columns:
-            data[col] = label_encoder.fit_transform(data[col])
+        data[col] = label_encoder.fit_transform(data[col])
 
     return data
 
@@ -31,10 +30,6 @@ def preprocess_data(data):
 def split_data(data):
     X = data.drop(columns=["gender", "city"])  # Hapus fitur "City"
     y = data["gender"]
-
-    # Label encode the gender column
-    le = LabelEncoder()
-    y = le.fit_transform(y)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -88,15 +83,15 @@ def main():
         enrollee_id = st.text_input("Enrollee ID", "")
         city = st.text_input("City", "")
         city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
-        gender = st.selectbox("Gender", ["", "Male", "Female", "Other"])
-        relevent_experience = st.selectbox("Relevent Experience", ["", "Has relevent experience", "No relevent experience"])
-        enrolled_university = st.selectbox("Enrolled University", ["", "no_enrollment", "Full time course", "Part time course"])
-        education_level = st.selectbox("Education Level", ["", "Graduate", "Masters", "Phd"])
-        major_discipline = st.selectbox("Major Discipline", ["", "STEM", "Business Degree", "Arts", "No Major", "Other"])
+        gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+        relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
+        enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
+        education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
+        major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
         experience = st.number_input("Experience", value=0)
-        company_size = st.selectbox("Company Size", ["", "<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
-        company_type = st.selectbox("Company Type", ["", "Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
-        last_new_job = st.selectbox("Last New Job", ["", "never", "1", "2", "3", "4", ">4"])
+        company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
+        company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
+        last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
         training_hours = st.number_input("Training Hours", value=0)
 
         # Tombol prediksi
