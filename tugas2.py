@@ -127,50 +127,62 @@ def main():
                 st.write("Kandidat diterima.")
             else:
                 st.write("Kandidat ditolak.")
-    # Membuat file PDF hasil prediksi
-            pdf = FPDF()
-            pdf.add_page()
-            pdf.set_font("Arial", size=12)
-            pdf.cell(200, 10, txt=f"Hasil Prediksi Kelayakan Kandidat", ln=True, align="C")
-            pdf.ln(10)
-            pdf.cell(200, 10, txt=f"Nama Kandidat: {enrollee_id}", ln=True)
-            pdf.cell(200, 10, txt=f"Presentase Kelayakan: {kelayakan}%", ln=True)
-            pdf.ln(10)
-            if kelayakan == 90:
-                pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
-                pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
-                pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
-                pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
-                pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 3 tahun.", ln=True)
-                pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
-                pdf.cell(200, 10, txt="- Jam Pelatihan: Kandidat memiliki lebih dari 50 jam pelatihan.", ln=True)
-                pdf.cell(200, 10, txt="- Durasi Pekerjaan Terakhir: Kandidat telah bekerja dalam durasi tertentu pada pekerjaan terakhir mereka (1-4 tahun atau lebih).", ln=True)
-            elif kelayakan == 70:
-                pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
-                pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
-                pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
-                pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
-                pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 2 tahun.", ln=True)
-                pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
-                pdf.cell(200, 10, txt="- Jam Pelatihan: Kandidat memiliki lebih dari 30 jam pelatihan.", ln=True)
-            elif kelayakan == 50:
-                pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
-                pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
-                pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
-                pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
-                pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 1 tahun.", ln=True)
-                pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
-            else:
-                pdf.cell(200, 10, txt="Kandidat tidak memenuhi salah satu atau lebih dari kriteria di atas.", ln=True)
+  # Membuat file PDF hasil prediksi
+pdf = FPDF()
+pdf.add_page()
+pdf.set_font("Arial", size=12)
 
-            pdf_output = pdf.output(dest="S").encode("latin-1")
+# Create a table with user-input data
+pdf.cell(200, 10, txt="Hasil Prediksi Kelayakan Kandidat", ln=True, align="C")
+pdf.ln(10)
 
-            st.download_button(
-                label="Download File",
-                data=pdf_output,
-                file_name=f"hasil_prediksi_{enrollee_id}.pdf",
-                mime="application/pdf"
-            )
+data = [
+    ["Nama Kandidat", enrollee_id],
+    ["City", city],
+    ["City Development Index", city_development_index],
+    ["Gender", gender],
+    ["Relevent Experience", relevent_experience],
+    ["Enrolled University", enrolled_university],
+    ["Education Level", education_level],
+    ["Major Discipline", major_discipline],
+    ["Experience", experience],
+    ["Company Size", company_size],
+    ["Company Type", company_type],
+    ["Last New Job", last_new_job],
+    ["Training Hours", training_hours],
+    ["Presentase Kelayakan", kelayakan],
+]
+
+pdf.set_font("Arial", size=10)
+pdf.cell(0, 10, txt="", ln=True)  # Add a blank line
+pdf.cell(0, 10, txt="Data Kandidat:", ln=True, align="L")
+pdf.ln(5)
+
+# Create a table with borders
+pdf.set_line_width(0.1)
+pdf.set_draw_color(0, 0, 0)
+pdf.set_fill_color(255, 255, 255)
+
+for row in data:
+    for col, value in enumerate(row):
+        pdf.cell(40, 10, txt=str(value), border=1, align="C")
+    pdf.ln(10)
+
+pdf.ln(10)
+
+if kelayakan >= 80:
+    pdf.cell(200, 10, txt="Kandidat diterima.", ln=True)
+else:
+    pdf.cell(200, 10, txt="Kandidat ditolak.", ln=True)
+
+pdf_output = pdf.output(dest="S").encode("latin-1")
+
+st.download_button(
+    label="Download File",
+    data=pdf_output,
+    file_name=f"hasil_prediksi_{enrollee_id}.pdf",
+    mime="application/pdf"
+)
 
 if __name__ == "__main__":
     main()
