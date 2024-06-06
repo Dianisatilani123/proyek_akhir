@@ -137,7 +137,7 @@ pdf.cell(200, 10, txt="Hasil Prediksi Kelayakan Kandidat", ln=True, align="C")
 pdf.ln(10)
 
 data = [
-    ["Nama Kandidat", enrollee_id],
+    ["Enrolee Id", enrollee_id],
     ["City", city],
     ["City Development Index", city_development_index],
     ["Gender", gender],
