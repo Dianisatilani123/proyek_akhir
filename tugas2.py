@@ -93,49 +93,46 @@ def main():
         company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
         last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
         training_hours = st.number_input("Training Hours", value=0)
+if st.button("Predict"):
+    # Input validation
+    if not enrollee_id:
+        st.error("Enrollee ID is required")
+    elif not city:
+        st.error("City is required")
+    elif city_development_index < 0:
+        st.error("City Development Index must be a non-negative value")
+    elif experience < 0:
+        st.error("Experience must be a non-negative value")
+    elif training_hours < 0:
+        st.error("Training Hours must be a non-negative value")
+    else:
+        # Menerapkan logika prediksi
+        input_data = pd.DataFrame({
+            'enrollee_id': [enrollee_id],
+            'city': [city],
+            'city_development_index': [city_development_index],
+            'elevent_experience': [relevent_experience],
+            'enrolled_university': [enrolled_university],
+            'education_level': [education_level],
+            'ajor_discipline': [major_discipline],
+            'experience': [experience],
+            'company_size': [company_size],
+            'company_type': [company_type],
+            'last_new_job': [last_new_job],
+            'training_hours': [training_hours]
+        }, columns=data.columns)  # Ensure the column order matches the original dataset
 
-        if st.button("Predict"):
-            # Input validation
-            if not enrollee_id:
-                st.error("Enrollee ID is required")
-            elif not city:
-                st.error("City is required")
-            elif city_development_index < 0:
-                st.error("City Development Index must be a non-negative value")
-            elif experience < 0:
-                st.error("Experience must be a non-negative value")
-            elif training_hours < 0:
-                st.error("Training Hours must be a non-negative value")
-            else:
-                # Menerapkan logika prediksi
-                input_data = pd.DataFrame({
-                    'enrollee_id': [enrollee_id],
-                    'city': [city],
-                    'city_development_index': [city_development_index],
-                    'gender': [gender],
-                    'relevent_experience': [relevent_experience],
-                    'enrolled_university': [enrolled_university],
-                    'education_level': [education_level],
-                    'major_discipline': [major_discipline],
-                    'experience': [experience],
-                    'company_size': [company_size],
-                    'company_type': [company_type],
-                    'last_new_job': [last_new_job],
-                    'training_hours': [training_hours]
-                })
+        # Preprocessing input data
+        input_data = preprocess_data(input_data)
 
-                # Preprocessing input data
-                input_data = preprocess_data(input_data)
+        # Predict kelayakan kandidat
+        prediction = model.predict(input_data)
 
-                # Predict kelayakan kandidat
-                prediction = model.predict(input_data)
-
-                # Tampilkan presentase kelayakan kandidat
-                if prediction[0] == 1:
-                    st.write("Kandidat diterima dengan presentase kelayakan 80%.")
-                else:
-                    st.write("Kandidat ditolak dengan presentase kelayakan 20%.")
-
+        # Tampilkan presentase kelayakan kandidat
+        if prediction[0] == 1:
+            st.write("Kandidat diterima dengan presentase kelayakan 80%.")
+        else:
+            st.write("Kandidat ditolak dengan presentase kelayakan 20%.")
 
 if __name__ == "__main__":
     main()
