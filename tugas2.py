@@ -95,7 +95,7 @@ with st.sidebar:
     training_hours = st.number_input("Training Hours", value=0)
 
 # Tombol prediksi
-  if st.button("Prediksi", key="predict_button"):
+if st.button("Prediksi", key="predict_button"):
     if (relevent_experience == "Has relevent experience" and
         (education_level == "Graduate" or education_level == "Masters") and
         major_discipline == "STEM" and
