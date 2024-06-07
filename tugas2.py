@@ -96,31 +96,31 @@ def main():
         training_hours = st.number_input("Training Hours", value=0)
 
         # Tombol prediksi
-        if st.button("Prediksi"):
-            # Menerapkan logika prediksi
-            if (relevent_experience == "Has relevent experience" and
-                (education_level == "Graduate" or education_level == "Masters") and
-                major_discipline == "STEM" and
-                (experience > 3 ) and
-                enrolled_university == "no_enrollment" and
-                training_hours > 50 and
-                last_new_job in ["1", "2", "3", "4", ">4"]):
-                kelayakan = 90  # Presentase kelayakan jika kandidat diterima
-            elif (relevent_experience == "Has relevent experience" and
-                  (education_level == "Graduate" or education_level == "Masters") and
-                  major_discipline == "STEM" and
-                  (experience > 2 ) and
-                  enrolled_university == "no_enrollment" and
-                  training_hours > 30):
+       if (relevent_experience == "Has relevent experience" and
+            (education_level == "Graduate" or education_level == "Masters") and
+            major_discipline == "STEM" and
+            (experience > 3 ) and
+            enrolled_university == "no_enrollment" and
+            training_hours > 50 and
+            last_new_job in ["1", "2", "3", "4", ">4"]):
+            kelayakan = 90  # Presentase kelayakan jika kandidat diterima
+        elif (relevent_experience == "Has relevent experience" and
+              (education_level == "Graduate" or education_level == "Masters") and
+              major_discipline == "STEM" and
+              (experience > 2 ) and
+              enrolled_university == "no_enrollment" and
+              training_hours > 30 and
+              last_new_job in ["1", "2", "3", "4"]):
                 kelayakan = 70  # Presentase kelayakan jika kandidat memiliki beberapa kriteria
-            elif (relevent_experience == "Has relevent experience" and
-                  (education_level == "Graduate" or education_level == "Masters") and
-                  major_discipline == "STEM" and
-                  (experience > 1 ) and
-                  enrolled_university == "no_enrollment"):
-                kelayakan = 50  # Presentase kelayakan jika kandidat memiliki beberapa kriteria
-            else:
-                kelayakan = 10  # Presentase kelayakan jika kandidat ditolak
+        elif (relevent_experience == "Has relevent experience" and
+              (education_level == "Graduate" or education_level == "Masters") and
+              major_discipline == "STEM" and
+              (experience > 1 ) and
+              enrolled_university == "no_enrollment" and
+              training_hours > 20):
+            kelayakan = 50  # Presentase kelayakan jika kandidat memiliki beberapa kriteria
+    else:
+            kelayakan = 10  # Presentase kelayakan jika kandidat ditolak
 
             st.write(f"Presentase kelayakan: {kelayakan}%")
             if kelayakan >= 80:
@@ -188,7 +188,7 @@ def main():
                 pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 1 tahun.", ln=True)
                 pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
             else:
-                pdf.cell(200, 10, txt="Kandidat tidak memenuhi salah satu atau lebih dari kriteria di atas.", ln=True)
+                pdf.cell(200, 10, txt="Kandidat tidak memenuhi salah satu atau lebih dari kriteria perusahaan.", ln=True)
 
             pdf_output = pdf.output(dest="S").encode("latin-1")
 
