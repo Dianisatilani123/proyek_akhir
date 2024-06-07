@@ -94,7 +94,7 @@ with st.sidebar:
     last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
     training_hours = st.number_input("Training Hours", value=0)
 
-    # Tombol prediksi
+# Tombol prediksi
 if st.button("Prediksi"):
     if (relevent_experience == "Has relevent experience" and
         (education_level == "Graduate" or education_level == "Masters") and
