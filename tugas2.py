@@ -77,10 +77,9 @@ def main():
     accuracy = evaluate_model(model, X_test, y_test)
     st.write(f"Akurasi model: {accuracy * 100:.2f}%")
 
-    # Menampilkan form input untuk memprediksi kelayakan kandidat
-    with st.sidebar:
+# Menampilkan form input untuk memprediksi kelayakan kandidat
+with st.sidebar:
     st.markdown("<h3>Masukkan Biodata Kandidat</h3>", unsafe_allow_html=True)
-    
     enrollee_id = st.text_input("Enrollee ID", "")
     city = st.text_input("City", "")
     city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
