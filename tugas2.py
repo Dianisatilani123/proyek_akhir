@@ -94,6 +94,8 @@ with st.sidebar:
     last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
     training_hours = st.number_input("Training Hours", value=0)
 
+    kelayakan = 0  # Initialize kelayakan to 0
+
     if st.button("Prediksi", key="predict_button"):
         if (relevent_experience == "Has relevent experience" and
             (education_level == "Graduate" or education_level == "Masters") and
@@ -206,5 +208,3 @@ with st.sidebar:
 
 if __name__ == "__main__":
     main()
-
-    
