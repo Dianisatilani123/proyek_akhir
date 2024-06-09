@@ -21,7 +21,7 @@ def preprocess_data(data):
     # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
     label_encoder = LabelEncoder()
     categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
-                        'major_discipline', 'company_size', 'company_type', 'last_new_job']
+                        'ajor_discipline', 'company_size', 'company_type', 'last_new_job']
     for col in categorical_cols:
         data[col] = label_encoder.fit_transform(data[col])
 
@@ -95,8 +95,8 @@ def main():
         last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
         training_hours = st.number_input("Training Hours", value=0)
 
-# Tombol prediksi
-   if st.button("Prediksi"):
+    # Tombol prediksi
+    if st.button("Prediksi"):
         # Menerapkan logika prediksi
         kelayakan = 0  # Initialize kelayakan to 0
         if (relevent_experience == "Has relevent experience" and
@@ -200,5 +200,6 @@ def main():
             file_name=f"hasil_prediksi_{enrollee_id}.pdf",
             mime="application/pdf"
         )
+
 if __name__ == "__main__": 
     main()
