@@ -222,5 +222,11 @@ def main():
                     mime="application/pdf"
                 )
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
+    st.set_page_config(page_title="Aplikasi Rekrutmen Tanpa Bias Gender", page_icon=":female_detective:", layout="wide")
+    st.sidebar.title("Navigasi")
+    st.sidebar.markdown("<h2><a href='#' style='text-decoration:none;color:#000000;'>Home</a></h2>", unsafe_allow_html=True)
+    st.sidebar.markdown("<h2><a href='#' style='text-decoration:none;color:#000000;'>Prediksi</a></h2>", unsafe_allow_html=True)
+    st.sidebar.markdown("<h2><a href='#' style='text-decoration:none;color:#000000;'>Laporan Keanekaragaman</a></h2>", unsafe_allow_html=True)
+
     main()
