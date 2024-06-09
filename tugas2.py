@@ -234,29 +234,7 @@ def main():
         # Load data
         data = load_data()
 
-        # Membuat laporan keanekaragaman
-        st.write("Distribusi Gender:")
-        st.write(data["gender"].value_counts())
-
-        st.write("Distribusi Tingkat Pendidikan:")
-        st.write(data["education_level"].value_counts())
-
-        st.write("Distribusi Disiplin Utama:")
-        st.write(data["major_discipline"].value_counts())
-
-        st.write("Distribusi Pengalaman Kerja:")
-        st.write(data["experience"].value_counts())
-
-        st.write("Distribusi Status Pendaftaran Universitas:")
-        st.write(data["enrolled_university"].value_counts())
-
-        st.write("Distribusi Jam Pelatihan:")
-        st.write(data["training_hours"].value_counts())
-
-        st.write("Distribusi Durasi Pekerjaan Terakhir:")
-        st.write(data["last_new_job"].value_counts())
-
-        # Membuat laporan keanekaragaman berdampingan
+        # Membuat laporan keanekaragaman 
         cols = st.columns(2)
 
         with cols[0]:
