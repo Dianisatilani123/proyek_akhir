@@ -64,7 +64,7 @@ def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
 
     # Navigasi header
-    navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi","Laporan Keanekaragaman"])
+    navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman"])
 
     if navigation == "HOME":
         st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
