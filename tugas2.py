@@ -79,7 +79,7 @@ def main():
 
     # Menampilkan form input untuk memprediksi kelayakan kandidat
     with st.sidebar:
-        st.markdown("<h3>Masukkan Biodata Kandidat</h3>", unsafe_allow_html=True)
+        st.markdown("<h1>Masukkan Biodata Kandidat</h1>", unsafe_allow_html=True)
         
         enrollee_id = st.text_input("Enrollee ID", "")
         city = st.text_input("City", "")
@@ -141,7 +141,7 @@ def main():
                 pdf = FPDF()
                 pdf.add_page()
                 pdf.set_font("Arial", size=12)
-                pdf.cell(200, 10, txt=f"Hasil Prediksi Kelayakan Kandidat", ln=True, align="C")
+                pdf.cell(200, 10, txt=f"HASIL SELEKSI KANDIDAT", ln=True, align="C")
                 pdf.ln(10)
                 pdf.cell(200, 10, txt=f"ID Kandidat: {enrollee_id}", ln=True)
                 pdf.cell(200, 10, txt=f"Presentase Kelayakan: {kelayakan}%", ln=True)
