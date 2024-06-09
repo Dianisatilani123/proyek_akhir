@@ -229,7 +229,60 @@ def main():
                     )
     elif navigation == "Laporan Keanekaragaman":
         st.write("Laporan Keanekaragaman:")
-        # TODO: Implementasi laporan keanekaragaman
+
+        # Load data
+        data = load_data()
+
+        # Preprocessing data
+        data = preprocess_data(data)
+
+        # Analitik keanekaragaman
+        st.write("Analitik Keanekaragaman:")
+        st.write("Jumlah pelamar:", len(data))
+        st.write("Jumlah karyawan:", len(data[data["gender"] == "Male"]) + len(data[data["gender"] == "Female"]))
+        st.write("Rasio karyawan laki-laki:", len(data[data["gender"] == "Male"]) / len(data) * 100, "%")
+        st.write("Rasio karyawan perempuan:", len(data[data["gender"] == "Female"]) / len(data) * 100, "%")
+
+        # Laporan keanekaragaman
+        st.write("Laporan Keanekaragaman:")
+        st.write("Keanekaragaman pelamar berdasarkan gender:")
+        st.write(data["gender"].value_counts())
+        st.write("Keanekaragaman pelamar berdasarkan usia:")
+        st.write(data["experience"].value_counts())
+        st.write("Keanekaragaman pelamar berdasarkan pendidikan:")
+        st.write(data["education_level"].value_counts())
+        st.write("Keanekaragaman pelamar berdasarkan disiplin utama:")
+        st.write(data["major_discipline"].value_counts())
+
+        # Grafik keanekaragaman
+        st.write("Grafik Keanekaragaman:")
+        fig, ax = plt.subplots()
+        ax.bar(data["gender"].value_counts().index, data["gender"].value_counts().values)
+        ax.set_title("Keanekaragaman Pelamar Berdasarkan Gender")
+        ax.set_xlabel("Gender")
+        ax.set_ylabel("Jumlah Pelamar")
+        st.pyplot(fig)
+
+        fig, ax = plt.subplots()
+        ax.bar(data["experience"].value_counts().index, data["experience"].value_counts().values)
+        ax.set_title("Keanekaragaman Pelamar Berdasarkan Usia")
+        ax.set_xlabel("Usia")
+        ax.set_ylabel("Jumlah Pelamar")
+        st.pyplot(fig)
+
+        fig, ax = plt.subplots()
+        ax.bar(data["education_level"].value_counts().index, data["education_level"].value_counts().values)
+        ax.set_title("Keanekaragaman Pelamar Berdasarkan Pendidikan")
+        ax.set_xlabel("Pendidikan")
+        ax.set_ylabel("Jumlah Pelamar")
+        st.pyplot(fig)
+
+        fig, ax = plt.subplots()
+        ax.bar(data["major_discipline"].value_counts().index, data["major_discipline"].value_counts().values)
+        ax.set_title("Keanekaragaman Pelamar Berdasarkan Disiplin Utama")
+        ax.set_xlabel("Disiplin Utama")
+        ax.set_ylabel("Jumlah Pelamar")
+        st.pyplot(fig)
 
 if __name__ == "__main__": 
     main()
