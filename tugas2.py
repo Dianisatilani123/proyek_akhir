@@ -300,7 +300,7 @@ def main():
             ws['A1'] = "Laporan Keanekaragaman"
         
             # Tulis data laporan ke dalam sheet
-     # Convert the Series object to a list
+# Convert the Series object to a list
 data = [
     ["Distribusi Gender", data["gender"].value_counts().tolist()],
     ["Distribusi Tingkat Pendidikan", data["education_level"].value_counts().tolist()],
@@ -317,6 +317,7 @@ for i, row in enumerate(data, start=2):
     row_str = ", ".join(map(str, row))
     ws.cell(row=i, column=1).value = row_str
     ws.merge_cells(start_row=i, start_column=1, end_row=i, end_column=2)
+
             # Simpan file Excel
             wb.save("laporan_keanekaragaman.xlsx")
         
