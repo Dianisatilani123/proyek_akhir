@@ -1,6 +1,5 @@
 import pandas as pd
 import streamlit as st
-from streamlit import columns
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
@@ -11,8 +10,6 @@ import matplotlib.pyplot as plt
 # Langkah 2: Load dataset
 def load_data():
     data = pd.read_csv("dataset_recruitment.csv")
-    st.write("Dataset:")
-    st.write(data.head(14))  # Show the first 14 rows
     return data
 
 # Langkah 3: Standarisasi data
@@ -83,7 +80,6 @@ def main():
 
         # Evaluate model
         accuracy = evaluate_model(model, X_test, y_test)
-        st.write(f"Akurasi model: {accuracy * 100:.2f}%")
 
         # Menampilkan form input untuk memprediksi kelayakan kandidat
         with st.sidebar:
@@ -231,109 +227,9 @@ def main():
                     )
     elif navigation == "Laporan Keanekaragaman":
         st.write("Laporan Keanekaragaman:")
+        # Load data
+        data = load_data()
+        st.write(data.head(14))  # Show the first 14 rows
 
-       # Load data
-    data = load_data()
-
-    # Membuat laporan keanekaragaman 
-    cols = st.columns(2)
-
-    with cols[0]:
-        st.write("Distribusi Gender:")
-        st.write(data["gender"].value_counts())
-        plt.figure(figsize=(8, 6))
-        data["gender"].value_counts().plot(kind="bar")
-        st.pyplot(plt)
-
-    with cols[1]:
-        st.write("Rasio Gender:")
-        st.write(data["gender"].value_counts(normalize=True))
-        plt.figure(figsize=(8, 6))
-        data["gender"].value_counts(normalize=True).plot(kind="bar")
-        st.pyplot(plt)
-
-    with cols[0]:
-        st.write("Distribusi Tingkat Pendidikan:")
-        st.write(data["education_level"].value_counts())
-        plt.figure(figsize=(8, 6))
-        data["education_level"].value_counts().plot(kind="bar")
-        st.pyplot(plt)
-
-    with cols[1]:
-        st.write("Rasio Tingkat Pendidikan:")
-        st.write(data["education_level"].value_counts(normalize=True))
-        plt.figure(figsize=(8, 6))
-        data["education_level"].value_counts(normalize=True).plot(kind="bar")
-        st.pyplot(plt)
-
-    with cols[0]:
-        st.write("Distribusi Disiplin Utama:")
-        st.write(data["major_discipline"].value_counts())
-        plt.figure(figsize=(8, 6))
-        data["major_discipline"].value_counts().plot(kind="bar")
-        st.pyplot(plt)
-
-    with cols[1]:
-        st.write("Rasio Disiplin Utama:")
-        st.write(data["major_discipline"].value_counts(normalize=True))
-        plt.figure(figsize=(8, 6))
-        data["major_discipline"].value_counts(normalize=True).plot(kind="bar")
-        st.pyplot(plt)
-
-    with cols[0]:
-        st.write("Distribusi Pengalaman Kerja:")
-        st.write(data["experience"].value_counts())
-        plt.figure(figsize=(8, 6))
-        data["experience"].value_counts().plot(kind="bar")
-        st.pyplot(plt)
-
-    with cols[1]:
-        st.write("Rasio Pengalaman Kerja:")
-        st.write(data["experience"].value_counts(normalize=True))
-        plt.figure(figsize=(8, 6))
-        data["experience"].value_counts(normalize=True).plot(kind="bar")
-        st.pyplot(plt)
-
-    with cols[0]:
-        st.write("Distribusi Status Pendaftaran Universitas:")
-        st.write(data["enrolled_university"].value_counts())
-        plt.figure(figsize=(8, 6))
-        data["enrolled_university"].value_counts().plot(kind="bar")
-        st.pyplot(plt)
-
-    with cols[1]:
-        st.write("Rasio Status Pendaftaran Universitas:")
-        st.write(data["enrolled_university"].value_counts(normalize=True))
-        plt.figure(figsize=(8, 6))
-        data["enrolled_university"].value_counts(normalize=True).plot(kind="bar")
-        st.pyplot(plt)
-
-    with cols[0]:
-        st.write("Distribusi Jam Pelatihan:")
-        st.write(data["training_hours"].value_counts())
-        plt.figure(figsize=(8, 6))
-        data["training_hours"].value_counts().plot(kind="bar")
-        st.pyplot(plt)
-
-    with cols[1]:
-        st.write("Rasio Jam Pelatihan:")
-        st.write(data["training_hours"].value_counts(normalize=True))
-        plt.figure(figsize=(8, 6))
-        data["training_hours"].value_counts(normalize=True).plot(kind="bar")
-        st.pyplot(plt)
-
-    with cols[0]:
-        st.write("Distribusi Durasi Pekerjaan Terakhir:")
-        st.write(data["last_new_job"].value_counts())
-        plt.figure(figsize=(8, 6))
-        data["last_new_job"].value_counts().plot(kind="bar")
-        st.pyplot(plt)
-
-    with cols[1]:
-        st.write("Rasio Durasi Pekerjaan Terakhir:")
-        st.write(data["last_new_job"].value_counts(normalize=True))
-        plt.figure(figsize=(8, 6))
-        data["last_new_job"].value_counts(normalize=True).plot(kind="bar")
-        st.pyplot(plt)
 if __name__ == "__main__":
     main()
