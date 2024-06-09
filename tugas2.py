@@ -98,7 +98,8 @@ def main():
 # Tombol prediksi
     if st.button("Prediksi"):
     # Menerapkan logika prediksi
-     if (relevent_experience == "Has relevent experience" and
+        kelayakan = 0  # Initialize kelayakan to 0
+    if (relevent_experience == "Has relevent experience" and
         (education_level == "Graduate" or education_level == "Masters") and
         major_discipline == "STEM" and
         (experience > 3 ) and
