@@ -49,7 +49,7 @@ def evaluate_model(model, X_test, y_test):
     report = classification_report(y_test, y_pred)
     matrix = confusion_matrix(y_test, y_pred)
     
-    st.write(f"Akurasi model: {accuracy * .2f}%")
+    st.write(f"Akurasi model: {accuracy * 100:.2f}%")
     st.write("Classification Report:")
     st.write(report)
     st.write("Confusion Matrix:")
