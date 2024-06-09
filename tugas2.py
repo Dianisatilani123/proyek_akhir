@@ -6,6 +6,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
+import matplotlib.pyplot as plt
 
 # Langkah 2: Load dataset
 def load_data():
@@ -240,30 +241,51 @@ def main():
         with cols[0]:
             st.write("Distribusi Gender:")
             st.write(data["gender"].value_counts())
+            plt.figure(figsize=(8, 6))
+            data["gender"].value_counts().plot(kind="bar")
+            st.pyplot(plt)
 
         with cols[1]:
             st.write("Distribusi Tingkat Pendidikan:")
             st.write(data["education_level"].value_counts())
+            plt.figure(figsize=(8, 6))
+            data["education_level"].value_counts().plot(kind="bar")
+            st.pyplot(plt)
 
         with cols[0]:
             st.write("Distribusi Disiplin Utama:")
             st.write(data["major_discipline"].value_counts())
+            plt.figure(figsize=(8, 6))
+            data["major_discipline"].value_counts().plot(kind="bar")
+            st.pyplot(plt)
 
         with cols[1]:
             st.write("Distribusi Pengalaman Kerja:")
             st.write(data["experience"].value_counts())
+            plt.figure(figsize=(8, 6))
+            data["experience"].value_counts().plot(kind="bar")
+            st.pyplot(plt)
 
         with cols[0]:
             st.write("Distribusi Status Pendaftaran Universitas:")
             st.write(data["enrolled_university"].value_counts())
+            plt.figure(figsize=(8, 6))
+            data["enrolled_university"].value_counts().plot(kind="bar")
+            st.pyplot(plt)
 
         with cols[1]:
             st.write("Distribusi Jam Pelatihan:")
             st.write(data["training_hours"].value_counts())
+            plt.figure(figsize=(8, 6))
+            data["training_hours"].value_counts().plot(kind="bar")
+            st.pyplot(plt)
 
         with cols[0]:
             st.write("Distribusi Durasi Pekerjaan Terakhir:")
             st.write(data["last_new_job"].value_counts())
+            plt.figure(figsize=(8, 6))
+            data["last_new_job"].value_counts().plot(kind="bar")
+            st.pyplot(plt)
 
 if __name__ == "__main__":
     main()
