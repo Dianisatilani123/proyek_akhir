@@ -290,40 +290,41 @@ def main():
             data["last_new_job"].value_counts().plot(kind="bar")
             st.pyplot(plt)
 
-       # Buat workbook Excel
-wb = Workbook()
-
-# Pilih sheet aktif
-ws = wb.active
-
-# Tulis judul laporan ke dalam cell A1
-ws['A1'] = "Laporan Keanekaragaman"
-
-# Tulis data laporan ke dalam sheet
-data = [
-    ["Distribusi Gender", data["gender"].value_counts()],
-    ["Distribusi Tingkat Pendidikan", data["education_level"].value_counts()],
-    ["Distribusi Disiplin Utama", data["major_discipline"].value_counts()],
-    ["Distribusi Pengalaman Kerja", data["experience"].value_counts()],
-    ["Distribusi Status Pendaftaran Universitas", data["enrolled_university"].value_counts()],
-    ["Distribusi Jam Pelatihan", data["training_hours"].value_counts()],
-    ["Distribusi Durasi Pekerjaan Terakhir", data["last_new_job"].value_counts()]
-]
-
-for i, row in enumerate(data, start=2):
-    ws.append(row)
-    ws.merge_cells(start_row=i, start_column=1, end_row=i, end_column=2)
-
-# Simpan file Excel
-wb.save("laporan_keanekaragaman.xlsx")
-
-   
-        st.download_button(
-            label="Download Laporan",
-            data=laporan_output,
-            file_name="laporan_keanekaragaman.xlsx",
-            mime="application/xlsx"
-        )
+           # Buat workbook Excel
+            wb = Workbook()
+        
+            # Pilih sheet aktif
+            ws = wb.active
+        
+            # Tulis judul laporan ke dalam cell A1
+            ws['A1'] = "Laporan Keanekaragaman"
+        
+            # Tulis data laporan ke dalam sheet
+            data = [
+                ["Distribusi Gender", data["gender"].value_counts()],
+                ["Distribusi Tingkat Pendidikan", data["education_level"].value_counts()],
+                ["Distribusi Disiplin Utama", data["major_discipline"].value_counts()],
+                ["Distribusi Pengalaman Kerja", data["experience"].value_counts()],
+                ["Distribusi Status Pendaftaran Universitas", data["enrolled_university"].value_counts()],
+                ["Distribusi Jam Pelatihan", data["training_hours"].value_counts()],
+                ["Distribusi Durasi Pekerjaan Terakhir", data["last_new_job"].value_counts()]
+            ]
+        
+            for i, row in enumerate(data, start=2):
+                ws.append(row)
+                ws.merge_cells(start_row=i, start_column=1, end_row=i, end_column=2)
+        
+            # Simpan file Excel
+            wb.save("laporan_keanekaragaman.xlsx")
+        
+            laporan_output = open("laporan_keanekaragaman.xlsx", "rb").read()
+        
+            st.download_button(
+                label="Download Laporan",
+                data=laporan_output,
+                file_name="laporan_keanekaragaman.xlsx",
+                mime="application/xlsx"
+            )
 
 if __name__ == "__main__":
     main()
