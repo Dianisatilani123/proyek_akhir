@@ -6,7 +6,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
-from openpyxl import Workbook
 import matplotlib.pyplot as plt
 
 # Langkah 2: Load dataset
@@ -290,45 +289,30 @@ def main():
             data["last_new_job"].value_counts().plot(kind="bar")
             st.pyplot(plt)
 
-           # Buat workbook Excel
-            wb = Workbook()
-        
-            # Pilih sheet aktif
-            ws = wb.active
-        
-            # Tulis judul laporan ke dalam cell A1
-            ws['A1'] = "Laporan Keanekaragaman"
-        
-            # Tulis data laporan ke dalam sheet
-# Convert the Series object to a list
-data = [
-    ["Distribusi Gender", data["gender"].value_counts().tolist()],
-    ["Distribusi Tingkat Pendidikan", data["education_level"].value_counts().tolist()],
-    ["Distribusi Disiplin Utama", data["major_discipline"].value_counts().tolist()],
-    ["Distribusi Pengalaman Kerja", data["experience"].value_counts().tolist()],
-    ["Distribusi Status Pendaftaran Universitas", data["enrolled_university"].value_counts().tolist()],
-    ["Distribusi Jam Pelatihan", data["training_hours"].value_counts().tolist()],
-    ["Distribusi Durasi Pekerjaan Terakhir", data["last_new_job"].value_counts().tolist()]
-]
+        # Membuat PDF laporan
+        laporan_pdf = FPDF()
+        laporan_pdf.add_page()
+        laporan_pdf.set_font("Arial", size=12)
+        laporan_pdf.cell(200, 10, txt="Laporan Keanekaragaman", ln=True, align="C")
+        laporan_pdf.ln(10)
 
-# Write the data to the Excel workbook
-for i, row in enumerate(data, start=2):
-    # Convert the list of values to a string
-    row_str = ", ".join(map(str, row))
-    ws.cell(row=i, column=1).value = row_str
-    ws.merge_cells(start_row=i, start_column=1, end_row=i, end_column=2)
+        # Tambahkan isi laporan ke dalam PDF
+        laporan_pdf.cell(200, 10, txt="Distribusi Gender:", ln=True)
+        laporan_pdf.write(5, str(data["gender"].value_counts()))
+        laporan_pdf.ln(10)
 
-            # Simpan file Excel
-            wb.save("laporan_keanekaragaman.xlsx")
-        
-            laporan_output = open("laporan_keanekaragaman.xlsx", "rb").read()
-        
-            st.download_button(
-                label="Download Laporan",
-                data=laporan_output,
-                file_name="laporan_keanekaragaman.xlsx",
-                mime="application/xlsx"
-            )
+        # Tambahkan grafik distribusi gender ke dalam PDF
+        laporan_pdf.image("gender_distribution.png", x=10, y=50, w=180, h=100)
+
+        # Simpan PDF laporan
+        laporan_output = laporan_pdf.output(dest="S").encode("latin-1")
+
+        st.download_button(
+            label="Download Laporan",
+            data=laporan_output,
+            file_name="laporan_keanekaragaman.pdf",
+            mime="application/pdf"
+        )
 
 if __name__ == "__main__":
     main()
