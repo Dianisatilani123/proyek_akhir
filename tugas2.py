@@ -49,7 +49,7 @@ def evaluate_model(model, X_test, y_test):
     report = classification_report(y_test, y_pred)
     matrix = confusion_matrix(y_test, y_pred)
     
-    st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+    st.write(f"Akurasi model: {accuracy * .2f}%")
     st.write("Classification Report:")
     st.write(report)
     st.write("Confusion Matrix:")
@@ -255,5 +255,36 @@ def main():
         st.write("Distribusi Durasi Pekerjaan Terakhir:")
         st.write(data["last_new_job"].value_counts())
 
-if __name__ == "__main__": 
+        # Membuat laporan keanekaragaman berdampingan
+        cols = st.beta_columns(2)
+
+        with cols[0]:
+            st.write("Distribusi Gender:")
+            st.write(data["gender"].value_counts())
+
+        with cols[1]:
+            st.write("Distribusi Tingkat Pendidikan:")
+            st.write(data["education_level"].value_counts())
+
+        with cols[0]:
+            st.write("Distribusi Disiplin Utama:")
+            st.write(data["major_discipline"].value_counts())
+
+        with cols[1]:
+            st.write("Distribusi Pengalaman Kerja:")
+            st.write(data["experience"].value_counts())
+
+        with cols[0]:
+            st.write("Distribusi Status Pendaftaran Universitas:")
+            st.write(data["enrolled_university"].value_counts())
+
+        with cols[1]:
+            st.write("Distribusi Jam Pelatihan:")
+            st.write(data["training_hours"].value_counts())
+
+        with cols[0]:
+            st.write("Distribusi Durasi Pekerjaan Terakhir:")
+            st.write(data["last_new_job"].value_counts())
+
+if __name__ == "__main__":
     main()
