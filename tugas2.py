@@ -61,7 +61,7 @@ def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
 
     # Navigasi header
-    navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman"])
+    navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Penilaian Keterampilan", "Laporan Keberagaman"])
 
     if navigation == "HOME":
         st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
@@ -228,28 +228,8 @@ def main():
                         mime="application/pdf"
                     )
      
-    elif navigation == "Laporan Keanekaragaman":
-        st.write("Laporan Keanekaragaman:")
-        # Load data
-        data = load_data()
-        st.write("Dataset Recruitment:")
-        st.write(data.head(14))  # Show the first 14 rows
-
-        # Distribusi data
-        st.write("Distribusi Data:")
-        st.write(data.describe())
-
-        # Rasio data
-        st.write("Rasio Data:")
-        st.write(data.groupby("gender").count())
-
-        # Plotting data
-        plt.figure(figsize=(10, 6))
-        plt.bar(data["gender"].value_counts().index, data["gender"].value_counts().values)
-        plt.xlabel("Gender")
-        plt.ylabel("Count")
-        plt.title("Rasio Gender")
-        st.pyplot(plt)
-
+    elif navigation == "Penilaian Keterampilan":
+        st.write("penilaian keterampilan:")
+      
 if __name__ == "__main__":
     main()
