@@ -174,8 +174,6 @@ def main():
                 pdf.cell(100, 10, txt=f"{training_hours}", ln=True)
 
                 if kelayakan == 90:
-                    pdf.set_text_color(0, 128, 0)  # Hijau
-                    pdf.set_font("Arial", size=12, style="B")
                     pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
                     pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
                     pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
@@ -185,8 +183,6 @@ def main():
                     pdf.cell(200, 10, txt="- Jam Pelatihan: Kandidat memiliki lebih dari 50 jam pelatihan.", ln=True)
                     pdf.cell(200, 10, txt="- Durasi Pekerjaan Terakhir: Kandidat telah bekerja dalam durasi tertentu pada pekerjaan terakhir mereka (1-4 tahun atau lebih).", ln=True)
                 elif kelayakan == 70:
-                    pdf.set_text_color(0, 128, 0)  # Hijau
-                    pdf.set_font("Arial", size=12, style="B")
                     pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
                     pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
                     pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
@@ -195,8 +191,6 @@ def main():
                     pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
                     pdf.cell(200, 10, txt="- Jam Pelatihan: Kandidat memiliki lebih dari 30 jam pelatihan.", ln=True)
                 elif kelayakan == 50:
-                    pdf.set_text_color(0, 128, 0)  # Hijau
-                    pdf.set_font("Arial", size=12, style="B")
                     pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
                     pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
                     pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
@@ -204,9 +198,19 @@ def main():
                     pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 1 tahun.", ln=True)
                     pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
                 else:
-                    pdf.set_text_color(255, 0, 0)  # Merah
-                    pdf.set_font("Arial", size=12, style="B")
                     pdf.cell(200, 10, txt="Kandidat tidak memenuhi salah satu atau lebih dari kriteria di atas.", ln=True)
+
+                if kelayakan >= 70:
+                    pdf.set_font("Arial", size=12, style="B")
+                    pdf.set_text_color(0, 128, 0)  # Green color
+                    pdf.cell(200, 10, txt="Kandidat diterima.", ln=True)
+                else:
+                    pdf.set_font("Arial", size=12, style="B")
+                    pdf.set_text_color(255, 0, 0)  # Red color
+                    pdf.cell(200, 10, txt="Kandidat ditolak.", ln=True)
+
+                pdf.set_font("Arial", size=12)
+                pdf.set_text_color(0, 0, 0)  # Black color
 
                 pdf_output = pdf.output(dest="S").encode("latin-1")
 
