@@ -62,22 +62,16 @@ def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
 
     # Navigation menu
-    nav_options = ["Home", "Load Data", "Preprocess Data", "Split Data", "Train Model", "Evaluate Model", "Predict"]
+    nav_options = ["Home", "Laporan Analitik", "Prediksi"]
     nav_selected = st.sidebar.selectbox("Navigation", nav_options)
 
     if nav_selected == "Home":
         st.write("Welcome to the Recruitment Application!")
-    elif nav_selected == "Load Data":
+    elif nav_selected == "Laporan Analitik":
         data = load_data()
-    elif nav_selected == "Preprocess Data":
-        data = preprocess_data(data)
-    elif nav_selected == "Split Data":
-        X_train, X_test, y_train, y_test = split_data(data)
-    elif nav_selected == "Train Model":
-        model = train_model(X_train, y_train)
-    elif nav_selected == "Evaluate Model":
-        accuracy = evaluate_model(model, X_test, y_test)
-    elif nav_selected == "Predict":
+        st.write("Laporan Analitik:")
+        st.write(data.describe())
+    elif nav_selected == "Prediksi":
         # Menampilkan form input untuk memprediksi kelayakan kandidat
         with st.sidebar:
             st.markdown("<h3>Masukkan Biodata Kandidat</h3>", unsafe_allow_html=True)
