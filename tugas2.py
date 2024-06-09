@@ -68,6 +68,8 @@ def main():
     elif navigation == "Prediksi":
         # Load data
         data = load_data()
+        st.write("Dataset Recruitment:")
+        st.write(data.head(14))  # Show the first 14 rows
 
         # Preprocessing data
         data = preprocess_data(data)
