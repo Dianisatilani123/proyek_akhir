@@ -6,57 +6,6 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
 
-# Langkah 2: Load dataset
-def load_data():
-    data = pd.read_csv("dataset_recruitment.csv")
-    st.write("Dataset:")
-    st.write(data.head(14))  # Show the first 14 rows
-    return data
-
-# Langkah 3: Standarisasi data
-def preprocess_data(data):
-    # Ubah nilai "<1" menjadi 0 dan nilai ">20" menjadi 25
-    data['experience'] = data['experience'].apply(lambda x: 0 if x == '<1' else (25 if x == '>20' else int(x)))
-
-    # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
-    label_encoder = LabelEncoder()
-    categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
-                        'ajor_discipline', 'company_size', 'company_type', 'last_new_job']
-    for col in categorical_cols:
-        data[col] = label_encoder.fit_transform(data[col])
-
-    return data
-
-# Langkah 4: Split data train dan test
-def split_data(data):
-    X = data.drop(columns=["gender", "city"])  # Hapus fitur "City"
-    y = data["gender"]
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    return X_train, X_test, y_train, y_test
-
-# Langkah 5: Membuat data latih menggunakan algoritma machine learning
-def train_model(X_train, y_train):
-    model = RandomForestClassifier()
-    model.fit(X_train, y_train)
-    return model
-
-# Langkah 6: Membuat model evaluasi untuk uji akurasi
-def evaluate_model(model, X_test, y_test):
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    report = classification_report(y_test, y_pred)
-    matrix = confusion_matrix(y_test, y_pred)
-    
-    st.write(f"Akurasi model: {accuracy * 100:.2f}%")
-    st.write("Classification Report:")
-    st.write(report)
-    st.write("Confusion Matrix:")
-    st.write(matrix)
-    
-    return accuracy
-
 # Langkah 7: Membuat model untuk aplikasi
 def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
@@ -120,86 +69,75 @@ def main():
 
                 if kelayakan >= 70:
                     st.write("Kandidat diterima.")
-                    pdf = FPDF()
-                    pdf.add_page()
-                    pdf.set_font("Arial", size=12)
-                    pdf.set_text_color(0, 0, 0)  # Warna hitam untuk semua teks
-                    pdf.cell(200, 10, txt="Hasil Prediksi Kelayakan Kandidat", ln=True, align="C")
-                    pdf.ln(10)
-                    pdf.cell(200, 10, txt=f"ID Kandidat: {enrollee_id}", ln=True)
-                    pdf.cell(200, 10, txt=f"Presentase Kelayakan: {kelayakan}%", ln=True)
-                    pdf.ln(10)
-                    pdf.cell(200, 10, txt="Biodata Kandidat:", ln=True)
-                    pdf.ln(5)
-                    pdf.cell(100, 10, txt="City:", ln=False)
-                    pdf.cell(100, 10, txt=f"{city}", ln=True)
-                    pdf.cell(100, 10, txt="City Development Index:", ln=False)
-                    pdf.cell(100, 10, txt=f"{city_development_index:.3f}", ln=True)
-                    pdf.cell(100, 10, txt="Gender:", ln=False)
-                    pdf.cell(100, 10, txt=f"{gender}", ln=True)
-                    pdf.cell(100, 10, txt="Relevent Experience:", ln=False)
-                    pdf.cell(100, 10, txt=f"{relevent_experience}", ln=True)
-                    pdf.cell(100, 10, txt="Enrolled University:", ln=False)
-                    pdf.cell(100, 10, txt=f"{enrolled_university}", ln=True)
-                    pdf.cell(100, 10, txt="Education Level:", ln=False)
-                    pdf.cell(100, 10, txt=f"{education_level}", ln=True)
-                    pdf.cell(100, 10, txt="Major Discipline:", ln=False)
-                    pdf.cell(100, 10, txt=f"{major_discipline}", ln=True)
-                    pdf.cell(100, 10, txt="Experience:", ln=False)
-                    pdf.cell(100, 10, txt=f"{experience}", ln=True)
-                    pdf.cell(100, 10, txt="Company Size:", ln=False)
-                    pdf.cell(100, 10, txt=f"{company_size}", ln=True)
-                    pdf.cell(100, 10, txt="Company Type:", ln=False)
-                    pdf.cell(100, 10, txt=f"{company_type}", ln=True)
-                    pdf.cell(100, 10, txt="Last New Job:", ln=False)
-                    pdf.cell(100, 10, txt=f"{last_new_job}", ln=True)
-                    pdf.cell(100, 10, txt="Training Hours:", ln=False)
-                    pdf.cell(100, 10, txt=f"{training_hours}", ln=True)
-                    pdf.ln(10)
+                else:
+                    st.write("Kandidat ditolak.")
+
+                st.write(f"Presentase kelayakan: {kelayakan}%")
+
+                # Menampilkan dataset
+                data = load_data()
+                st.write("Dataset:")
+                st.write(data.head(14))
+
+                # Menampilkan akurasi model
+                X_train, X_test, y_train, y_test = split_data(data)
+                model = train_model(X_train, y_train)
+                accuracy = evaluate_model(model, X_test, y_test)
+                st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+
+                # Menampilkan classification report
+                report = classification_report(y_test, model.predict(X_test))
+                st.write("Classification Report:")
+                st.write(report)
+
+                # Menampilkan confusion matrix
+                matrix = confusion_matrix(y_test, model.predict(X_test))
+                st.write("Confusion Matrix:")
+                st.write(matrix)
+
+                # Membuat PDF
+                pdf = FPDF()
+                pdf.add_page()
+                pdf.set_font("Arial", size=12)
+                pdf.set_text_color(0, 0, 0)  # Warna hitam untuk semua teks
+                pdf.cell(200, 10, txt="Hasil Prediksi Kelayakan Kandidat", ln=True, align="C")
+                pdf.ln(10)
+                pdf.cell(200, 10, txt=f"ID Kandidat: {enrollee_id}", ln=True)
+                pdf.cell(200, 10, txt=f"Presentase Kelayakan: {kelayakan}%", ln=True)
+                pdf.ln(10)
+                pdf.cell(200, 10, txt="Biodata Kandidat:", ln=True)
+                pdf.ln(5)
+                pdf.cell(100, 10, txt="City:", ln=False)
+                pdf.cell(100, 10, txt=f"{city}", ln=True)
+                pdf.cell(100, 10, txt="City Development Index:", ln=False)
+                pdf.cell(100, 10, txt=f"{city_development_index:.3f}", ln=True)
+                pdf.cell(100, 10, txt="Gender:", ln=False)
+                pdf.cell(100, 10, txt=f"{gender}", ln=True)
+                pdf.cell(100, 10, txt="Relevent Experience:", ln=False)
+                pdf.cell(100, 10, txt=f"{relevent_experience}", ln=True)
+                pdf.cell(100, 10, txt="Enrolled University:", ln=False)
+                pdf.cell(100, 10, txt=f"{enrolled_university}", ln=True)
+                pdf.cell(100, 10, txt="Education Level:", ln=False)
+                pdf.cell(100, 10, txt=f"{education_level}", ln=True)
+                pdf.cell(100, 10, txt="Major Discipline:", ln=False)
+                pdf.cell(100, 10, txt=f"{major_discipline}", ln=True)
+                pdf.cell(100, 10, txt="Experience:", ln=False)
+                pdf.cell(100, 10, txt=f"{experience}", ln=True)
+                pdf.cell(100, 10, txt="Company Size:", ln=False)
+                pdf.cell(100, 10, txt=f"{company_size}", ln=True)
+                pdf.cell(100, 10, txt="Company Type:", ln=False)
+                pdf.cell(100, 10, txt=f"{company_type}", ln=True)
+                pdf.cell(100, 10, txt="Last New Job:", ln=False)
+                pdf.cell(100, 10, txt=f"{last_new_job}", ln=True)
+                pdf.cell(100, 10, txt="Training Hours:", ln=False)
+                pdf.cell(100, 10, txt=f"{training_hours}", ln=True)
+                pdf.ln(10)
+                if kelayakan >= 70:
                     pdf.set_text_color(0, 128, 0)  # Warna hijau untuk keterangan diterima
                     pdf.cell(200, 10, txt="Keterangan: Kandidat diterima.", ln=True)
                 else:
-                    st.write("Kandidat ditolak.")
-                    pdf = FPDF()
-                    pdf.add_page()
-                    pdf.set_font("Arial", size=12)
-                    pdf.set_text_color(0, 0, 0)  # Warna hitam untuk semua teks
-                    pdf.cell(200, 10, txt="Hasil Prediksi Kelayakan Kandidat", ln=True, align="C")
-                    pdf.ln(10)
-                    pdf.cell(200, 10, txt=f"ID Kandidat: {enrollee_id}", ln=True)
-                    pdf.cell(200, 10, txt=f"Presentase Kelayakan: {kelayakan}%", ln=True)
-                    pdf.ln(10)
-                    pdf.cell(200, 10, txt="Biodata Kandidat:", ln=True)
-                    pdf.ln(5)
-                    pdf.cell(100, 10, txt="City:", ln=False)
-                    pdf.cell(100, 10, txt=f"{city}", ln=True)
-                    pdf.cell(100, 10, txt="City Development Index:", ln=False)
-                    pdf.cell(100, 10, txt=f"{city_development_index:.3f}", ln=True)
-                    pdf.cell(100, 10, txt="Gender:", ln=False)
-                    pdf.cell(100, 10, txt=f"{gender}", ln=True)
-                    pdf.cell(100, 10, txt="Relevent Experience:", ln=False)
-                    pdf.cell(100, 10, txt=f"{relevent_experience}", ln=True)
-                    pdf.cell(100, 10, txt="Enrolled University:", ln=False)
-                    pdf.cell(100, 10, txt=f"{enrolled_university}", ln=True)
-                    pdf.cell(100, 10, txt="Education Level:", ln=False)
-                    pdf.cell(100, 10, txt=f"{education_level}", ln=True)
-                    pdf.cell(100, 10, txt="Major Discipline:", ln=False)
-                    pdf.cell(100, 10, txt=f"{major_discipline}", ln=True)
-                    pdf.cell(100, 10, txt="Experience:", ln=False)
-                    pdf.cell(100, 10, txt=f"{experience}", ln=True)
-                    pdf.cell(100, 10, txt="Company Size:", ln=False)
-                    pdf.cell(100, 10, txt=f"{company_size}", ln=True)
-                    pdf.cell(100, 10, txt="Company Type:", ln=False)
-                    pdf.cell(100, 10, txt=f"{company_type}", ln=True)
-                    pdf.cell(100, 10, txt="Last New Job:", ln=False)
-                    pdf.cell(100, 10, txt=f"{last_new_job}", ln=True)
-                    pdf.cell(100, 10, txt="Training Hours:", ln=False)
-                    pdf.cell(100, 10, txt=f"{training_hours}", ln=True)
-                    pdf.ln(10)
                     pdf.set_text_color(255, 0, 0)  # Warna merah untuk keterangan ditolak
                     pdf.cell(200, 10, txt="Keterangan: Kandidat ditolak.", ln=True)
-
-                st.write(f"Presentase kelayakan: {kelayakan}%")
 
                 pdf_output = pdf.output(dest="S").encode("latin-1")
 
