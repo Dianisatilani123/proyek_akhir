@@ -95,7 +95,7 @@ def main():
         last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
         training_hours = st.number_input("Training Hours", value=0)
 
-        # Tombol prediksi
+# Tombol prediksi
 if st.button("Prediksi"):
     # Menerapkan logika prediksi
     if (relevent_experience == "Has relevent experience" and
@@ -199,6 +199,5 @@ if st.button("Prediksi"):
         file_name=f"hasil_prediksi_{enrollee_id}.pdf",
         mime="application/pdf"
     )
-
 if __name__ == "__main__": 
     main()
