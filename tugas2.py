@@ -78,25 +78,28 @@ def main():
     st.write(f"Akurasi model: {accuracy * 100:.2f}%")
 
     # Menampilkan form input untuk memprediksi kelayakan kandidat
-    with st.sidebar:
-        st.markdown("<h3>Masukkan Biodata Kandidat</h3>", unsafe_allow_html=True)
-        
-        enrollee_id = st.text_input("Enrollee ID", "")
-        city = st.text_input("City", "")
-        city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
-        gender = st.selectbox("Gender", ["Male", "Female", "Other"])
-        relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
-        enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
-        education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
-        major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
-        experience = st.number_input("Experience", value=0)
-        company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
-        company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
-        last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
-        training_hours = st.number_input("Training Hours", value=0)
+ with st.sidebar:
+    st.markdown("<h3>Masukkan Biodata Kandidat</h3>", unsafe_allow_html=True)
+    
+    enrollee_id = st.text_input("Enrollee ID", "")
+    city = st.text_input("City", "")
+    city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
+    gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+    relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
+    enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
+    education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
+    major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
+    experience = st.number_input("Experience", value=0)
+    company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
+    company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
+    last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
+    training_hours = st.number_input("Training Hours", value=0)
 
-    # Tombol prediksi
-    if st.button("Prediksi"):
+    # Tombol prediksi dan download PDF
+    prediksi_button = st.button("Prediksi")
+    download_button = st.button("Download PDF")
+
+    if prediksi_button:
         # Menerapkan logika prediksi
         kelayakan = 0  # Initialize kelayakan to 0
         if (relevent_experience == "Has relevent experience" and
@@ -194,12 +197,13 @@ def main():
 
         pdf_output = pdf.output(dest="S").encode("latin-1")
 
-        st.download_button(
-            label="Download File",
-            data=pdf_output,
-            file_name=f"hasil_prediksi_{enrollee_id}.pdf",
-            mime="application/pdf"
-        )
+        if download_button:
+            st.download_button(
+                label="Download File",
+                data=pdf_output,
+                file_name=f"hasil_prediksi_{enrollee_id}.pdf",
+                mime="application/pdf"
+            )
 
 if __name__ == "__main__": 
     main()
