@@ -21,7 +21,7 @@ def preprocess_data(data):
     # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
     label_encoder = LabelEncoder()
     categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
-                        'major_discipline', 'company_size', 'company_type', 'last_new_job']
+                        'ajor_discipline', 'company_size', 'company_type', 'last_new_job']
     for col in categorical_cols:
         data[col] = label_encoder.fit_transform(data[col])
 
@@ -196,7 +196,6 @@ def main():
 
             pdf_output = pdf.output(dest="S").encode("latin-1")
 
-            # Tombol download PDF
             st.download_button(
                 label="Download File",
                 data=pdf_output,
