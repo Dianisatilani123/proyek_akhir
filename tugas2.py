@@ -96,9 +96,9 @@ def main():
         training_hours = st.number_input("Training Hours", value=0)
 
 # Tombol prediksi
- if st.button("Prediksi"):
+    if st.button("Prediksi"):
     # Menerapkan logika prediksi
-    kelayakan = 0  # Initialize kelayakan to 0
+       kelayakan = 0  # Initialize kelayakan to 0
     if (relevent_experience == "Has relevent experience" and
         (education_level == "Graduate" or education_level == "Masters") and
         major_discipline == "STEM" and
