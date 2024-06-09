@@ -1,6 +1,6 @@
 import pandas as pd
 import streamlit as st
-from streamlit import beta_columns
+from streamlit import columns
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
@@ -257,7 +257,7 @@ def main():
         st.write(data["last_new_job"].value_counts())
 
         # Membuat laporan keanekaragaman berdampingan
-        cols = st.beta_columns(2)
+        cols = st.columns(2)
 
         with cols[0]:
             st.write("Distribusi Gender:")
