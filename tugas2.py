@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+from streamlit import columns
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
@@ -7,12 +8,14 @@ from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
 import matplotlib.pyplot as plt
 
-# Load dataset
+# Langkah 2: Load dataset
 def load_data():
     data = pd.read_csv("dataset_recruitment.csv")
+    st.write("Dataset:")
+    st.write(data.head(14))  # Show the first 14 rows
     return data
 
-# Preprocess data
+# Langkah 3: Standarisasi data
 def preprocess_data(data):
     # Ubah nilai "<1" menjadi 0 dan nilai ">20" menjadi 25
     data['experience'] = data['experience'].apply(lambda x: 0 if x == '<1' else (25 if x == '>20' else int(x)))
@@ -26,7 +29,7 @@ def preprocess_data(data):
 
     return data
 
-# Split data train dan test
+# Langkah 4: Split data train dan test
 def split_data(data):
     X = data.drop(columns=["gender", "city"])  # Hapus fitur "City"
     y = data["gender"]
@@ -35,13 +38,13 @@ def split_data(data):
 
     return X_train, X_test, y_train, y_test
 
-# Train model
+# Langkah 5: Membuat data latih menggunakan algoritma machine learning
 def train_model(X_train, y_train):
     model = RandomForestClassifier()
     model.fit(X_train, y_train)
     return model
 
-# Evaluate model
+# Langkah 6: Membuat model evaluasi untuk uji akurasi
 def evaluate_model(model, X_test, y_test):
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
@@ -56,63 +59,33 @@ def evaluate_model(model, X_test, y_test):
     
     return accuracy
 
-# Create report
-def create_report(data):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-
-    pdf.cell(200, 10, txt="Laporan Keanekaragaman", ln=True, align="C")
-    pdf.ln(10)
-
-    pdf.cell(200, 10, txt="Distribusi Gender:", ln=True)
-    pdf.write(5, str(data["gender"].value_counts()))
-    pdf.ln(10)
-
-    pdf.image("gender_distribution.png", x=10, y=50, w=180, h=100)
-
-    pdf.cell(200, 10, txt="Distribusi Tingkat Pendidikan:", ln=True)
-    pdf.write(5, str(data["education_level"].value_counts()))
-    pdf.ln(10)
-
-    pdf.cell(200, 10, txt="Distribusi Disiplin Utama:", ln=True)
-    pdf.write(5, str(data["major_discipline"].value_counts()))
-    pdf.ln(10)
-
-    pdf.cell(200, 10, txt="Distribusi Pengalaman Kerja:", ln=True)
-    pdf.write(5, str(data["experience"].value_counts()))
-    pdf.ln(10)
-
-    pdf.cell(200, 10, txt="Distribusi Status Pendaftaran Universitas:", ln=True)
-    pdf.write(5, str(data["enrolled_university"].value_counts()))
-    pdf.ln(10)
-
-    pdf.cell(200, 10, txt="Distribusi Jam Pelatihan:", ln=True)
-    pdf.write(5, str(data["training_hours"].value_counts()))
-    pdf.ln(10)
-
-    pdf.cell(200, 10, txt="Distribusi Durasi Pekerjaan Terakhir:", ln=True)
-    pdf.write(5, str(data["last_new_job"].value_counts()))
-    pdf.ln(10)
-
-    pdf_output = pdf.output(dest="S").encode("latin-1")
-
-    return pdf_output
-
+# Langkah 7: Membuat model untuk aplikasi
 def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
 
+    # Navigasi header
     navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman"])
 
     if navigation == "HOME":
         st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
     elif navigation == "Prediksi":
+        # Load data
         data = load_data()
-        data = preprocess_data(data)
-        X_train, X_test, y_train, y_test = split_data(data)
-        model = train_model(X_train, y_train)
-        accuracy = evaluate_model(model, X_test, y_test)
 
+        # Preprocessing data
+        data = preprocess_data(data)
+
+        # Split data
+        X_train, X_test, y_train, y_test = split_data(data)
+
+        # Train model
+        model = train_model(X_train, y_train)
+
+        # Evaluate model
+        accuracy = evaluate_model(model, X_test, y_test)
+        st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+
+        # Menampilkan form input untuk memprediksi kelayakan kandidat
         with st.sidebar:
             st.markdown("<h1>Masukkan Biodata Kandidat</h1>", unsafe_allow_html=True)
             
@@ -130,6 +103,7 @@ def main():
             last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
             training_hours = st.number_input("Training Hours", value=0)
 
+            # Tombol prediksi
             prediksi_button = st.button("Prediksi")
 
             if prediksi_button:
@@ -171,6 +145,7 @@ def main():
                     else:
                         st.write("Kandidat ditolak.")
 
+                    # Membuat file PDF hasil prediksi
                     pdf = FPDF()
                     pdf.add_page()
                     pdf.set_font("Arial", size=12)
@@ -247,6 +222,7 @@ def main():
 
                     pdf_output = pdf.output(dest="S").encode("latin-1")
 
+                    # Tombol download PDF
                     st.download_button(
                         label="Download File",
                         data=pdf_output,
@@ -254,15 +230,62 @@ def main():
                         mime="application/pdf"
                     )
     elif navigation == "Laporan Keanekaragaman":
-        data = load_data()
-        pdf_output = create_report(data)
+        st.write("Laporan Keanekaragaman:")
 
-        st.download_button(
-            label="Download Laporan",
-            data=pdf_output,
-            file_name="laporan_keanekaragaman.pdf",
-            mime="application/pdf"
-        )
+        # Load data
+        data = load_data()
+
+        # Membuat laporan keanekaragaman 
+        cols = st.columns(2)
+
+        with cols[0]:
+            st.write("Distribusi Gender:")
+            st.write(data["gender"].value_counts())
+            plt.figure(figsize=(8, 6))
+            data["gender"].value_counts().plot(kind="bar")
+            st.pyplot(plt)
+
+        with cols[1]:
+            st.write("Distribusi Tingkat Pendidikan:")
+            st.write(data["education_level"].value_counts())
+            plt.figure(figsize=(8, 6))
+            data["education_level"].value_counts().plot(kind="bar")
+            st.pyplot(plt)
+
+        with cols[0]:
+            st.write("Distribusi Disiplin Utama:")
+            st.write(data["major_discipline"].value_counts())
+            plt.figure(figsize=(8, 6))
+            data["major_discipline"].value_counts().plot(kind="bar")
+            st.pyplot(plt)
+
+        with cols[1]:
+            st.write("Distribusi Pengalaman Kerja:")
+            st.write(data["experience"].value_counts())
+            plt.figure(figsize=(8, 6))
+            data["experience"].value_counts().plot(kind="bar")
+            st.pyplot(plt)
+
+        with cols[0]:
+            st.write("Distribusi Status Pendaftaran Universitas:")
+            st.write(data["enrolled_university"].value_counts())
+            plt.figure(figsize=(8, 6))
+            data["enrolled_university"].value_counts().plot(kind="bar")
+            st.pyplot(plt)
+
+        with cols[1]:
+            st.write("Distribusi Jam Pelatihan:")
+            st.write(data["training_hours"].value_counts())
+            plt.figure(figsize=(8, 6))
+            data["training_hours"].value_counts().plot(kind="bar")
+            st.pyplot(plt)
+
+        with cols[0]:
+            st.write("Distribusi Durasi Pekerjaan Terakhir:")
+            st.write(data["last_new_job"].value_counts())
+            plt.figure(figsize=(8, 6))
+            data["last_new_job"].value_counts().plot(kind="bar")
+            st.pyplot(plt)
 
 if __name__ == "__main__":
     main()
