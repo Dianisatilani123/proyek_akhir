@@ -300,22 +300,23 @@ def main():
             ws['A1'] = "Laporan Keanekaragaman"
         
             # Tulis data laporan ke dalam sheet
-        # Convert the Series object to a list
-            data = [
-                ["Distribusi Gender", data["gender"].value_counts().tolist()],
-                ["Distribusi Tingkat Pendidikan", data["education_level"].value_counts().tolist()],
-                ["Distribusi Disiplin Utama", data["major_discipline"].value_counts().tolist()],
-                ["Distribusi Pengalaman Kerja", data["experience"].value_counts().tolist()],
-                ["Distribusi Status Pendaftaran Universitas", data["enrolled_university"].value_counts().tolist()],
-                ["Distribusi Jam Pelatihan", data["training_hours"].value_counts().tolist()],
-                ["Distribusi Durasi Pekerjaan Terakhir", data["last_new_job"].value_counts().tolist()]
-            ]
-            
-            # Write the data to the Excel workbook
-            for i, row in enumerate(data, start=2):
-                ws.append(row)
-                ws.merge_cells(start_row=i, start_column=1, end_row=i, end_column=2)
-        
+     # Convert the Series object to a list
+data = [
+    ["Distribusi Gender", data["gender"].value_counts().tolist()],
+    ["Distribusi Tingkat Pendidikan", data["education_level"].value_counts().tolist()],
+    ["Distribusi Disiplin Utama", data["major_discipline"].value_counts().tolist()],
+    ["Distribusi Pengalaman Kerja", data["experience"].value_counts().tolist()],
+    ["Distribusi Status Pendaftaran Universitas", data["enrolled_university"].value_counts().tolist()],
+    ["Distribusi Jam Pelatihan", data["training_hours"].value_counts().tolist()],
+    ["Distribusi Durasi Pekerjaan Terakhir", data["last_new_job"].value_counts().tolist()]
+]
+
+# Write the data to the Excel workbook
+for i, row in enumerate(data, start=2):
+    # Convert the list of values to a string
+    row_str = ", ".join(map(str, row))
+    ws.cell(row=i, column=1).value = row_str
+    ws.merge_cells(start_row=i, start_column=1, end_row=i, end_column=2)
             # Simpan file Excel
             wb.save("laporan_keanekaragaman.xlsx")
         
