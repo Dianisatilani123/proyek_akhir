@@ -302,7 +302,7 @@ laporan_pdf.ln(10)
 
 # Tambahkan distribusi gender ke dalam PDF laporan
 laporan_pdf.cell(200, 10, txt="Distribusi Gender:", ln=True)
-laporan_pdf.write(5, str(data["gender"].value_counts()))
+laporan_pdf.cell(200, 10, txt=str(data["gender"].value_counts()), ln=True)
 laporan_pdf.ln(10)
 
 # Tambahkan grafik distribusi gender ke dalam PDF laporan
