@@ -78,7 +78,7 @@ def main():
     st.write(f"Akurasi model: {accuracy * 100:.2f}%")
 
     # Menampilkan form input untuk memprediksi kelayakan kandidat
- with st.sidebar:
+with st.sidebar:
     st.markdown("<h3>Masukkan Biodata Kandidat</h3>", unsafe_allow_html=True)
     
     enrollee_id = st.text_input("Enrollee ID", "")
