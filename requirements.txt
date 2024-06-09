@@ -4,4 +4,4 @@ streamlit
 numpy
 fpdf
 matplotlib
-seaborn
+openpyxl
