@@ -125,8 +125,13 @@ def main():
 
             if kelayakan >= 70:
                 st.write("Kandidat diterima.")
+                pdf.set_text_color(0, 128, 0)  # Warna hijau untuk kandidat yang diterima
+                pdf.cell(200, 10, txt="Keterangan: Kandidat diterima.", ln=True)
             else:
                 st.write("Kandidat ditolak.")
+                pdf.set_text_color(255, 0, 0)  # Warna merah untuk kandidat yang ditolak
+                pdf.cell(200, 10, txt="Keterangan: Kandidat ditolak.", ln=True)
+
             st.write(f"Presentase kelayakan: {kelayakan}%")
 
             # Membuat file PDF hasil prediksi
