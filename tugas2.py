@@ -244,7 +244,9 @@ def main():
             plt.figure(figsize=(8, 6))
             data["gender"].value_counts().plot(kind="bar")
             st.pyplot(plt)
+            plt.savefig("gender_distribution.png")  # Save the graph as an image file
 
+        
         with cols[1]:
             st.write("Distribusi Tingkat Pendidikan:")
             st.write(data["education_level"].value_counts())
