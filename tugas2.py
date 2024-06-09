@@ -289,30 +289,64 @@ def main():
             data["last_new_job"].value_counts().plot(kind="bar")
             st.pyplot(plt)
 
-        # Membuat PDF laporan
-        laporan_pdf = FPDF()
-        laporan_pdf.add_page()
-        laporan_pdf.set_font("Arial", size=12)
-        laporan_pdf.cell(200, 10, txt="Laporan Keanekaragaman", ln=True, align="C")
-        laporan_pdf.ln(10)
+# Buat objek FPDF untuk membuat PDF laporan
+laporan_pdf = FPDF()
 
-        # Tambahkan isi laporan ke dalam PDF
-        laporan_pdf.cell(200, 10, txt="Distribusi Gender:", ln=True)
-        laporan_pdf.write(5, str(data["gender"].value_counts()))
-        laporan_pdf.ln(10)
+# Tambahkan halaman dan atur font untuk PDF laporan
+laporan_pdf.add_page()
+laporan_pdf.set_font("Arial", size=12)
 
-        # Tambahkan grafik distribusi gender ke dalam PDF
-        laporan_pdf.image("gender_distribution.png", x=10, y=50, w=180, h=100)
+# Tambahkan judul dan subjudul untuk PDF laporan
+laporan_pdf.cell(200, 10, txt="Laporan Keanekaragaman", ln=True, align="C")
+laporan_pdf.ln(10)
 
-        # Simpan PDF laporan
-        laporan_output = laporan_pdf.output(dest="S").encode("latin-1")
+# Tambahkan distribusi gender ke dalam PDF laporan
+laporan_pdf.cell(200, 10, txt="Distribusi Gender:", ln=True)
+laporan_pdf.write(5, str(data["gender"].value_counts()))
+laporan_pdf.ln(10)
 
-        st.download_button(
-            label="Download Laporan",
-            data=laporan_output,
-            file_name="laporan_keanekaragaman.pdf",
-            mime="application/pdf"
-        )
+# Tambahkan grafik distribusi gender ke dalam PDF laporan
+laporan_pdf.image("gender_distribution.png", x=10, y=50, w=180, h=100)
+
+# Tambahkan distribusi tingkat pendidikan ke dalam PDF laporan
+laporan_pdf.cell(200, 10, txt="Distribusi Tingkat Pendidikan:", ln=True)
+laporan_pdf.write(5, str(data["education_level"].value_counts()))
+laporan_pdf.ln(10)
+
+# Tambahkan distribusi disiplin utama ke dalam PDF laporan
+laporan_pdf.cell(200, 10, txt="Distribusi Disiplin Utama:", ln=True)
+laporan_pdf.write(5, str(data["major_discipline"].value_counts()))
+laporan_pdf.ln(10)
+
+# Tambahkan distribusi pengalaman kerja ke dalam PDF laporan
+laporan_pdf.cell(200, 10, txt="Distribusi Pengalaman Kerja:", ln=True)
+laporan_pdf.write(5, str(data["experience"].value_counts()))
+laporan_pdf.ln(10)
+
+# Tambahkan distribusi status pendaftaran universitas ke dalam PDF laporan
+laporan_pdf.cell(200, 10, txt="Distribusi Status Pendaftaran Universitas:", ln=True)
+laporan_pdf.write(5, str(data["enrolled_university"].value_counts()))
+laporan_pdf.ln(10)
+
+# Tambahkan distribusi jam pelatihan ke dalam PDF laporan
+laporan_pdf.cell(200, 10, txt="Distribusi Jam Pelatihan:", ln=True)
+laporan_pdf.write(5, str(data["training_hours"].value_counts()))
+laporan_pdf.ln(10)
+
+# Tambahkan distribusi durasi pekerjaan terakhir ke dalam PDF laporan
+laporan_pdf.cell(200, 10, txt="Distribusi Durasi Pekerjaan Terakhir:", ln=True)
+laporan_pdf.write(5, str(data["last_new_job"].value_counts()))
+laporan_pdf.ln(10)
+
+# Simpan PDF laporan
+laporan_output = laporan_pdf.output(dest="S").encode("latin-1")
+
+st.download_button(
+    label="Download Laporan",
+    data=laporan_output,
+    file_name="laporan_keanekaragaman.pdf",
+    mime="application/pdf"
+)
 
 if __name__ == "__main__":
     main()
