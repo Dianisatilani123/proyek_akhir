@@ -6,6 +6,36 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
 
+# CSS untuk mengubah gaya tombol
+def add_custom_css():
+    st.markdown(
+        """
+        <style>
+        .stButton button {
+            background-color: #4CAF50; /* Hijau */
+            color: white;
+            border: none;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition-duration: 0.4s;
+        }
+
+        .stButton button:hover {
+            background-color: white;
+            color: black;
+            border: 2px solid #4CAF50;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
 # Langkah 2: Load dataset
 def load_data():
     data = pd.read_csv("dataset_recruitment.csv")
@@ -96,7 +126,7 @@ def login():
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
-        if username == "admin" and password == "admin123":
+        if username == "admin" dan password == "admin123":
             st.session_state['logged_in'] = True
             st.success("Login berhasil!")
             st.experimental_rerun()  # Refresh halaman setelah login berhasil
@@ -112,47 +142,8 @@ def logout():
 
 # Langkah 8: Membuat model untuk aplikasi
 def main():
-    st.markdown("""
-        <style>
-        body, h1, h2, h3, h4, h5, h6, p, div {
-            color: black !important;
-        }
-        .main {
-            background-color: #f5f5f5;
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-            font-family: 'Arial', sans-serif;
-        }
-        h2 {
-            font-family: 'Arial', sans-serif;
-        }
-        .sidebar .sidebar-content {
-            background-color: #ecf0f1;
-        }
-        .stButton>button {
-            background-color: #2980b9;
-            color: white;
-            border-radius: 5px;
-        }
-        .stButton>button:hover {
-            background-color: #3498db;
-            color: white;
-        }
-        .stMarkdown h1 {
-            text-align: center;
-            font-family: 'Arial', sans-serif;
-        }
-        /* Gaya untuk tombol navigasi sidebar */
-        .css-1v3fvcr .css-10trblm {
-            color: black !important;
-            font-weight: bold !important;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
-    st.markdown("<h1>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
+    add_custom_css()  # Tambahkan CSS khusus untuk tombol
 
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
@@ -204,26 +195,29 @@ def main():
                 prediksi_button = st.button("Prediksi")
 
                 if prediksi_button:
-                    if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
-                        enrolled_university == "" or education_level == "" or major_discipline == "" or 
-                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
+                    if (enrollee_id == "" or city == "" or gender == "" atau relevent_experience == "" atau 
+                        enrolled_university == "" atau education_level == "" atau major_discipline == "" atau 
+                        experience == 0 atau company_size == "" atau company_type == "" atau last_new_job == "" atau 
                         training_hours == 0):
                         st.error("Silakan isi semua form inputan terlebih dahulu!")
                     else:
                         # Menerapkan logika prediksi
                         kelayakan = 0  # Initialize kelayakan to 0
-                        if (relevent_experience == "Has relevent experience" and
-                            (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
-                            (experience >= 2) and
-                            (training_hours >= 20)):
-                            kelayakan = 1  # Update kelayakan if criteria met
-                        
-                        st.write(f"Hasil prediksi kelayakan kandidat: {'Layak' if kelayakan == 1 else 'Tidak Layak'}")
+                        if (relevent_experience == "Has relevent experience" dan
+                            (education_level == "Graduate" atau education_level == "Masters" atau education_level == "Phd") dan
+                            training_hours >= 50):
+                            kelayakan = 1
+
+                        if kelayakan == 1:
+                            st.success("Kandidat layak untuk dipertimbangkan!")
+                        else:
+                            st.error("Kandidat tidak layak untuk dipertimbangkan!")
 
         elif navigation == "Laporan Keanekaragaman":
             data = load_data()
             generate_diversity_report(data)
 
+        # Tombol logout
         logout()
 
 if __name__ == "__main__":
