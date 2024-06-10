@@ -187,6 +187,9 @@ def main():
         accuracy = evaluate_model(model, X_test, y_test)
         st.write(f"Akurasi model: {accuracy * 100:.2f}%")
 
+        # Menyimpan nama kolom yang digunakan dalam data pelatihan
+        trained_columns = X_train.columns.tolist()
+
         # Menampilkan form input untuk memprediksi kelayakan kandidat
         with st.sidebar:
             st.markdown("<h1>Masukkan Biodata Kandidat</h1>", unsafe_allow_html=True)
@@ -225,6 +228,9 @@ def main():
                 input_df = pd.DataFrame([input_data])
                 input_df = preprocess_data(input_df)
                 input_df = input_df.drop(columns=["gender", "city"])
+
+                # Menyusun ulang kolom input sesuai dengan kolom data pelatihan
+                input_df = input_df[trained_columns]
 
                 prediction = model.predict(input_df)
                 st.write(f"Hasil prediksi: {prediction[0]}")
