@@ -122,8 +122,10 @@ def generate_diversity_report(data):
     last_new_job_counts = data['last_new_job'].value_counts()
     st.bar_chart(last_new_job_counts)
 
+    return gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts
+
 # Ekspor laporan ke PDF
-def export_report_to_pdf(data):
+def export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
@@ -131,11 +133,40 @@ def export_report_to_pdf(data):
     # Menambahkan konten ke PDF
     pdf.cell(200, 10, txt="Laporan Analitik dan Keberagaman", ln=True, align='C')
 
-    # Contoh: Menambahkan jumlah pelamar berdasarkan gender
-    gender_counts = data['gender'].value_counts()
+    # Menambahkan jumlah pelamar berdasarkan gender
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan gender:", ln=True)
     for gender, count in gender_counts.items():
         pdf.cell(200, 10, txt=f"{gender}: {count}", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan tingkat pendidikan
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan tingkat pendidikan:", ln=True)
+    for education, count in education_counts.items():
+        pdf.cell(200, 10, txt=f"{education}: {count}", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan pengalaman relevan
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan pengalaman relevan:", ln=True)
+    for experience, count in experience_counts.items():
+        pdf.cell(200, 10, txt=f"{experience}: {count}", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan perusahaan sebelumnya
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan perusahaan sebelumnya:", ln=True)
+    for company_type, count in company_type_counts.items():
+        pdf.cell(200, 10, txt=f"{company_type}: {count}", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan ukuran perusahaan sebelumnya
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya:", ln=True)
+    for company_size, count in company_size_counts.items():
+        pdf.cell(200, 10, txt=f"{company_size}: {count}", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan disiplin ilmu
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan disiplin ilmu:", ln=True)
+    for discipline, count in discipline_counts.items():
+        pdf.cell(200, 10, txt=f"{discipline}: {count}", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan waktu terakhir kali pindah kerja
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja:", ln=True)
+    for last_new_job, count in last_new_job_counts.items():
+        pdf.cell(200, 10, txt=f"{last_new_job}: {count}", ln=True)
 
     # Simpan file PDF
     pdf_file = "Laporan_Keberagaman.pdf"
@@ -237,7 +268,7 @@ def main():
                 if prediksi_button:
                     if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
                         enrolled_university == "" or education_level == "" or major_discipline == "" or 
-                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or
+                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
                         training_hours == 0):
                         st.error("Silakan isi semua form inputan terlebih dahulu!")
                     else:
@@ -274,9 +305,9 @@ def main():
 
         elif navigation == "Laporan Keanekaragaman":
             data = load_data()
-            generate_diversity_report(data)
+            gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts = generate_diversity_report(data)
             if st.button("Export Laporan ke PDF"):
-                pdf_file = export_report_to_pdf(data)
+                pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts)
                 st.success("Laporan berhasil diekspor ke PDF!")
                 download_file(pdf_file)
 
