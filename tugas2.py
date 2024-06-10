@@ -369,7 +369,7 @@ def main():
                 download_file(pdf_file)
         elif navigation == "Database":
                 st.subheader("Tampilkan Database")
-                engine = create_engine("sqlite:///mydatabase.db")
+                engine = create_engine("sqlite:///recruitment_data.db")
                 conn = engine.connect()
                 data = pd.read_sql("SELECT * FROM recruitment_data", conn)
                 st.write(data)
