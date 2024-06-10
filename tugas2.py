@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 import base64
 import matplotlib.pyplot as plt
 import seaborn as sns
+import sqlite3
 
 # CSS untuk mengubah gaya tombol
 def add_custom_css():
@@ -39,7 +40,29 @@ def add_custom_css():
         """,
         unsafe_allow_html=True
     )
+# Langkah 1: Membuat koneksi ke database SQLite
+conn = sqlite3.connect('recruitment_data.db')
+cursor = conn.cursor()
 
+# Langkah 2: Membuat tabel jika belum ada
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS recruitment_data (
+        enrollee_id INTEGER PRIMARY KEY,
+        city TEXT,
+        city_development_index REAL,
+        gender TEXT,
+        relevent_experience TEXT,
+        enrolled_university TEXT,
+        education_level TEXT,
+        major_discipline TEXT,
+        experience INTEGER,
+        company_size TEXT,
+        company_type TEXT,
+        last_new_job TEXT,
+        training_hours INTEGER,
+        keterangan TEXT
+    )
+''')
 # Langkah 2: Load dataset
 def load_data():
     data = pd.read_csv("dataset_recruitment.csv")
@@ -276,7 +299,7 @@ def main():
         login()
     else:
         # Navigasi header
-        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman"])
+        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman","Database"])
 
         if navigation == "HOME":
             st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
@@ -344,7 +367,12 @@ def main():
                 pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
                 st.success("Laporan berhasil diekspor ke PDF!")
                 download_file(pdf_file)
-
+        elif navigation == "Database":
+                st.subheader("Tampilkan Database")
+                engine = create_engine("sqlite:///mydatabase.db")
+                conn = engine.connect()
+                data = pd.read_sql("SELECT * FROM recruitment_data", conn)
+                st.write(data)
         # Tombol logout
         logout()
 
