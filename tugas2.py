@@ -158,7 +158,7 @@ def generate_diversity_report(data):
     discipline_counts = data['major_discipline'].value_counts()
     fig6, ax6 = plt.subplots()
     sns.barplot(x=discipline_counts.index, y=discipline_counts.values, ax=ax6)
-    ax6.set_title("Jumlah pelamar berdasarkan disiplin ilmu")
+        ax6.set_title("Jumlah pelamar berdasarkan disiplin ilmu")
     ax6.set_xlabel("Disiplin Ilmu")
     ax6.set_ylabel("Jumlah")
     st.pyplot(fig6)
@@ -350,3 +350,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
