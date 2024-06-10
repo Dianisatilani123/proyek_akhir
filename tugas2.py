@@ -102,13 +102,14 @@ def login():
             st.experimental_rerun()  # Refresh halaman setelah login berhasil
         else:
             st.error("Username atau Password salah!")
-            st.experimental_rerun()  # Refresh halaman setelah logout berhasil
-
+           
 # Tombol logout
 def logout():
     if st.button("Logout"):
         st.session_state['logged_in'] = False
         st.success("Logout berhasil!")
+        st.experimental_rerun()  # Refresh halaman setelah logout berhasil
+
 
 # Langkah 8: Membuat model untuk aplikasi
 def main():
