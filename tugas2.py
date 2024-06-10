@@ -5,7 +5,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
-import matplotlib.pyplot as plt
 
 # Langkah 2: Load dataset
 def load_data():
@@ -62,80 +61,33 @@ def evaluate_model(model, X_test, y_test):
 def generate_diversity_report(data):
     st.markdown("<h2>Laporan Analitik dan Keberagaman</h2>", unsafe_allow_html=True)
     
-    gender_counts = data['gender'].value_counts()
-    education_counts = data['education_level'].value_counts()
-    experience_counts = data['relevent_experience'].value_counts()
-    company_type_counts = data['company_type'].value_counts()
-    company_size_counts = data['company_size'].value_counts()
-    discipline_counts = data['major_discipline'].value_counts()
-    last_new_job_counts = data['last_new_job'].value_counts()
-
     st.write("Jumlah pelamar berdasarkan gender:")
+    gender_counts = data['gender'].value_counts()
     st.bar_chart(gender_counts)
     
     st.write("Jumlah pelamar berdasarkan tingkat pendidikan:")
+    education_counts = data['education_level'].value_counts()
     st.bar_chart(education_counts)
     
     st.write("Jumlah pelamar berdasarkan pengalaman relevan:")
+    experience_counts = data['relevent_experience'].value_counts()
     st.bar_chart(experience_counts)
     
     st.write("Jumlah pelamar berdasarkan perusahaan sebelumnya:")
+    company_type_counts = data['company_type'].value_counts()
     st.bar_chart(company_type_counts)
     
     st.write("Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya:")
+    company_size_counts = data['company_size'].value_counts()
     st.bar_chart(company_size_counts)
     
     st.write("Jumlah pelamar berdasarkan disiplin ilmu:")
+    discipline_counts = data['major_discipline'].value_counts()
     st.bar_chart(discipline_counts)
     
     st.write("Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja:")
+    last_new_job_counts = data['last_new_job'].value_counts()
     st.bar_chart(last_new_job_counts)
-
-    # Tombol download PDF
-    if st.button("Download Laporan Keberagaman PDF"):
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", size=12)
-        
-        pdf.cell(200, 10, txt="Laporan Keberagaman", ln=True, align="C")
-        pdf.ln(10)
-
-        # Adding gender distribution chart
-        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan gender:", ln=True)
-        fig, ax = plt.subplots()
-        gender_counts.plot(kind='bar', ax=ax)
-        plt.tight_layout()
-        ax.set_ylabel('Jumlah Pelamar')
-        ax.set_xlabel('Gender')
-        plt.savefig('gender_counts.png')
-        pdf.image('gender_counts.png', x=10, y=30, w=100)
-        pdf.ln(60)
-
-        # Adding other distributions similarly
-        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan tingkat pendidikan:", ln=True)
-        fig, ax = plt.subplots()
-        education_counts.plot(kind='bar', ax=ax)
-        plt.tight_layout()
-        ax.set_ylabel('Jumlah Pelamar')
-        ax.set_xlabel('Tingkat Pendidikan')
-        plt.savefig('education_counts.png')
-        pdf.image('education_counts.png', x=10, y=90, w=100)
-        pdf.ln(60)
-
-        # Add more plots as needed in similar fashion...
-        # Clean up saved figures
-        import os
-        os.remove('gender_counts.png')
-        os.remove('education_counts.png')
-        # Repeat for other plots if saved...
-
-        pdf_output = pdf.output(dest="S").encode("latin-1")
-        st.download_button(
-            label="Download Laporan PDF",
-            data=pdf_output,
-            file_name="laporan_keberagaman.pdf",
-            mime="application/pdf"
-        )
 
 # Langkah 8: Membuat model untuk aplikasi
 def main():
