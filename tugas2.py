@@ -8,8 +8,13 @@ from fpdf import FPDF
 import matplotlib.pyplot as plt
 import seaborn as sns
 import hashlib
+import joblib
+import logging
 
-# CSS untuk mengubah gaya tombol
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+
+# CSS untuk mengubah gaya tombol dan memperindah tampilan aplikasi
 def add_custom_css():
     st.markdown(
         """
@@ -34,78 +39,124 @@ def add_custom_css():
             color: black;
             border: 2px solid #4CAF50;
         }
+
+        .sidebar .sidebar-content {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 10px;
+        }
         </style>
         """,
         unsafe_allow_html=True
     )
 
-# Langkah 2: Load dataset
-def load_data(file=None):
-    if file:
-        data = pd.read_csv(file)
-    else:
-        data = pd.read_csv("dataset_recruitment.csv")
-    
-    st.write("Dataset:")
-    st.write(data.head(14))  # Show the first 14 rows
-    st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
-    return data
+# Sidebar untuk navigasi
+def sidebar_navigation():
+    st.sidebar.title("Navigasi")
+    options = st.sidebar.radio("Pilih halaman:", ["Home", "Prediksi", "Laporan Keanekaragaman"])
+    return options
 
-# Langkah 3: Standarisasi data
-def preprocess_data(data):
-    # Ubah nilai "<1" menjadi 0 dan nilai ">20" menjadi 25
-    data['experience'] = data['experience'].apply(lambda x: 0 if x == '<1' else (25 if x == '>20' else int(x)))
-
-    # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
-    label_encoder = LabelEncoder()
-    categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
+# Validasi input
+def validate_input(data):
+    required_columns = ['relevent_experience', 'enrolled_university', 'education_level', 
                         'major_discipline', 'company_size', 'company_type', 'last_new_job']
-    for col in categorical_cols:
-        data[col] = label_encoder.fit_transform(data[col])
+    missing_columns = [col for col in required_columns if col not in data.columns]
+    if missing_columns:
+        st.error(f"Kolom yang diperlukan tidak ada dalam dataset: {', '.join(missing_columns)}")
+        return False
+    return True
 
-    st.write("Data setelah preprocessing:")
-    st.write(data.head(14))  # Tampilkan 14 baris pertama data setelah preprocessing
-    return data
+# Penanganan error saat memproses data
+def load_data(file=None):
+    try:
+        if file:
+            data = pd.read_csv(file)
+        else:
+            data = pd.read_csv("dataset_recruitment.csv")
+        
+        st.write("Dataset:")
+        st.write(data.head(14))  # Show the first 14 rows
+        st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
+        return data
+    except Exception as e:
+        st.error(f"Error saat memuat data: {e}")
+        logging.error(f"Error saat memuat data: {e}")
+        return None
 
-# Langkah 4: Split data train dan test
+def preprocess_data(data):
+    try:
+        # Ubah nilai "<1" menjadi 0 dan nilai ">20" menjadi 25
+        data['experience'] = data['experience'].apply(lambda x: 0 if x == '<1' else (25 if x == '>20' else int(x)))
+
+        # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
+        label_encoder = LabelEncoder()
+        categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
+                            'major_discipline', 'company_size', 'company_type', 'last_new_job']
+        for col in categorical_cols:
+            data[col] = label_encoder.fit_transform(data[col])
+
+        st.write("Data setelah preprocessing:")
+        st.write(data.head(14))  # Tampilkan 14 baris pertama data setelah preprocessing
+        return data
+    except Exception as e:
+        st.error(f"Error saat memproses data: {e}")
+        logging.error(f"Error saat memproses data: {e}")
+        return None
+
+# Split data train dan test
 def split_data(data):
-    X = data.drop(columns=["gender", "city"])  # Hapus fitur "City"
-    y = data["gender"]
+    try:
+        X = data.drop(columns=["gender", "city"])  # Hapus fitur "City"
+        y = data["gender"]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    return X_train, X_test, y_train, y_test
+        return X_train, X_test, y_train, y_test
+    except Exception as e:
+        st.error(f"Error saat membagi data: {e}")
+        logging.error(f"Error saat membagi data: {e}")
+        return None, None, None, None
 
-# Langkah 5: Membuat data latih menggunakan algoritma machine learning
+# Membuat model dan melatihnya
 def train_model(X_train, y_train):
-    model = RandomForestClassifier()
-    model.fit(X_train, y_train)
-    return model
+    try:
+        model = RandomForestClassifier()
+        model.fit(X_train, y_train)
+        return model
+    except Exception as e:
+        st.error(f"Error saat melatih model: {e}")
+        logging.error(f"Error saat melatih model: {e}")
+        return None
 
-# Langkah 6: Membuat model evaluasi untuk uji akurasi
+# Evaluasi model
 def evaluate_model(model, X_test, y_test):
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    report = classification_report(y_test, y_pred)
-    matrix = confusion_matrix(y_test, y_pred)
-    
-    st.write(f"Akurasi model: {accuracy * 100:.2f}%")
-    st.write("Classification Report:")
-    st.write(report)
-    st.write("Confusion Matrix:")
-    st.write(matrix)
-    
-    # Visualisasi Confusion Matrix
-    fig, ax = plt.subplots()
-    sns.heatmap(matrix, annot=True, fmt="d", cmap="Blues", ax=ax)
-    ax.set_xlabel("Predicted")
-    ax.set_ylabel("Actual")
-    ax.set_title("Confusion Matrix")
-    st.pyplot(fig)
+    try:
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        report = classification_report(y_test, y_pred)
+        matrix = confusion_matrix(y_test, y_pred)
+        
+        st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+        st.write("Classification Report:")
+        st.write(report)
+        st.write("Confusion Matrix:")
+        st.write(matrix)
+        
+        # Visualisasi Confusion Matrix
+        fig, ax = plt.subplots()
+        sns.heatmap(matrix, annot=True, fmt="d", cmap="Blues", ax=ax)
+        ax.set_xlabel("Predicted")
+        ax.set_ylabel("Actual")
+        ax.set_title("Confusion Matrix")
+        st.pyplot(fig)
 
-    return accuracy
+        return accuracy
+    except Exception as e:
+        st.error(f"Error saat evaluasi model: {e}")
+        logging.error(f"Error saat evaluasi model: {e}")
+        return None
 
-# Langkah 7: Membuat laporan analitik dan keberagaman
+# Generate laporan keberagaman
 def generate_diversity_report(data):
     st.markdown("<h2>Laporan Analitik dan Keberagaman</h2>", unsafe_allow_html=True)
 
@@ -196,9 +247,6 @@ def export_report_to_pdf(data, gender_counts, education_counts, experience_count
     pdf.add_page()
     pdf.set_font("Arial", size=12)
 
-    # Menambahkan konten ke PDF
-    pdf.cell(200, 10, txt="Laporan Analitik dan Keberagaman", ln=True, align='C')
-
     # Menambahkan jumlah pelamar berdasarkan gender
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan gender:", ln=True)
     for gender, count in gender_counts.items():
@@ -245,6 +293,20 @@ def export_report_to_pdf(data, gender_counts, education_counts, experience_count
     pdf.output(pdf_output)
     return pdf_output
 
+# Simpan dan muat model
+def save_model(model):
+    joblib.dump(model, 'model_recruitment.pkl')
+    st.success("Model berhasil disimpan.")
+
+def load_model():
+    try:
+        model = joblib.load('model_recruitment.pkl')
+        st.success("Model berhasil dimuat.")
+        return model
+    except FileNotFoundError:
+        st.error("Model tidak ditemukan, silakan latih dan simpan model terlebih dahulu.")
+        return None
+
 # Main function
 def main():
     st.title("Sistem Analitik dan Keberagaman Pelamar Kerja")
@@ -253,22 +315,51 @@ def main():
     # Tambahkan custom CSS
     add_custom_css()
 
-    # Upload file CSV
-    uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
+    # Sidebar navigation
+    page = sidebar_navigation()
 
-    if uploaded_file:
-        data = load_data(uploaded_file)
-        data = preprocess_data(data)
-        X_train, X_test, y_train, y_test = split_data(data)
-        model = train_model(X_train, y_train)
-        accuracy = evaluate_model(model, X_test, y_test)
-        
-        gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
-        
-        # Export to PDF button
-        if st.button("Ekspor laporan ke PDF"):
-            pdf_output = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
-            st.success(f"Laporan berhasil diekspor ke {pdf_output}")
+    if page == "Home":
+        st.write("Selamat datang di Sistem Analitik dan Keberagaman Pelamar Kerja.")
+        st.write("Silakan navigasi menggunakan sidebar untuk memulai.")
+    elif page == "Prediksi":
+        st.write("Halaman Prediksi")
+
+        # Upload file CSV
+        uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
+
+        if uploaded_file:
+            data = load_data(uploaded_file)
+            if validate_input(data):
+                data = preprocess_data(data)
+                if data is not None:
+                    X_train, X_test, y_train, y_test = split_data(data)
+                    if X_train is not None:
+                        model = train_model(X_train, y_train)
+                        if model is not None:
+                            accuracy = evaluate_model(model, X_test, y_test)
+                            save_model(model)
+                            
+                            if st.button("Muat Model yang Tersimpan"):
+                                model = load_model()
+                                if model:
+                                    accuracy = evaluate_model(model, X_test, y_test)
+    elif page == "Laporan Keanekaragaman":
+        st.write("Halaman Laporan Keanekaragaman")
+
+        # Upload file CSV
+        uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
+
+        if uploaded_file:
+            data = load_data(uploaded_file)
+            if validate_input(data):
+                data = preprocess_data(data)
+                if data is not None:
+                    gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
+                    
+                    # Export to PDF button
+                    if st.button("Ekspor laporan ke PDF"):
+                        pdf_output = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
+                        st.success(f"Laporan berhasil diekspor ke {pdf_output}")
 
 if __name__ == "__main__":
     main()
