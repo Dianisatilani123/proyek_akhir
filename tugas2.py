@@ -264,6 +264,11 @@ def logout():
         st.success("Logout berhasil!")
         st.experimental_rerun()  # Refresh halaman setelah logout berhasil
 
+# Definisi fungsi download_prediction_result
+def download_prediction_result(predictions):
+    predictions.to_csv("prediction_result.csv", index=False)
+    st.success("Hasil prediksi berhasil diunduh dalam format CSV!")
+    
 # Langkah 8: Membuat model untuk aplikasi
 def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
@@ -351,15 +356,11 @@ def main():
                             "Training Hours": [training_hours],
                             "Prediction": ["Layak"]
                         })
-                        # Panggil fungsi untuk mengunduh hasil prediksi
+                         # Panggil fungsi untuk mengunduh hasil prediksi
                         download_prediction_result(prediction_result)
                 else:
-                         st.error("Kandidat tidak layak untuk dipertimbangkan!")
+                        st.error("Kandidat tidak layak untuk dipertimbangkan!")
 
-                   # Fungsi untuk mengunduh hasil prediksi dalam format CSV
-            def download_prediction_result(predictions):
-                        predictions.to_csv("prediction_result.csv", index=False)
-                        st.success("Hasil prediksi berhasil diunduh dalam format CSV!")
 
 
         elif navigation == "Laporan Keanekaragaman":
