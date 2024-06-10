@@ -341,12 +341,12 @@ def main():
                 # Tombol prediksi
                 prediksi_button = st.button("Prediksi")
 
-            if prediksi_button:
-                if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
+                if prediksi_button:
+                    if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
                     enrolled_university == "" or education_level == "" or major_discipline == "" or 
                     experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
                     training_hours == 0):
-                    st.error("Silakan isi semua form inputan terlebih dahulu!")
+                        st.error("Silakan isi semua form inputan terlebih dahulu!")
                 else:
                     # Memasukkan data input ke dalam DataFrame baru
                     input_data = pd.DataFrame({
