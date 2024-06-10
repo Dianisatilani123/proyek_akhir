@@ -144,6 +144,11 @@ def main():
             text-align: center;
             font-family: 'Arial', sans-serif;
         }
+        /* Gaya untuk tombol navigasi sidebar */
+        .css-1v3fvcr .css-10trblm {
+            color: black !important;
+            font-weight: bold !important;
+        }
         </style>
     """, unsafe_allow_html=True)
 
@@ -201,15 +206,15 @@ def main():
                 if prediksi_button:
                     if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
                         enrolled_university == "" or education_level == "" or major_discipline == "" or 
-                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
+                        experience == 0 atau company_size == "" atau company_type == "" atau last_new_job == "" atau 
                         training_hours == 0):
                         st.error("Silakan isi semua form inputan terlebih dahulu!")
                     else:
                         # Menerapkan logika prediksi
                         kelayakan = 0  # Initialize kelayakan to 0
-                        if (relevent_experience == "Has relevent experience" and
-                            (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
-                            (experience >= 2) and
+                        if (relevent_experience == "Has relevent experience" dan
+                            (education_level == "Graduate" atau education_level == "Masters" atau education_level == "Phd") dan
+                            (experience >= 2) dan
                             (training_hours >= 20)):
                             kelayakan = 1  # Update kelayakan if criteria met
                         
