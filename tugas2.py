@@ -5,6 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
+import matplotlib.pyplot as plt
 
 # Langkah 2: Load dataset
 def load_data():
@@ -57,37 +58,99 @@ def evaluate_model(model, X_test, y_test):
     
     return accuracy
 
+# Fungsi untuk menyimpan grafik sebagai gambar
+def save_plot_as_image(fig, filename):
+    fig.savefig(filename, format='png')
+
 # Langkah 7: Membuat laporan analitik dan keberagaman
 def generate_diversity_report(data):
     st.markdown("<h2>Laporan Analitik dan Keberagaman</h2>", unsafe_allow_html=True)
     
-    st.write("Jumlah pelamar berdasarkan gender:")
+    # Menyimpan grafik dalam variabel
     gender_counts = data['gender'].value_counts()
-    st.bar_chart(gender_counts)
+    fig1, ax1 = plt.subplots()
+    ax1.bar(gender_counts.index, gender_counts.values)
+    ax1.set_title("Jumlah pelamar berdasarkan gender")
+    save_plot_as_image(fig1, "gender_counts.png")
     
-    st.write("Jumlah pelamar berdasarkan tingkat pendidikan:")
     education_counts = data['education_level'].value_counts()
-    st.bar_chart(education_counts)
+    fig2, ax2 = plt.subplots()
+    ax2.bar(education_counts.index, education_counts.values)
+    ax2.set_title("Jumlah pelamar berdasarkan tingkat pendidikan")
+    save_plot_as_image(fig2, "education_counts.png")
     
-    st.write("Jumlah pelamar berdasarkan pengalaman relevan:")
     experience_counts = data['relevent_experience'].value_counts()
-    st.bar_chart(experience_counts)
+    fig3, ax3 = plt.subplots()
+    ax3.bar(experience_counts.index, experience_counts.values)
+    ax3.set_title("Jumlah pelamar berdasarkan pengalaman relevan")
+    save_plot_as_image(fig3, "experience_counts.png")
     
-    st.write("Jumlah pelamar berdasarkan perusahaan sebelumnya:")
     company_type_counts = data['company_type'].value_counts()
-    st.bar_chart(company_type_counts)
+    fig4, ax4 = plt.subplots()
+    ax4.bar(company_type_counts.index, company_type_counts.values)
+    ax4.set_title("Jumlah pelamar berdasarkan perusahaan sebelumnya")
+    save_plot_as_image(fig4, "company_type_counts.png")
     
-    st.write("Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya:")
     company_size_counts = data['company_size'].value_counts()
-    st.bar_chart(company_size_counts)
+    fig5, ax5 = plt.subplots()
+    ax5.bar(company_size_counts.index, company_size_counts.values)
+    ax5.set_title("Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya")
+    save_plot_as_image(fig5, "company_size_counts.png")
     
-    st.write("Jumlah pelamar berdasarkan disiplin ilmu:")
     discipline_counts = data['major_discipline'].value_counts()
-    st.bar_chart(discipline_counts)
+    fig6, ax6 = plt.subplots()
+    ax6.bar(discipline_counts.index, discipline_counts.values)
+    ax6.set_title("Jumlah pelamar berdasarkan disiplin ilmu")
+    save_plot_as_image(fig6, "discipline_counts.png")
     
-    st.write("Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja:")
     last_new_job_counts = data['last_new_job'].value_counts()
-    st.bar_chart(last_new_job_counts)
+    fig7, ax7 = plt.subplots()
+    ax7.bar(last_new_job_counts.index, last_new_job_counts.values)
+    ax7.set_title("Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja")
+    save_plot_as_image(fig7, "last_new_job_counts.png")
+    
+    # Membuat file PDF
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    pdf.cell(200, 10, txt="Laporan Analitik dan Keberagaman", ln=True, align="C")
+    
+    pdf.ln(10)
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan gender", ln=True)
+    pdf.image("gender_counts.png", x=10, y=30, w=190)
+    
+    pdf.add_page()
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan tingkat pendidikan", ln=True)
+    pdf.image("education_counts.png", x=10, y=30, w=190)
+    
+    pdf.add_page()
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan pengalaman relevan", ln=True)
+    pdf.image("experience_counts.png", x=10, y=30, w=190)
+    
+    pdf.add_page()
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan perusahaan sebelumnya", ln=True)
+    pdf.image("company_type_counts.png", x=10, y=30, w=190)
+    
+    pdf.add_page()
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya", ln=True)
+    pdf.image("company_size_counts.png", x=10, y=30, w=190)
+    
+    pdf.add_page()
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan disiplin ilmu", ln=True)
+    pdf.image("discipline_counts.png", x=10, y=30, w=190)
+    
+    pdf.add_page()
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja", ln=True)
+    pdf.image("last_new_job_counts.png", x=10, y=30, w=190)
+    
+    pdf_output = pdf.output(dest="S").encode("latin-1")
+
+    st.download_button(
+        label="Download Laporan Keanekaragaman",
+        data=pdf_output,
+        file_name="laporan_keanekaragaman.pdf",
+        mime="application/pdf"
+    )
 
 # Langkah 8: Membuat model untuk aplikasi
 def main():
@@ -231,21 +294,21 @@ def main():
                     elif kelayakan == 50:
                         pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
                         pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
-                        pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
-                        pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
-                        pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 1 tahun.", ln=True)
-                        pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
+                        pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln.True)
+                        pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln.True)
+                        pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 1 tahun.", ln.True)
+                        pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln.True)
                     else:
-                        pdf.cell(200, 10, txt="Kandidat tidak memenuhi salah satu atau lebih dari kriteria di atas.", ln=True)
+                        pdf.cell(200, 10, txt="Kandidat tidak memenuhi salah satu atau lebih dari kriteria di atas.", ln.True)
 
                     if kelayakan >= 70:
                         pdf.set_font("Arial", size=12, style="B")
                         pdf.set_text_color(0, 128, 0)  # Green color
-                        pdf.cell(200, 10, txt="Kandidat diterima.", ln=True)
+                        pdf.cell(200, 10, txt="Kandidat diterima.", ln.True)
                     else:
                         pdf.set_font("Arial", size=12, style="B")
                         pdf.set_text_color(255, 0, 0)  # Red color
-                        pdf.cell(200, 10, txt="Kandidat ditolak.", ln=True)
+                        pdf.cell(200, 10, txt="Kandidat ditolak.", ln.True)
 
                     pdf.set_font("Arial", size=12)
                     pdf.set_text_color(0, 0, 0)  # Black color
@@ -263,5 +326,63 @@ def main():
         data = load_data()
         generate_diversity_report(data)
 
-if __name__ == "__main__": 
+        # Generate PDF report for diversity
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+        pdf.cell(200, 10, txt="LAPORAN KEANEKARAGAMAN", ln=True, align="C")
+        pdf.ln(10)
+
+        # Gender diversity
+        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan gender:", ln=True)
+        for index, value in gender_counts.items():
+            pdf.cell(200, 10, txt=f"{index}: {value}", ln=True)
+        pdf.ln(10)
+
+        # Education level diversity
+        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan tingkat pendidikan:", ln=True)
+        for index, value in education_counts.items():
+            pdf.cell(200, 10, txt=f"{index}: {value}", ln=True)
+        pdf.ln(10)
+
+        # Relevant experience diversity
+        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan pengalaman relevan:", ln=True)
+        for index, value in experience_counts.items():
+            pdf.cell(200, 10, txt=f"{index}: {value}", ln=True)
+        pdf.ln(10)
+
+        # Company type diversity
+        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan perusahaan sebelumnya:", ln=True)
+        for index, value in company_type_counts.items():
+            pdf.cell(200, 10, txt=f"{index}: {value}", ln=True)
+        pdf.ln(10)
+
+        # Company size diversity
+        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya:", ln=True)
+        for index, value in company_size_counts.items():
+            pdf.cell(200, 10, txt=f"{index}: {value}", ln=True)
+        pdf.ln(10)
+
+        # Major discipline diversity
+        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan disiplin ilmu:", ln=True)
+        for index, value in discipline_counts.items():
+            pdf.cell(200, 10, txt=f"{index}: {value}", ln=True)
+        pdf.ln(10)
+
+        # Last new job diversity
+        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja:", ln=True)
+        for index, value in last_new_job_counts.items():
+            pdf.cell(200, 10, txt=f"{index}: {value}", ln=True)
+        pdf.ln(10)
+
+        pdf_output = pdf.output(dest="S").encode("latin-1")
+
+        st.download_button(
+            label="Download Laporan Keanekaragaman",
+            data=pdf_output,
+            file_name="laporan_keanekaragaman.pdf",
+            mime="application/pdf"
+        )
+
+if __name__ == "__main__":
     main()
