@@ -11,6 +11,7 @@ def load_data():
     data = pd.read_csv("dataset_recruitment.csv")
     st.write("Dataset:")
     st.write(data.head(14))  # Show the first 14 rows
+    st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
     return data
 
 # Langkah 3: Standarisasi data
