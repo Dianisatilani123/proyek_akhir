@@ -369,12 +369,11 @@ def main():
                             'training_hours': [training_hours]
                         })
 
-                        # Melakukan preprocessing data pada input
-                        input_data = preprocess_data(input_data)
+                       # Select only the relevant columns from the input data
+                        input_data = input_data[X_train.columns]
 
-                        # Melakukan prediksi
+                        # Make predictions using the trained model
                         kelayakan = model.predict(input_data)
-
                         # Menampilkan hasil prediksi
                         if kelayakan == 1:
                             result_placeholder.success("Kandidat layak untuk dipertimbangkan!")
