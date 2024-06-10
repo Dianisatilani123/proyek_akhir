@@ -357,7 +357,7 @@ def main():
                          st.error("Kandidat tidak layak untuk dipertimbangkan!")
 
                    # Fungsi untuk mengunduh hasil prediksi dalam format CSV
-                 def download_prediction_result(predictions):
+            def download_prediction_result(predictions):
                         predictions.to_csv("prediction_result.csv", index=False)
                         st.success("Hasil prediksi berhasil diunduh dalam format CSV!")
 
@@ -375,4 +375,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
