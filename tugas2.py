@@ -316,7 +316,7 @@ def main():
             # Train model
             model = train_model(X_train, y_train)
 
-            # Evaluate model
+          # Evaluate model
             accuracy = evaluate_model(model, X_test, y_test)
             st.write(f"Akurasi model: {accuracy * 100:.2f}%")
 
@@ -403,4 +403,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
