@@ -5,6 +5,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
+from sqlalchemy import create_engine
+import base64
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # CSS untuk mengubah gaya tombol
 def add_custom_css():
@@ -91,34 +95,154 @@ def evaluate_model(model, X_test, y_test):
 # Langkah 7: Membuat laporan analitik dan keberagaman
 def generate_diversity_report(data):
     st.markdown("<h2>Laporan Analitik dan Keberagaman</h2>", unsafe_allow_html=True)
-    
+
+    figures = []
+
+    # Plotting gender counts
     st.write("Jumlah pelamar berdasarkan gender:")
     gender_counts = data['gender'].value_counts()
-    st.bar_chart(gender_counts)
-    
+    fig1, ax1 = plt.subplots()
+    sns.barplot(x=gender_counts.index, y=gender_counts.values, ax=ax1)
+    ax1.set_title("Jumlah pelamar berdasarkan gender")
+    ax1.set_xlabel("Gender")
+    ax1.set_ylabel("Jumlah")
+    st.pyplot(fig1)
+    figures.append(fig1)
+
+    # Plotting education level counts
     st.write("Jumlah pelamar berdasarkan tingkat pendidikan:")
     education_counts = data['education_level'].value_counts()
-    st.bar_chart(education_counts)
-    
+    fig2, ax2 = plt.subplots()
+    sns.barplot(x=education_counts.index, y=education_counts.values, ax=ax2)
+    ax2.set_title("Jumlah pelamar berdasarkan tingkat pendidikan")
+    ax2.set_xlabel("Tingkat Pendidikan")
+    ax2.set_ylabel("Jumlah")
+    st.pyplot(fig2)
+    figures.append(fig2)
+
+    # Plotting relevant experience counts
     st.write("Jumlah pelamar berdasarkan pengalaman relevan:")
     experience_counts = data['relevent_experience'].value_counts()
-    st.bar_chart(experience_counts)
-    
+    fig3, ax3 = plt.subplots()
+    sns.barplot(x=experience_counts.index, y=experience_counts.values, ax=ax3)
+    ax3.set_title("Jumlah pelamar berdasarkan pengalaman relevan")
+    ax3.set_xlabel("Pengalaman Relevan")
+    ax3.set_ylabel("Jumlah")
+    st.pyplot(fig3)
+    figures.append(fig3)
+
+    # Plotting company type counts
     st.write("Jumlah pelamar berdasarkan perusahaan sebelumnya:")
     company_type_counts = data['company_type'].value_counts()
-    st.bar_chart(company_type_counts)
-    
+    fig4, ax4 = plt.subplots()
+    sns.barplot(x=company_type_counts.index, y=company_type_counts.values, ax=ax4)
+    ax4.set_title("Jumlah pelamar berdasarkan perusahaan sebelumnya")
+    ax4.set_xlabel("Tipe Perusahaan")
+    ax4.set_ylabel("Jumlah")
+    st.pyplot(fig4)
+    figures.append(fig4)
+
+    # Plotting company size counts
     st.write("Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya:")
     company_size_counts = data['company_size'].value_counts()
-    st.bar_chart(company_size_counts)
-    
+    fig5, ax5 = plt.subplots()
+    sns.barplot(x=company_size_counts.index, y=company_size_counts.values, ax=ax5)
+    ax5.set_title("Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya")
+    ax5.set_xlabel("Ukuran Perusahaan")
+    ax5.set_ylabel("Jumlah")
+    st.pyplot(fig5)
+    figures.append(fig5)
+
+    # Plotting major discipline counts
     st.write("Jumlah pelamar berdasarkan disiplin ilmu:")
     discipline_counts = data['major_discipline'].value_counts()
-    st.bar_chart(discipline_counts)
-    
+    fig6, ax6 = plt.subplots()
+    sns.barplot(x=discipline_counts.index, y=discipline_counts.values, ax=ax6)
+    ax6.set_title("Jumlah pelamar berdasarkan disiplin ilmu")
+    ax6.set_xlabel("Disiplin Ilmu")
+    ax6.set_ylabel("Jumlah")
+    st.pyplot(fig6)
+    figures.append(fig6)
+
+    # Plotting last new job counts
     st.write("Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja:")
     last_new_job_counts = data['last_new_job'].value_counts()
-    st.bar_chart(last_new_job_counts)
+    fig7, ax7 = plt.subplots()
+    sns.barplot(x=last_new_job_counts.index, y=last_new_job_counts.values, ax=ax7)
+    ax7.set_title("Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja")
+    ax7.set_xlabel("Waktu Terakhir Pindah Kerja")
+    ax7.set_ylabel("Jumlah")
+    st.pyplot(fig7)
+    figures.append(fig7)
+
+    return gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures
+
+# Ekspor laporan ke PDF
+def export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+
+    # Menambahkan konten ke PDF
+    pdf.cell(200, 10, txt="Laporan Analitik dan Keberagaman", ln=True, align='C')
+
+    # Menambahkan jumlah pelamar berdasarkan gender
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan gender:", ln=True)
+    for gender, count in gender_counts.items():
+        pdf.cell(200, 10, txt=f"{gender}: {count}", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan tingkat pendidikan
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan tingkat pendidikan:", ln=True)
+    for education, count in education_counts.items():
+        pdf.cell(200, 10, txt=f"{education}: {count}", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan pengalaman relevan
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan pengalaman relevan:", ln=True)
+    for experience, count in experience_counts.items():
+        pdf.cell(200, 10, txt=f"{experience}: {count}", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan perusahaan sebelumnya
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan perusahaan sebelumnya:", ln=True)
+    for company_type, count in company_type_counts.items():
+        pdf.cell(200, 10, txt=f"{company_type}: {count}", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan ukuran perusahaan sebelumnya
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya:", ln=True)
+    for company_size, count in company_size_counts.items():
+        pdf.cell(200, 10, txt=f"{company_size}: {count}", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan disiplin ilmu
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan disiplin ilmu:", ln=True)
+    for discipline, count in discipline_counts.items():
+        pdf.cell(200, 10, txt=f"{discipline}: {count}", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan waktu terakhir kali pindah kerja
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja:", ln=True)
+    for last_new_job, count in last_new_job_counts.items():
+        pdf.cell(200, 10, txt=f"{last_new_job}: {count}", ln=True)
+
+    # Menyimpan grafik sebagai gambar dan menambahkannya ke PDF
+    for i, fig in enumerate(figures, start=1):
+        img_path = f"figure_{i}.png"
+        fig.savefig(img_path)
+        pdf.add_page()
+        pdf.image(img_path, x=10, y=10, w=pdf.w - 20)
+
+    pdf_file = "Laporan_Keberagaman.pdf"
+    pdf.output(pdf_file)
+    
+    return pdf_file
+
+# Fungsi untuk menampilkan tautan unduhan
+def download_file(file_path):
+    with open(file_path, "rb") as file:
+        btn = st.download_button(
+            label="Download Laporan",
+            data=file,
+            file_name=file_path,
+            mime="application/octet-stream"
+        )
+        return btn
 
 # Halaman login
 def login():
@@ -215,7 +339,11 @@ def main():
 
         elif navigation == "Laporan Keanekaragaman":
             data = load_data()
-            generate_diversity_report(data)
+            gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
+            if st.button("Export Laporan ke PDF"):
+                pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
+                st.success("Laporan berhasil diekspor ke PDF!")
+                download_file(pdf_file)
 
         # Tombol logout
         logout()
