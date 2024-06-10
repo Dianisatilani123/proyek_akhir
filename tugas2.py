@@ -7,6 +7,8 @@ from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
 from sqlalchemy import create_engine
 import base64
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # CSS untuk mengubah gaya tombol
 def add_custom_css():
@@ -93,39 +95,90 @@ def evaluate_model(model, X_test, y_test):
 # Langkah 7: Membuat laporan analitik dan keberagaman
 def generate_diversity_report(data):
     st.markdown("<h2>Laporan Analitik dan Keberagaman</h2>", unsafe_allow_html=True)
-    
+
+    figures = []
+
+    # Plotting gender counts
     st.write("Jumlah pelamar berdasarkan gender:")
     gender_counts = data['gender'].value_counts()
-    st.bar_chart(gender_counts)
-    
+    fig1, ax1 = plt.subplots()
+    sns.barplot(x=gender_counts.index, y=gender_counts.values, ax=ax1)
+    ax1.set_title("Jumlah pelamar berdasarkan gender")
+    ax1.set_xlabel("Gender")
+    ax1.set_ylabel("Jumlah")
+    st.pyplot(fig1)
+    figures.append(fig1)
+
+    # Plotting education level counts
     st.write("Jumlah pelamar berdasarkan tingkat pendidikan:")
     education_counts = data['education_level'].value_counts()
-    st.bar_chart(education_counts)
-    
+    fig2, ax2 = plt.subplots()
+    sns.barplot(x=education_counts.index, y=education_counts.values, ax=ax2)
+    ax2.set_title("Jumlah pelamar berdasarkan tingkat pendidikan")
+    ax2.set_xlabel("Tingkat Pendidikan")
+    ax2.set_ylabel("Jumlah")
+    st.pyplot(fig2)
+    figures.append(fig2)
+
+    # Plotting relevant experience counts
     st.write("Jumlah pelamar berdasarkan pengalaman relevan:")
     experience_counts = data['relevent_experience'].value_counts()
-    st.bar_chart(experience_counts)
-    
+    fig3, ax3 = plt.subplots()
+    sns.barplot(x=experience_counts.index, y=experience_counts.values, ax=ax3)
+    ax3.set_title("Jumlah pelamar berdasarkan pengalaman relevan")
+    ax3.set_xlabel("Pengalaman Relevan")
+    ax3.set_ylabel("Jumlah")
+    st.pyplot(fig3)
+    figures.append(fig3)
+
+    # Plotting company type counts
     st.write("Jumlah pelamar berdasarkan perusahaan sebelumnya:")
     company_type_counts = data['company_type'].value_counts()
-    st.bar_chart(company_type_counts)
-    
+    fig4, ax4 = plt.subplots()
+    sns.barplot(x=company_type_counts.index, y=company_type_counts.values, ax=ax4)
+    ax4.set_title("Jumlah pelamar berdasarkan perusahaan sebelumnya")
+    ax4.set_xlabel("Tipe Perusahaan")
+    ax4.set_ylabel("Jumlah")
+    st.pyplot(fig4)
+    figures.append(fig4)
+
+    # Plotting company size counts
     st.write("Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya:")
     company_size_counts = data['company_size'].value_counts()
-    st.bar_chart(company_size_counts)
-    
+    fig5, ax5 = plt.subplots()
+    sns.barplot(x=company_size_counts.index, y=company_size_counts.values, ax=ax5)
+    ax5.set_title("Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya")
+    ax5.set_xlabel("Ukuran Perusahaan")
+    ax5.set_ylabel("Jumlah")
+    st.pyplot(fig5)
+    figures.append(fig5)
+
+    # Plotting major discipline counts
     st.write("Jumlah pelamar berdasarkan disiplin ilmu:")
     discipline_counts = data['major_discipline'].value_counts()
-    st.bar_chart(discipline_counts)
-    
+    fig6, ax6 = plt.subplots()
+    sns.barplot(x=discipline_counts.index, y=discipline_counts.values, ax=ax6)
+    ax6.set_title("Jumlah pelamar berdasarkan disiplin ilmu")
+    ax6.set_xlabel("Disiplin Ilmu")
+    ax6.set_ylabel("Jumlah")
+    st.pyplot(fig6)
+    figures.append(fig6)
+
+    # Plotting last new job counts
     st.write("Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja:")
     last_new_job_counts = data['last_new_job'].value_counts()
-    st.bar_chart(last_new_job_counts)
+    fig7, ax7 = plt.subplots()
+    sns.barplot(x=last_new_job_counts.index, y=last_new_job_counts.values, ax=ax7)
+    ax7.set_title("Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja")
+    ax7.set_xlabel("Waktu Terakhir Pindah Kerja")
+    ax7.set_ylabel("Jumlah")
+    st.pyplot(fig7)
+    figures.append(fig7)
 
-    return gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts
+    return gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures
 
 # Ekspor laporan ke PDF
-def export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts):
+def export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
@@ -168,28 +221,28 @@ def export_report_to_pdf(data, gender_counts, education_counts, experience_count
     for last_new_job, count in last_new_job_counts.items():
         pdf.cell(200, 10, txt=f"{last_new_job}: {count}", ln=True)
 
-    # Simpan file PDF
+    # Menyimpan grafik sebagai gambar dan menambahkannya ke PDF
+    for i, fig in enumerate(figures, start=1):
+        img_path = f"figure_{i}.png"
+        fig.savefig(img_path)
+        pdf.add_page()
+        pdf.image(img_path, x=10, y=10, w=pdf.w - 20)
+
     pdf_file = "Laporan_Keberagaman.pdf"
     pdf.output(pdf_file)
+    
     return pdf_file
 
-# Fungsi untuk mengunduh file
+# Fungsi untuk menampilkan tautan unduhan
 def download_file(file_path):
     with open(file_path, "rb") as file:
-        b64 = base64.b64encode(file.read()).decode()
-        href = f'<a href="data:application/octet-stream;base64,{b64}" download="{file_path}">Download Laporan PDF</a>'
-        st.markdown(href, unsafe_allow_html=True)
-
-# Integrasi database
-def create_db_connection():
-    engine = create_engine('sqlite:///recruitment_app.db')
-    conn = engine.connect()
-    return conn
-
-def save_prediction_to_db(prediction_data):
-    conn = create_db_connection()
-    prediction_data.to_sql('predictions', conn, if_exists='append', index=False)
-    conn.close()
+        btn = st.download_button(
+            label="Download Laporan",
+            data=file,
+            file_name=file_path,
+            mime="application/octet-stream"
+        )
+        return btn
 
 # Halaman login
 def login():
@@ -197,11 +250,11 @@ def login():
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
-        if username == "admin" and password == "admin123":
+       if username == "admin" and password == "admin123":
             st.session_state['logged_in'] = True
             st.success("Login berhasil!")
             st.experimental_rerun()  # Refresh halaman setelah login berhasil
-        else:
+    else:
             st.error("Username atau Password salah!")
            
 # Tombol logout
@@ -268,7 +321,7 @@ def main():
                 if prediksi_button:
                     if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
                         enrolled_university == "" or education_level == "" or major_discipline == "" or 
-                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
+                        experience == 0 atau company_size == "" or company_type == "" or last_new_job == "" or 
                         training_hours == 0):
                         st.error("Silakan isi semua form inputan terlebih dahulu!")
                     else:
@@ -284,30 +337,11 @@ def main():
                         else:
                             st.error("Kandidat tidak layak untuk dipertimbangkan!")
 
-                        # Simpan hasil prediksi ke database
-                        prediction_data = pd.DataFrame({
-                            'enrollee_id': [enrollee_id],
-                            'city': [city],
-                            'city_development_index': [city_development_index],
-                            'gender': [gender],
-                            'relevent_experience': [relevent_experience],
-                            'enrolled_university': [enrolled_university],
-                            'education_level': [education_level],
-                            'major_discipline': [major_discipline],
-                            'experience': [experience],
-                            'company_size': [company_size],
-                            'company_type': [company_type],
-                            'last_new_job': [last_new_job],
-                            'training_hours': [training_hours],
-                            'kelayakan': [kelayakan]
-                        })
-                        save_prediction_to_db(prediction_data)
-
         elif navigation == "Laporan Keanekaragaman":
             data = load_data()
-            gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts = generate_diversity_report(data)
+            gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
             if st.button("Export Laporan ke PDF"):
-                pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts)
+                pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
                 st.success("Laporan berhasil diekspor ke PDF!")
                 download_file(pdf_file)
 
