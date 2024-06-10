@@ -340,64 +340,64 @@ def main():
 
                 # Tombol prediksi
                 prediksi_button = st.button("Prediksi")
-
     if prediksi_button:
-      if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
-        enrolled_university == "" or education_level == "" or major_discipline == "" or 
-        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
-        training_hours == 0):
-        st.error("Silakan isi semua form inputan terlebih dahulu!")
-    else:
-        # Memasukkan data input ke dalam DataFrame baru
-        input_data = pd.DataFrame({
-            'enrollee_id': [enrollee_id],
-            'city': [city],
-            'city_development_index': [city_development_index],
-            'gender': [gender],
-            'relevent_experience': [relevent_experience],
-            'enrolled_university': [enrolled_university],
-            'education_level': [education_level],
-            'major_discipline': [major_discipline],
-            'experience': [experience],
-            'company_size': [company_size],
-            'company_type': [company_type],
-            'last_new_job': [last_new_job],
-            'training_hours': [training_hours]
-        })
-
-        # Melakukan preprocessing data pada input
-        input_data = preprocess_data(input_data)
-
-        # Melakukan prediksi
-        kelayakan = model.predict(input_data)
-
-        # Menampilkan hasil prediksi
-        if kelayakan == 1:
-            st.success("Kandidat layak untuk dipertimbangkan!")
+        if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
+            enrolled_university == "" or education_level == "" or major_discipline == "" or 
+            experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
+            training_hours == 0):
+            st.error("Silakan isi semua form inputan terlebih dahulu!")
         else:
-            st.error("Kandidat tidak layak untuk dipertimbangkan!")
+            # Memasukkan data input ke dalam DataFrame baru
+            input_data = pd.DataFrame({
+                'enrollee_id': [enrollee_id],
+                'city': [city],
+                'city_development_index': [city_development_index],
+                'gender': [gender],
+                'relevent_experience': [relevent_experience],
+                'enrolled_university': [enrolled_university],
+                'education_level': [education_level],
+                'major_discipline': [major_discipline],
+                'experience': [experience],
+                'company_size': [company_size],
+                'company_type': [company_type],
+                'last_new_job': [last_new_job],
+                'training_hours': [training_hours]
+            })
 
-        # Menyimpan hasil prediksi ke dalam database SQLite
-        input_data['kelayakan'] = kelayakan
-        input_data['status'] = input_data['kelayakan'].apply(lambda x: 'Diterima' if x == 1 else 'Ditolak')
-        input_data.to_sql('hasil_prediksi', conn, if_exists='replace', index=False)
+            # Melakukan preprocessing data pada input
+            input_data = preprocess_data(input_data)
 
+            # Melakukan prediksi
+            kelayakan = model.predict(input_data)
 
-        elif navigation == "Laporan Keanekaragaman":
-            data = load_data()
-            gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
-            if st.button("Export Laporan ke PDF"):
-                pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
-                st.success("Laporan berhasil diekspor ke PDF!")
-                download_file(pdf_file)
-        elif navigation == "Database":
-                st.subheader("Tampilkan Database")
-                engine = create_engine("sqlite:///recruitment_data.db")
-                conn = engine.connect()
-                data = pd.read_sql("SELECT * FROM recruitment_data", conn)
-                st.write(data)
-        # Tombol logout
-        logout()
+            # Menampilkan hasil prediksi
+            if kelayakan == 1:
+                st.success("Kandidat layak untuk dipertimbangkan!")
+            else:
+                st.error("Kandidat tidak layak untuk dipertimbangkan!")
+
+            # Menyimpan hasil prediksi ke dalam database SQLite
+            input_data['kelayakan'] = kelayakan
+            input_data['status'] = input_data['kelayakan'].apply(lambda x: 'Diterima' if x == 1 else 'Ditolak')
+            input_data.to_sql('hasil_prediksi', conn, if_exists='replace', index=False)
+
+    elif navigation == "Laporan Keanekaragaman":
+        data = load_data()
+        gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
+        if st.button("Export Laporan ke PDF"):
+            pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
+            st.success("Laporan berhasil diekspor ke PDF!")
+            download_file(pdf_file)
+    elif navigation == "Database":
+           st.subheader("Tampilkan Database")
+            engine = create_engine("sqlite:///recruitment_data.db")
+            conn = engine.connect()
+            data = pd.read_sql("SELECT * FROM recruitment_data", conn)
+            st.write(data)
+    # Tombol logout
+    logout()
+
+    
 
 if __name__ == "__main__":
     main()
