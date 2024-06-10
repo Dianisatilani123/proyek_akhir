@@ -230,6 +230,10 @@ def main():
                 input_df = input_df.drop(columns=["gender", "city"])
 
                 # Menyusun ulang kolom input sesuai dengan kolom data pelatihan
+                for col in trained_columns:
+                    if col not in input_df.columns:
+                        input_df[col] = 0  # Menambahkan kolom yang hilang dengan nilai default 0
+
                 input_df = input_df[trained_columns]
 
                 prediction = model.predict(input_df)
