@@ -325,12 +325,13 @@ def main():
                         training_hours == 0):
                         st.error("Silakan isi semua form inputan terlebih dahulu!")
                     else:
-                        # Menerapkan logika prediksi
+                       # Menerapkan logika prediksi
                         kelayakan = 0  # Initialize kelayakan to 0
-                        if (relevent_experience == "Has relevent experience" and
-                            (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
-                            training_hours >= 50):
-                            kelayakan = 1
+                    if (relevent_experience == "Has relevent experience" and
+                        (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
+                        major_discipline == "STEM" and  # Tambahkan syarat Major Discipline wajib STEM
+                        training_hours >= 50):
+                        kelayakan = 1
 
                         if kelayakan == 1:
                             st.success("Kandidat layak untuk dipertimbangkan!")
