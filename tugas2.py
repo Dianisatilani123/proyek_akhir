@@ -369,21 +369,22 @@ def main():
                             'training_hours': [training_hours]
                         })
 
-                       # Select only the relevant columns from the input data
+                      # Select only the relevant columns from the input data
                         input_data = input_data[X_train.columns]
 
                         # Make predictions using the trained model
                         kelayakan = model.predict(input_data.values)
+
                         # Menampilkan hasil prediksi
-                        if kelayakan == 1:
+                    if kelayakan == 1:
                             result_placeholder.success("Kandidat layak untuk dipertimbangkan!")
-                        else:
+                    else:
                             result_placeholder.error("Kandidat tidak layak untuk dipertimbangkan!")
 
                         # Menyimpan hasil prediksi ke dalam database SQLite
-                        input_data['kelayakan'] = kelayakan
-                        input_data['status'] = input_data['kelayakan'].apply(lambda x: 'Diterima' if x == 1 else 'Ditolak')
-                        input_data.to_sql('hasil_prediksi', conn, if_exists='replace', index=False)
+                    input_data['kelayakan'] = kelayakan
+                    input_data['status'] = input_data['kelayakan'].apply(lambda x: 'Diterima' if x == 1 else 'Ditolak')
+                    input_data.to_sql('hasil_prediksi', conn, if_exists='replace', index=False)
         elif navigation == "Laporan Keanekaragaman":
             data = load_data()
             gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
