@@ -130,7 +130,7 @@ def login():
             st.session_state['logged_in'] = True
             st.success("Login berhasil!")
             st.experimental_rerun()  # Refresh halaman setelah login berhasil
-        else:
+    else:
             st.error("Username atau Password salah!")
            
 # Tombol logout
@@ -195,16 +195,16 @@ def main():
                 prediksi_button = st.button("Prediksi")
 
                 if prediksi_button:
-                    if (enrollee_id == "" or city == "" or gender == "" atau relevent_experience == "" atau 
-                        enrolled_university == "" atau education_level == "" atau major_discipline == "" atau 
-                        experience == 0 atau company_size == "" atau company_type == "" atau last_new_job == "" atau 
+                    if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
+                        enrolled_university == "" or education_level == "" or major_discipline == "" or 
+                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
                         training_hours == 0):
                         st.error("Silakan isi semua form inputan terlebih dahulu!")
                     else:
                         # Menerapkan logika prediksi
                         kelayakan = 0  # Initialize kelayakan to 0
-                        if (relevent_experience == "Has relevent experience" dan
-                            (education_level == "Graduate" atau education_level == "Masters" atau education_level == "Phd") dan
+                        if (relevent_experience == "Has relevent experience" and
+                            (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
                             training_hours >= 50):
                             kelayakan = 1
 
