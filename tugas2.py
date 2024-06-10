@@ -5,16 +5,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
+from sqlalchemy import create_engine
+import base64
 import matplotlib.pyplot as plt
 import seaborn as sns
-import hashlib
-import joblib
-import logging
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-
-# CSS untuk mengubah gaya tombol dan memperindah tampilan aplikasi
+# CSS untuk mengubah gaya tombol
 def add_custom_css():
     st.markdown(
         """
@@ -39,124 +35,64 @@ def add_custom_css():
             color: black;
             border: 2px solid #4CAF50;
         }
-
-        .sidebar .sidebar-content {
-            background-color: #f4f4f4;
-            padding: 10px;
-            border-radius: 10px;
-        }
         </style>
         """,
         unsafe_allow_html=True
     )
 
-# Sidebar untuk navigasi
-def sidebar_navigation():
-    st.sidebar.title("Navigasi")
-    options = st.sidebar.radio("Pilih halaman:", ["Home", "Prediksi", "Laporan Keanekaragaman"])
-    return options
+# Langkah 2: Load dataset
+def load_data():
+    data = pd.read_csv("dataset_recruitment.csv")
+    st.write("Dataset:")
+    st.write(data.head(14))  # Show the first 14 rows
+    st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
+    return data
 
-# Validasi input
-def validate_input(data):
-    required_columns = ['relevent_experience', 'enrolled_university', 'education_level', 
-                        'major_discipline', 'company_size', 'company_type', 'last_new_job']
-    missing_columns = [col for col in required_columns if col not in data.columns]
-    if missing_columns:
-        st.error(f"Kolom yang diperlukan tidak ada dalam dataset: {', '.join(missing_columns)}")
-        return False
-    return True
-
-# Penanganan error saat memproses data
-def load_data(file=None):
-    try:
-        if file:
-            data = pd.read_csv(file)
-        else:
-            data = pd.read_csv("dataset_recruitment.csv")
-        
-        st.write("Dataset:")
-        st.write(data.head(14))  # Show the first 14 rows
-        st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
-        return data
-    except Exception as e:
-        st.error(f"Error saat memuat data: {e}")
-        logging.error(f"Error saat memuat data: {e}")
-        return None
-
+# Langkah 3: Standarisasi data
 def preprocess_data(data):
-    try:
-        # Ubah nilai "<1" menjadi 0 dan nilai ">20" menjadi 25
-        data['experience'] = data['experience'].apply(lambda x: 0 if x == '<1' else (25 if x == '>20' else int(x)))
+    # Ubah nilai "<1" menjadi 0 dan nilai ">20" menjadi 25
+    data['experience'] = data['experience'].apply(lambda x: 0 if x == '<1' else (25 if x == '>20' else int(x)))
 
-        # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
-        label_encoder = LabelEncoder()
-        categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
-                            'major_discipline', 'company_size', 'company_type', 'last_new_job']
-        for col in categorical_cols:
-            data[col] = label_encoder.fit_transform(data[col])
+    # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
+    label_encoder = LabelEncoder()
+    categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
+                        'major_discipline', 'company_size', 'company_type', 'last_new_job']
+    for col in categorical_cols:
+        data[col] = label_encoder.fit_transform(data[col])
 
-        st.write("Data setelah preprocessing:")
-        st.write(data.head(14))  # Tampilkan 14 baris pertama data setelah preprocessing
-        return data
-    except Exception as e:
-        st.error(f"Error saat memproses data: {e}")
-        logging.error(f"Error saat memproses data: {e}")
-        return None
+    return data
 
-# Split data train dan test
+# Langkah 4: Split data train dan test
 def split_data(data):
-    try:
-        X = data.drop(columns=["gender", "city"])  # Hapus fitur "City"
-        y = data["gender"]
+    X = data.drop(columns=["gender", "city"])  # Hapus fitur "City"
+    y = data["gender"]
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-        return X_train, X_test, y_train, y_test
-    except Exception as e:
-        st.error(f"Error saat membagi data: {e}")
-        logging.error(f"Error saat membagi data: {e}")
-        return None, None, None, None
+    return X_train, X_test, y_train, y_test
 
-# Membuat model dan melatihnya
+# Langkah 5: Membuat data latih menggunakan algoritma machine learning
 def train_model(X_train, y_train):
-    try:
-        model = RandomForestClassifier()
-        model.fit(X_train, y_train)
-        return model
-    except Exception as e:
-        st.error(f"Error saat melatih model: {e}")
-        logging.error(f"Error saat melatih model: {e}")
-        return None
+    model = RandomForestClassifier()
+    model.fit(X_train, y_train)
+    return model
 
-# Evaluasi model
+# Langkah 6: Membuat model evaluasi untuk uji akurasi
 def evaluate_model(model, X_test, y_test):
-    try:
-        y_pred = model.predict(X_test)
-        accuracy = accuracy_score(y_test, y_pred)
-        report = classification_report(y_test, y_pred)
-        matrix = confusion_matrix(y_test, y_pred)
-        
-        st.write(f"Akurasi model: {accuracy * 100:.2f}%")
-        st.write("Classification Report:")
-        st.write(report)
-        st.write("Confusion Matrix:")
-        st.write(matrix)
-        
-        # Visualisasi Confusion Matrix
-        fig, ax = plt.subplots()
-        sns.heatmap(matrix, annot=True, fmt="d", cmap="Blues", ax=ax)
-        ax.set_xlabel("Predicted")
-        ax.set_ylabel("Actual")
-        ax.set_title("Confusion Matrix")
-        st.pyplot(fig)
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    report = classification_report(y_test, y_pred)
+    matrix = confusion_matrix(y_test, y_pred)
+    
+    st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+    st.write("Classification Report:")
+    st.write(report)
+    st.write("Confusion Matrix:")
+    st.write(matrix)
+    
+    return accuracy
 
-        return accuracy
-    except Exception as e:
-        st.error(f"Error saat evaluasi model: {e}")
-        logging.error(f"Error saat evaluasi model: {e}")
-        return None
-
-# Generate laporan keberagaman
+# Langkah 7: Membuat laporan analitik dan keberagaman
 def generate_diversity_report(data):
     st.markdown("<h2>Laporan Analitik dan Keberagaman</h2>", unsafe_allow_html=True)
 
@@ -247,6 +183,9 @@ def export_report_to_pdf(data, gender_counts, education_counts, experience_count
     pdf.add_page()
     pdf.set_font("Arial", size=12)
 
+    # Menambahkan konten ke PDF
+    pdf.cell(200, 10, txt="Laporan Analitik dan Keberagaman", ln=True, align='C')
+
     # Menambahkan jumlah pelamar berdasarkan gender
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan gender:", ln=True)
     for gender, count in gender_counts.items():
@@ -282,84 +221,224 @@ def export_report_to_pdf(data, gender_counts, education_counts, experience_count
     for last_new_job, count in last_new_job_counts.items():
         pdf.cell(200, 10, txt=f"{last_new_job}: {count}", ln=True)
 
-    # Menambahkan grafik ke PDF
-    for i, fig in enumerate(figures):
-        fig.savefig(f"plot_{i}.png")
-        pdf.image(f"plot_{i}.png", x=10, y=pdf.get_y(), w=180)
-        pdf.ln(85)  # Sesuaikan nilai ini sesuai dengan ukuran gambar dan jarak antar gambar
+    # Menyimpan grafik sebagai gambar dan menambahkannya ke PDF
+    for i, fig in enumerate(figures, start=1):
+        img_path = f"figure_{i}.png"
+        fig.savefig(img_path)
+        pdf.add_page()
+        pdf.image(img_path, x=10, y=10, w=pdf.w - 20)
 
-    # Simpan laporan sebagai PDF
-    pdf_output = "laporan_analitik_dan_keberagaman.pdf"
-    pdf.output(pdf_output)
-    return pdf_output
+    pdf_file = "Laporan_Keberagaman.pdf"
+    pdf.output(pdf_file)
+    
+    return pdf_file
 
-# Simpan dan muat model
-def save_model(model):
-    joblib.dump(model, 'model_recruitment.pkl')
-    st.success("Model berhasil disimpan.")
+# Fungsi untuk menampilkan tautan unduhan
+def download_file(file_path):
+    with open(file_path, "rb") as file:
+        btn = st.download_button(
+            label="Download Laporan",
+            data=file,
+            file_name=file_path,
+            mime="application/octet-stream"
+        )
+        return btn
 
-def load_model():
-    try:
-        model = joblib.load('model_recruitment.pkl')
-        st.success("Model berhasil dimuat.")
-        return model
-    except FileNotFoundError:
-        st.error("Model tidak ditemukan, silakan latih dan simpan model terlebih dahulu.")
-        return None
+# Halaman login
+def login():
+    st.markdown("<h2>Login Admin</h2>", unsafe_allow_html=True)
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    if st.button("Login"):
+       if username == "admin" and password == "admin123":
+            st.session_state['logged_in'] = True
+            st.success("Login berhasil!")
+            st.experimental_rerun()  # Refresh halaman setelah login berhasil
+    else:
+            st.error("Username atau Password salah!")
+           
+# Tombol logout
+def logout():
+    if st.button("Logout"):
+        st.session_state['logged_in'] = False
+        st.success("Logout berhasil!")
+        st.experimental_rerun()  # Refresh halaman setelah logout berhasil
 
-# Main function
+# Langkah 8: Membuat model untuk aplikasi
 def main():
-    st.title("Sistem Analitik dan Keberagaman Pelamar Kerja")
-    st.write("Aplikasi ini membantu dalam menganalisis dan menghasilkan laporan keberagaman pelamar kerja berdasarkan dataset yang diunggah.")
+    st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
+    add_custom_css()  # Tambahkan CSS khusus untuk tombol
 
-    # Tambahkan custom CSS
-    add_custom_css()
+    if 'logged_in' not in st.session_state:
+        st.session_state['logged_in'] = False
 
-    # Sidebar navigation
-    page = sidebar_navigation()
+    if not st.session_state['logged_in']:
+        login()
+    else:
+        # Navigasi header
+        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman"])
 
-    if page == "Home":
-        st.write("Selamat datang di Sistem Analitik dan Keberagaman Pelamar Kerja.")
-        st.write("Silakan navigasi menggunakan sidebar untuk memulai.")
-    elif page == "Prediksi":
-        st.write("Halaman Prediksi")
+        if navigation == "HOME":
+            st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
+        elif navigation == "Prediksi":
+            # Load data
+            data = load_data()
 
-        # Upload file CSV
-        uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
+            # Preprocessing data
+            data = preprocess_data(data)
 
-        if uploaded_file:
-            data = load_data(uploaded_file)
-            if validate_input(data):
-                data = preprocess_data(data)
-                if data is not None:
-                    X_train, X_test, y_train, y_test = split_data(data)
-                    if X_train is not None:
-                        model = train_model(X_train, y_train)
-                        if model is not None:
-                            accuracy = evaluate_model(model, X_test, y_test)
-                            save_model(model)
-                            
-                            if st.button("Muat Model yang Tersimpan"):
-                                model = load_model()
-                                if model:
-                                    accuracy = evaluate_model(model, X_test, y_test)
-    elif page == "Laporan Keanekaragaman":
-        st.write("Halaman Laporan Keanekaragaman")
+            # Split data
+            X_train, X_test, y_train, y_test = split_data(data)
 
-        # Upload file CSV
-        uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
+            # Train model
+            model = train_model(X_train, y_train)
 
-        if uploaded_file:
-            data = load_data(uploaded_file)
-            if validate_input(data):
-                data = preprocess_data(data)
-                if data is not None:
-                    gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
-                    
-                    # Export to PDF button
-                    if st.button("Ekspor laporan ke PDF"):
-                        pdf_output = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
-                        st.success(f"Laporan berhasil diekspor ke {pdf_output}")
+            # Evaluate model
+            accuracy = evaluate_model(model, X_test, y_test)
+            st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+
+            # Menampilkan form input untuk memprediksi kelayakan kandidat
+            with st.sidebar:
+                st.markdown("<h1>Masukkan Biodata Kandidat</h1>", unsafe_allow_html=True)
+                
+                enrollee_id = st.text_input("Enrollee ID", "")
+                city = st.text_input("City", "")
+                city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
+                gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+                relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
+                enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
+                education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
+                major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
+                experience = st.number_input("Experience", value=0)
+                company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
+                company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
+                last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
+                training_hours = st.number_input("Training Hours", value=0)
+
+                # Tombol prediksi
+                prediksi_button = st.button("Prediksi")
+
+                if prediksi_button:
+                    if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
+                        enrolled_university == "" or education_level == "" or major_discipline == "" or 
+                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
+                        training_hours == 0):
+                        st.error("Silakan isi semua form inputan terlebih dahulu!")
+                    else:
+                       # Menerapkan logika prediksi
+                        kelayakan = 0  # Initialize kelayakan to 0
+                        if (relevent_experience == "Has relevent experience" and
+                        (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
+                        major_discipline == "STEM" and  # Tambahkan syarat Major Discipline wajib STEM
+                        training_hours >= 50):
+                         kelayakan = 1
+
+                        if kelayakan == 1:
+                            st.success("Kandidat layak untuk dipertimbangkan!")
+                        else:
+                            st.error("Kandidat tidak layak untuk dipertimbangkan!")
+
+        elif navigation == "Laporan Keanekaragaman":
+            data = load_data()
+            gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
+            if st.button("Export Laporan ke PDF"):
+                pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
+                st.success("Laporan berhasil diekspor ke PDF!")
+                download_file(pdf_file)
+
+       
+# Tombol logout
+def logout():
+    if st.button("Logout"):
+        st.session_state['logged_in'] = False
+        st.success("Logout berhasil!")
+        st.experimental_rerun()  # Refresh halaman setelah logout berhasil
+
+# Langkah 8: Membuat model untuk aplikasi
+def main():
+    st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
+    add_custom_css()  # Tambahkan CSS khusus untuk tombol
+
+    if 'logged_in' not in st.session_state:
+        st.session_state['logged_in'] = False
+
+    if not st.session_state['logged_in']:
+        login()
+    else:
+        # Navigasi header
+        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman"])
+
+        if navigation == "HOME":
+            st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
+        elif navigation == "Prediksi":
+            # Load data
+            data = load_data()
+
+            # Preprocessing data
+            data = preprocess_data(data)
+
+            # Split data
+            X_train, X_test, y_train, y_test = split_data(data)
+
+            # Train model
+            model = train_model(X_train, y_train)
+
+            # Evaluate model
+            accuracy = evaluate_model(model, X_test, y_test)
+            st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+
+            # Menampilkan form input untuk memprediksi kelayakan kandidat
+            with st.sidebar:
+                st.markdown("<h1>Masukkan Biodata Kandidat</h1>", unsafe_allow_html=True)
+                
+                enrollee_id = st.text_input("Enrollee ID", "")
+                city = st.text_input("City", "")
+                city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
+                gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+                relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
+                enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
+                education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
+                major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
+                experience = st.number_input("Experience", value=0)
+                company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
+                company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
+                last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
+                training_hours = st.number_input("Training Hours", value=0)
+
+                # Tombol prediksi
+                prediksi_button = st.button("Prediksi")
+
+                if prediksi_button:
+                    if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
+                        enrolled_university == "" or education_level == "" or major_discipline == "" or 
+                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
+                        training_hours == 0):
+                        st.error("Silakan isi semua form inputan terlebih dahulu!")
+                    else:
+                       # Menerapkan logika prediksi
+                        kelayakan = 0  # Initialize kelayakan to 0
+                        if (relevent_experience == "Has relevent experience" and
+                        (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
+                        major_discipline == "STEM" and  # Tambahkan syarat Major Discipline wajib STEM
+                        training_hours >= 50):
+                         kelayakan = 1
+
+                        if kelayakan == 1:
+                            st.success("Kandidat layak untuk dipertimbangkan!")
+                        else:
+                            st.error("Kandidat tidak layak untuk dipertimbangkan!")
+
+        elif navigation == "Laporan Keanekaragaman":
+            data = load_data()
+            gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
+            if st.button("Export Laporan ke PDF"):
+                pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
+                st.success("Laporan berhasil diekspor ke PDF!")
+                download_file(pdf_file)
+
+        # Tombol logout
+        logout()
 
 if __name__ == "__main__":
     main()
+
