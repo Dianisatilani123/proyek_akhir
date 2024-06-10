@@ -5,3 +5,4 @@ fpdf
 sqlalchemy
 matplotlib
 seaborn
+sqlite3
