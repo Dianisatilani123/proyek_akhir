@@ -189,200 +189,40 @@ def main():
             relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
             enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
             education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
-            major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
-            experience = st.number_input("Experience", value=0)
-            company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
-            company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
-            last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
-            training_hours = st.number_input("Training Hours", value=0)
+            major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "Humanities", "No Major"])
+            experience = st.number_input("Experience (Years)", min_value=0, max_value=25, step=1)
+            company_size = st.selectbox("Company Size", ["<10", "10/49", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
+            company_type = st.selectbox("Company Type", ["Private", "Public", "NGO", "Government", "Other"])
+            last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", "4+"])
 
-            # Tombol prediksi
-            prediksi_button = st.button("Prediksi")
+            predict_button = st.button("Prediksi")
+            
+            if predict_button:
+                input_data = {
+                    "enrollee_id": enrollee_id,
+                    "city": city,
+                    "city_development_index": city_development_index,
+                    "gender": gender,
+                    "relevent_experience": relevent_experience,
+                    "enrolled_university": enrolled_university,
+                    "education_level": education_level,
+                    "major_discipline": major_discipline,
+                    "experience": experience,
+                    "company_size": company_size,
+                    "company_type": company_type,
+                    "last_new_job": last_new_job
+                }
+                
+                input_df = pd.DataFrame([input_data])
+                input_df = preprocess_data(input_df)
+                input_df = input_df.drop(columns=["gender", "city"])
 
-            if prediksi_button:
-                if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
-                    enrolled_university == "" or education_level == "" or major_discipline == "" or 
-                    experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
-                    training_hours == 0):
-                    st.error("Silakan isi semua form inputan terlebih dahulu!")
-                else:
-                    # Menerapkan logika prediksi
-                    kelayakan = 0  # Initialize kelayakan to 0
-                    if (relevent_experience == "Has relevent experience" and
-                        (education_level == "Graduate" or education_level == "Masters") and
-                        major_discipline == "STEM" and
-                        (experience > 3 ) and
-                        enrolled_university == "no_enrollment" and
-                        training_hours > 50 and
-                        last_new_job in ["1", "2", "3", "4", ">4"]):
-                        kelayakan = 90  # Presentase kelayakan jika kandidat diterima
-                    elif (relevent_experience == "Has relevent experience" and
-                          (education_level == "Graduate" or education_level == "Masters") and
-                          major_discipline == "STEM" and
-                          (experience > 2 ) and
-                          enrolled_university == "no_enrollment" and
-                          training_hours > 30):
-                        kelayakan = 70  # Presentase kelayakan jika kandidat memiliki beberapa kriteria
-                    elif (relevent_experience == "Has relevent experience" and
-                          (education_level == "Graduate" or education_level == "Masters") and
-                          major_discipline == "STEM" and
-                          (experience > 1 ) and
-                          enrolled_university == "no_enrollment"):
-                        kelayakan = 50  # Presentase kelayakan jika kandidat memiliki beberapa kriteria
-                    else:
-                        kelayakan = 10  # Presentase kelayakan jika kandidat ditolak
-
-                    st.write(f"Presentase kelayakan: {kelayakan}%")
-                    if kelayakan >= 70:
-                        st.write("Kandidat diterima.")
-                    else:
-                        st.write("Kandidat ditolak.")
-
-                    # Membuat file PDF hasil prediksi
-                    pdf = FPDF()
-                    pdf.add_page()
-                    pdf.set_font("Arial", size=12)
-                    pdf.cell(200, 10, txt=f"HASIL SELEKSI KANDIDAT", ln=True, align="C")
-                    pdf.ln(10)
-                    pdf.cell(200, 10, txt=f"ID Kandidat: {enrollee_id}", ln=True)
-                    pdf.cell(200, 10, txt=f"Presentase Kelayakan: {kelayakan}%", ln=True)
-                    pdf.ln(10)
-                    pdf.cell(200, 10, txt="Biodata Kandidat:", ln=True)
-                    pdf.ln(5)
-                    pdf.cell(100, 10, txt="City:", ln=False)
-                    pdf.cell(100, 10, txt=f"{city}", ln=True)
-                    pdf.cell(100, 10, txt="City Development Index:", ln=False)
-                    pdf.cell(100, 10, txt=f"{city_development_index:.3f}", ln=True)
-                    pdf.cell(100, 10, txt="Gender:", ln=False)
-                    pdf.cell(100, 10, txt=f"{gender}", ln=True)
-                    pdf.cell(100, 10, txt="Relevent Experience:", ln=False)
-                    pdf.cell(100, 10, txt=f"{relevent_experience}", ln=True)
-                    pdf.cell(100, 10, txt="Enrolled University:", ln=False)
-                    pdf.cell(100, 10, txt=f"{enrolled_university}", ln=True)
-                    pdf.cell(100, 10, txt="Education Level:", ln=False)
-                    pdf.cell(100, 10, txt=f"{education_level}", ln=True)
-                    pdf.cell(100, 10, txt="Major Discipline:", ln=False)
-                    pdf.cell(100, 10, txt=f"{major_discipline}", ln=True)
-                    pdf.cell(100, 10, txt="Experience:", ln=False)
-                    pdf.cell(100, 10, txt=f"{experience}", ln=True)
-                    pdf.cell(100, 10, txt="Company Size:", ln=False)
-                    pdf.cell(100, 10, txt=f"{company_size}", ln=True)
-                    pdf.cell(100, 10, txt="Company Type:", ln=False)
-                    pdf.cell(100, 10, txt=f"{company_type}", ln=True)
-                    pdf.cell(100, 10, txt="Last New Job:", ln=False)
-                    pdf.cell(100, 10, txt=f"{last_new_job}", ln=True)
-                    pdf.cell(100, 10, txt="Training Hours:", ln=False)
-                    pdf.cell(100, 10, txt=f"{training_hours}", ln=True)
-
-                    if kelayakan == 90:
-                        pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
-                        pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
-                        pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
-                        pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
-                        pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 3 tahun.", ln=True)
-                        pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
-                        pdf.cell(200, 10, txt="- Jam Pelatihan: Kandidat memiliki lebih dari 50 jam pelatihan.", ln=True)
-                        pdf.cell(200, 10, txt="- Durasi Pekerjaan Terakhir: Kandidat telah bekerja dalam durasi tertentu pada pekerjaan terakhir mereka (1-4 tahun atau lebih).", ln=True)
-                    elif kelayakan == 70:
-                        pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
-                        pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
-                        pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
-                        pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
-                        pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 2 tahun.", ln=True)
-                        pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
-                        pdf.cell(200, 10, txt="- Jam Pelatihan: Kandidat memiliki lebih dari 30 jam pelatihan.", ln=True)
-                    elif kelayakan == 50:
-                        pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
-                        pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
-                        pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
-                        pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
-                        pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 1 tahun.", ln=True)
-                        pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
-                    else:
-                        pdf.cell(200, 10, txt="Kandidat tidak memenuhi salah satu atau lebih dari kriteria di atas.", ln=True)
-
-                    if kelayakan >= 70:
-                        pdf.set_font("Arial", size=12, style="B")
-                        pdf.set_text_color(0, 128, 0)  # Green color
-                        pdf.cell(200, 10, txt="Kandidat diterima.", ln=True)
-                    else:
-                        pdf.set_font("Arial", size=12, style="B")
-                        pdf.set_text_color(255, 0, 0)  # Red color
-                        pdf.cell(200, 10, txt="Kandidat ditolak.", ln=True)
-
-                    pdf.set_font("Arial", size=12)
-                    pdf.set_text_color(0, 0, 0)  # Black color
-
-                    pdf_output = pdf.output(dest="S").encode("latin-1")
-
-                    # Tombol download PDF
-                    st.download_button(
-                        label="Download File",
-                        data=pdf_output,
-                        file_name=f"hasil_prediksi_{enrollee_id}.pdf",
-                        mime="application/pdf"
-                    )
+                prediction = model.predict(input_df)
+                st.write(f"Hasil prediksi: {prediction[0]}")
+                
     elif navigation == "Laporan Keanekaragaman":
         data = load_data()
         generate_diversity_report(data)
-
-        # Generate PDF report for diversity
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", size=12)
-        pdf.cell(200, 10, txt="LAPORAN KEANEKARAGAMAN", ln=True, align="C")
-        pdf.ln(10)
-
-        # Gender diversity
-        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan gender:", ln=True)
-        for index, value in gender_counts.items():
-            pdf.cell(200, 10, txt=f"{index}: {value}", ln=True)
-        pdf.ln(10)
-
-        # Education level diversity
-        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan tingkat pendidikan:", ln=True)
-        for index, value in education_counts.items():
-            pdf.cell(200, 10, txt=f"{index}: {value}", ln=True)
-        pdf.ln(10)
-
-        # Relevant experience diversity
-        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan pengalaman relevan:", ln=True)
-        for index, value in experience_counts.items():
-            pdf.cell(200, 10, txt=f"{index}: {value}", ln=True)
-        pdf.ln(10)
-
-        # Company type diversity
-        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan perusahaan sebelumnya:", ln=True)
-        for index, value in company_type_counts.items():
-            pdf.cell(200, 10, txt=f"{index}: {value}", ln=True)
-        pdf.ln(10)
-
-        # Company size diversity
-        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya:", ln=True)
-        for index, value in company_size_counts.items():
-            pdf.cell(200, 10, txt=f"{index}: {value}", ln=True)
-        pdf.ln(10)
-
-        # Major discipline diversity
-        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan disiplin ilmu:", ln=True)
-        for index, value in discipline_counts.items():
-            pdf.cell(200, 10, txt=f"{index}: {value}", ln=True)
-        pdf.ln(10)
-
-        # Last new job diversity
-        pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja:", ln=True)
-        for index, value in last_new_job_counts.items():
-            pdf.cell(200, 10, txt=f"{index}: {value}", ln=True)
-        pdf.ln(10)
-
-        pdf_output = pdf.output(dest="S").encode("latin-1")
-
-        st.download_button(
-            label="Download Laporan Keanekaragaman",
-            data=pdf_output,
-            file_name="laporan_keanekaragaman.pdf",
-            mime="application/pdf"
-        )
 
 if __name__ == "__main__":
     main()
