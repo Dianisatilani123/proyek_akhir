@@ -209,7 +209,7 @@ def main():
                           training_hours > 30):
                         kelayakan = 70  # Presentase kelayakan jika kandidat memiliki beberapa kriteria
                     elif (relevent_experience == "Has relevent experience" and
-                          (education_level == "Graduate" atau education_level == "Masters") and
+                          (education_level == "Graduate" or education_level == "Masters") and
                           major_discipline == "STEM" and
                           (experience > 1 ) and
                           enrolled_university == "no_enrollment"):
