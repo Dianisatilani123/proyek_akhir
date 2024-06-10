@@ -235,7 +235,7 @@ def main():
                         # Menerapkan logika prediksi
                         kelayakan = 0  # Initialize kelayakan to 0
                         if (relevent_experience == "Has relevent experience" and
-                            (education_level == "Graduate" or education_level == "Masters" atau education_level == "Phd") and
+                            (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
                             training_hours >= 50):
                             kelayakan = 1
 
