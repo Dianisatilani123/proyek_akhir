@@ -6,6 +6,7 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
 from sqlalchemy import create_engine
+import base64
 
 # CSS untuk mengubah gaya tombol
 def add_custom_css():
@@ -137,8 +138,16 @@ def export_report_to_pdf(data):
         pdf.cell(200, 10, txt=f"{gender}: {count}", ln=True)
 
     # Simpan file PDF
-    pdf.output("Laporan_Keberagaman.pdf")
-    st.success("Laporan berhasil diekspor ke PDF!")
+    pdf_file = "Laporan_Keberagaman.pdf"
+    pdf.output(pdf_file)
+    return pdf_file
+
+# Fungsi untuk mengunduh file
+def download_file(file_path):
+    with open(file_path, "rb") as file:
+        b64 = base64.b64encode(file.read()).decode()
+        href = f'<a href="data:application/octet-stream;base64,{b64}" download="{file_path}">Download Laporan PDF</a>'
+        st.markdown(href, unsafe_allow_html=True)
 
 # Integrasi database
 def create_db_connection():
@@ -228,7 +237,7 @@ def main():
                 if prediksi_button:
                     if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
                         enrolled_university == "" or education_level == "" or major_discipline == "" or 
-                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
+                        experience == 0 or company_size == "" or company_type == "" atau last_new_job == "" atau 
                         training_hours == 0):
                         st.error("Silakan isi semua form inputan terlebih dahulu!")
                     else:
@@ -267,7 +276,9 @@ def main():
             data = load_data()
             generate_diversity_report(data)
             if st.button("Export Laporan ke PDF"):
-                export_report_to_pdf(data)
+                pdf_file = export_report_to_pdf(data)
+                st.success("Laporan berhasil diekspor ke PDF!")
+                download_file(pdf_file)
 
         # Tombol logout
         logout()
