@@ -332,10 +332,35 @@ def main():
                             training_hours >= 50):
                             kelayakan = 1
 
+
                         if kelayakan == 1:
                             st.success("Kandidat layak untuk dipertimbangkan!")
-                        else:
-                            st.error("Kandidat tidak layak untuk dipertimbangkan!")
+                            # Simpan hasil prediksi ke dalam DataFrame
+                            prediction_result = pd.DataFrame({
+                            "Enrollee ID": [enrollee_id],
+                            "City": [city],
+                            "Gender": [gender],
+                            "Relevent Experience": [relevent_experience],
+                            "Enrolled University": [enrolled_university],
+                            "Education Level": [education_level],
+                            "Major Discipline": [major_discipline],
+                            "Experience": [experience],
+                            "Company Size": [company_size],
+                            "Company Type": [company_type],
+                            "Last New Job": [last_new_job],
+                            "Training Hours": [training_hours],
+                            "Prediction": ["Layak"]
+                        })
+                        # Panggil fungsi untuk mengunduh hasil prediksi
+                        download_prediction_result(prediction_result)
+                else:
+                         st.error("Kandidat tidak layak untuk dipertimbangkan!")
+
+                    # Fungsi untuk mengunduh hasil prediksi dalam format CSV
+                def download_prediction_result(predictions):
+                        predictions.to_csv("prediction_result.csv", index=False)
+                        st.success("Hasil prediksi berhasil diunduh dalam format CSV!")
+
 
         elif navigation == "Laporan Keanekaragaman":
             data = load_data()
