@@ -373,7 +373,7 @@ def main():
                         input_data = input_data[X_train.columns]
 
                         # Make predictions using the trained model
-                        kelayakan = model.predict(input_data)
+                        kelayakan = model.predict(input_data.values)
                         # Menampilkan hasil prediksi
                         if kelayakan == 1:
                             result_placeholder.success("Kandidat layak untuk dipertimbangkan!")
