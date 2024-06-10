@@ -114,17 +114,18 @@ def logout():
 def main():
     st.markdown("""
         <style>
+        body, h1, h2, h3, h4, h5, h6, p, div {
+            color: black !important;
+        }
         .main {
             background-color: #f5f5f5;
             padding: 20px;
         }
         h1 {
-            color: #2c3e50;
             text-align: center;
             font-family: 'Arial', sans-serif;
         }
         h2 {
-            color: #2980b9;
             font-family: 'Arial', sans-serif;
         }
         .sidebar .sidebar-content {
@@ -140,7 +141,6 @@ def main():
             color: white;
         }
         .stMarkdown h1 {
-            color: #2c3e50;
             text-align: center;
             font-family: 'Arial', sans-serif;
         }
