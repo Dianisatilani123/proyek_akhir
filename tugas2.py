@@ -5,11 +5,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
-import matplotlib.pyplot as plt
 
 # Langkah 2: Load dataset
 def load_data():
     data = pd.read_csv("dataset_recruitment.csv")
+    st.write("Dataset:")
+    st.write(data.head(14))  # Show the first 14 rows
     return data
 
 # Langkah 3: Standarisasi data
@@ -56,20 +57,50 @@ def evaluate_model(model, X_test, y_test):
     
     return accuracy
 
-# Langkah 7: Membuat model untuk aplikasi
+# Langkah 7: Membuat laporan analitik dan keberagaman
+def generate_diversity_report(data):
+    st.markdown("<h2>Laporan Analitik dan Keberagaman</h2>", unsafe_allow_html=True)
+    
+    st.write("Jumlah pelamar berdasarkan gender:")
+    gender_counts = data['gender'].value_counts()
+    st.bar_chart(gender_counts)
+    
+    st.write("Jumlah pelamar berdasarkan tingkat pendidikan:")
+    education_counts = data['education_level'].value_counts()
+    st.bar_chart(education_counts)
+    
+    st.write("Jumlah pelamar berdasarkan pengalaman relevan:")
+    experience_counts = data['relevent_experience'].value_counts()
+    st.bar_chart(experience_counts)
+    
+    st.write("Jumlah pelamar berdasarkan perusahaan sebelumnya:")
+    company_type_counts = data['company_type'].value_counts()
+    st.bar_chart(company_type_counts)
+    
+    st.write("Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya:")
+    company_size_counts = data['company_size'].value_counts()
+    st.bar_chart(company_size_counts)
+    
+    st.write("Jumlah pelamar berdasarkan disiplin ilmu:")
+    discipline_counts = data['major_discipline'].value_counts()
+    st.bar_chart(discipline_counts)
+    
+    st.write("Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja:")
+    last_new_job_counts = data['last_new_job'].value_counts()
+    st.bar_chart(last_new_job_counts)
+
+# Langkah 8: Membuat model untuk aplikasi
 def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
 
     # Navigasi header
-    navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Penilaian Keterampilan", "Laporan Keberagaman"])
+    navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman"])
 
     if navigation == "HOME":
         st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
     elif navigation == "Prediksi":
         # Load data
         data = load_data()
-        st.write("Dataset Recruitment:")
-        st.write(data.head(14))  # Show the first 14 rows
 
         # Preprocessing data
         data = preprocess_data(data)
@@ -82,6 +113,7 @@ def main():
 
         # Evaluate model
         accuracy = evaluate_model(model, X_test, y_test)
+        st.write(f"Akurasi model: {accuracy * 100:.2f}%")
 
         # Menampilkan form input untuk memprediksi kelayakan kandidat
         with st.sidebar:
@@ -129,7 +161,7 @@ def main():
                           training_hours > 30):
                         kelayakan = 70  # Presentase kelayakan jika kandidat memiliki beberapa kriteria
                     elif (relevent_experience == "Has relevent experience" and
-                          (education_level == "Graduate" or education_level == "Masters") and
+                          (education_level == "Graduate" atau education_level == "Masters") and
                           major_discipline == "STEM" and
                           (experience > 1 ) and
                           enrolled_university == "no_enrollment"):
@@ -227,9 +259,9 @@ def main():
                         file_name=f"hasil_prediksi_{enrollee_id}.pdf",
                         mime="application/pdf"
                     )
-     
-    elif navigation == "Penilaian Keterampilan":
-        st.write("penilaian keterampilan:")
-      
-if __name__ == "__main__":
+    elif navigation == "Laporan Keanekaragaman":
+        data = load_data()
+        generate_diversity_report(data)
+
+if __name__ == "__main__": 
     main()
