@@ -321,7 +321,7 @@ def main():
                 if prediksi_button:
                     if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
                         enrolled_university == "" or education_level == "" or major_discipline == "" or 
-                        experience == 0 atau company_size == "" or company_type == "" or last_new_job == "" or 
+                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
                         training_hours == 0):
                         st.error("Silakan isi semua form inputan terlebih dahulu!")
                     else:
