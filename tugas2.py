@@ -295,7 +295,7 @@ def main():
                         pdf.cell(200, 10, txt="Kriteria dan Tingkat Kelayakan:", ln=True)
                         pdf.cell(200, 10, txt="- Pengalaman Relevan: Kandidat memiliki pengalaman yang relevan.", ln=True)
                         pdf.cell(200, 10, txt="- Tingkat Pendidikan: Kandidat memiliki gelar Sarjana atau Magister.", ln=True)
-                        pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)4
+                        pdf.cell(200, 10, txt="- Disiplin Utama: Kandidat berasal dari bidang STEM.", ln=True)
                         pdf.cell(200, 10, txt="- Pengalaman Kerja: Kandidat memiliki pengalaman kerja lebih dari 1 tahun.", ln=True)
                         pdf.cell(200, 10, txt="- Status Pendaftaran Universitas: Kandidat tidak sedang terdaftar di universitas.", ln=True)
                     else:
