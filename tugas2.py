@@ -27,6 +27,11 @@ def preprocess_data(data, fit_label_encoders=False):
         label_encoders = {col: LabelEncoder().fit(data[col]) for col in categorical_cols}
         
     for col in categorical_cols:
+        # Check if any new category not seen during training
+        unseen_labels = set(data[col]) - set(label_encoders[col].classes_)
+        if unseen_labels:
+            # Add the unseen labels to the encoder
+            label_encoders[col].classes_ = np.append(label_encoders[col].classes_, list(unseen_labels))
         data[col] = label_encoders[col].transform(data[col])
 
     return data
