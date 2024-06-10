@@ -15,16 +15,19 @@ def load_data():
     return data
 
 # Langkah 3: Standarisasi data
-def preprocess_data(data):
+def preprocess_data(data, fit_label_encoders=False):
     # Ubah nilai "<1" menjadi 0 dan nilai ">20" menjadi 25
     data['experience'] = data['experience'].apply(lambda x: 0 if x == '<1' else (25 if x == '>20' else int(x)))
 
     # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
-    label_encoder = LabelEncoder()
     categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
                         'major_discipline', 'company_size', 'company_type', 'last_new_job']
+    if fit_label_encoders:
+        global label_encoders
+        label_encoders = {col: LabelEncoder().fit(data[col]) for col in categorical_cols}
+        
     for col in categorical_cols:
-        data[col] = label_encoder.fit_transform(data[col])
+        data[col] = label_encoders[col].transform(data[col])
 
     return data
 
@@ -66,48 +69,48 @@ def save_plot_as_image(fig, filename):
 def generate_diversity_report(data):
     st.markdown("<h2>Laporan Analitik dan Keberagaman</h2>", unsafe_allow_html=True)
     
-    # Menyimpan grafik dalam variabel
+    # Menampilkan grafik dalam aplikasi Streamlit
     gender_counts = data['gender'].value_counts()
     fig1, ax1 = plt.subplots()
     ax1.bar(gender_counts.index, gender_counts.values)
     ax1.set_title("Jumlah pelamar berdasarkan gender")
-    save_plot_as_image(fig1, "gender_counts.png")
+    st.pyplot(fig1)
     
     education_counts = data['education_level'].value_counts()
     fig2, ax2 = plt.subplots()
     ax2.bar(education_counts.index, education_counts.values)
     ax2.set_title("Jumlah pelamar berdasarkan tingkat pendidikan")
-    save_plot_as_image(fig2, "education_counts.png")
+    st.pyplot(fig2)
     
     experience_counts = data['relevent_experience'].value_counts()
     fig3, ax3 = plt.subplots()
     ax3.bar(experience_counts.index, experience_counts.values)
     ax3.set_title("Jumlah pelamar berdasarkan pengalaman relevan")
-    save_plot_as_image(fig3, "experience_counts.png")
+    st.pyplot(fig3)
     
     company_type_counts = data['company_type'].value_counts()
     fig4, ax4 = plt.subplots()
     ax4.bar(company_type_counts.index, company_type_counts.values)
     ax4.set_title("Jumlah pelamar berdasarkan perusahaan sebelumnya")
-    save_plot_as_image(fig4, "company_type_counts.png")
+    st.pyplot(fig4)
     
     company_size_counts = data['company_size'].value_counts()
     fig5, ax5 = plt.subplots()
     ax5.bar(company_size_counts.index, company_size_counts.values)
     ax5.set_title("Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya")
-    save_plot_as_image(fig5, "company_size_counts.png")
+    st.pyplot(fig5)
     
     discipline_counts = data['major_discipline'].value_counts()
     fig6, ax6 = plt.subplots()
     ax6.bar(discipline_counts.index, discipline_counts.values)
     ax6.set_title("Jumlah pelamar berdasarkan disiplin ilmu")
-    save_plot_as_image(fig6, "discipline_counts.png")
+    st.pyplot(fig6)
     
     last_new_job_counts = data['last_new_job'].value_counts()
     fig7, ax7 = plt.subplots()
     ax7.bar(last_new_job_counts.index, last_new_job_counts.values)
     ax7.set_title("Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja")
-    save_plot_as_image(fig7, "last_new_job_counts.png")
+    st.pyplot(fig7)
     
     # Membuat file PDF
     pdf = FPDF()
@@ -166,7 +169,7 @@ def main():
         data = load_data()
 
         # Preprocessing data
-        data = preprocess_data(data)
+        data = preprocess_data(data, fit_label_encoders=True)
 
         # Split data
         X_train, X_test, y_train, y_test = split_data(data)
