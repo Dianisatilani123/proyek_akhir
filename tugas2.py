@@ -5,6 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
+from sqlalchemy import create_engine
 
 # CSS untuk mengubah gaya tombol
 def add_custom_css():
@@ -120,17 +121,47 @@ def generate_diversity_report(data):
     last_new_job_counts = data['last_new_job'].value_counts()
     st.bar_chart(last_new_job_counts)
 
+# Ekspor laporan ke PDF
+def export_report_to_pdf(data):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+
+    # Menambahkan konten ke PDF
+    pdf.cell(200, 10, txt="Laporan Analitik dan Keberagaman", ln=True, align='C')
+
+    # Contoh: Menambahkan jumlah pelamar berdasarkan gender
+    gender_counts = data['gender'].value_counts()
+    pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan gender:", ln=True)
+    for gender, count in gender_counts.items():
+        pdf.cell(200, 10, txt=f"{gender}: {count}", ln=True)
+
+    # Simpan file PDF
+    pdf.output("Laporan_Keberagaman.pdf")
+    st.success("Laporan berhasil diekspor ke PDF!")
+
+# Integrasi database
+def create_db_connection():
+    engine = create_engine('sqlite:///recruitment_app.db')
+    conn = engine.connect()
+    return conn
+
+def save_prediction_to_db(prediction_data):
+    conn = create_db_connection()
+    prediction_data.to_sql('predictions', conn, if_exists='append', index=False)
+    conn.close()
+
 # Halaman login
 def login():
     st.markdown("<h2>Login Admin</h2>", unsafe_allow_html=True)
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
-       if username == "admin" and password == "admin123":
+        if username == "admin" and password == "admin123":
             st.session_state['logged_in'] = True
             st.success("Login berhasil!")
             st.experimental_rerun()  # Refresh halaman setelah login berhasil
-    else:
+        else:
             st.error("Username atau Password salah!")
            
 # Tombol logout
@@ -204,7 +235,7 @@ def main():
                         # Menerapkan logika prediksi
                         kelayakan = 0  # Initialize kelayakan to 0
                         if (relevent_experience == "Has relevent experience" and
-                            (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
+                            (education_level == "Graduate" or education_level == "Masters" atau education_level == "Phd") and
                             training_hours >= 50):
                             kelayakan = 1
 
@@ -213,9 +244,30 @@ def main():
                         else:
                             st.error("Kandidat tidak layak untuk dipertimbangkan!")
 
+                        # Simpan hasil prediksi ke database
+                        prediction_data = pd.DataFrame({
+                            'enrollee_id': [enrollee_id],
+                            'city': [city],
+                            'city_development_index': [city_development_index],
+                            'gender': [gender],
+                            'relevent_experience': [relevent_experience],
+                            'enrolled_university': [enrolled_university],
+                            'education_level': [education_level],
+                            'major_discipline': [major_discipline],
+                            'experience': [experience],
+                            'company_size': [company_size],
+                            'company_type': [company_type],
+                            'last_new_job': [last_new_job],
+                            'training_hours': [training_hours],
+                            'kelayakan': [kelayakan]
+                        })
+                        save_prediction_to_db(prediction_data)
+
         elif navigation == "Laporan Keanekaragaman":
             data = load_data()
             generate_diversity_report(data)
+            if st.button("Export Laporan ke PDF"):
+                export_report_to_pdf(data)
 
         # Tombol logout
         logout()
