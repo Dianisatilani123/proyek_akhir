@@ -351,6 +351,14 @@ def main():
 
             # Upload file CSV
             uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
+# Langkah 2: Load dataset
+def load_data(uploaded_file):
+    data = pd.read_csv(uploaded_file)
+    st.write("Dataset:")
+    st.write(data.head(14))  # Show the first 14 rows
+    st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
+    return data
+
 
             if uploaded_file:
                 data = load_data(uploaded_file)
