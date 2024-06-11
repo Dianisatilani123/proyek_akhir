@@ -300,7 +300,7 @@ def main():
             # Menampilkan form input untuk memprediksi kelayakan kandidat
             with st.sidebar:
                 st.markdown("<h1>Masukkan Biodata Kandidat</h1>", unsafe_allow_html=True)
-                
+
                 enrollee_id = st.text_input("Enrollee ID", "")
                 city = st.text_input("City", "")
                 city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
@@ -319,9 +319,9 @@ def main():
                 prediksi_button = st.button("Prediksi")
 
                 if prediksi_button:
-                    if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
-                        enrolled_university == "" or education_level == "" or major_discipline == "" or 
-                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
+                    if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or
+                        enrolled_university == "" or education_level == "" or major_discipline == "" or
+                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or
                         training_hours == 0):
                         st.error("Silakan isi semua form inputan terlebih dahulu!")
                     else:
@@ -339,9 +339,10 @@ def main():
                             st.error("Kandidat tidak layak untuk dipertimbangkan!")
 
         elif navigation == "Laporan Keanekaragaman":
+
             data = load_data()
             gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
-            if st.button("Export Laporan ke PDF"):
+            if st.button("Export Laporan ke PDF")
                 pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
                 st.success("Laporan berhasil diekspor ke PDF!")
                 download_file(pdf_file)
