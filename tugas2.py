@@ -395,8 +395,8 @@ def main():
         elif navigation == "Upload Dataset":
                 st.write("Upload Dataset")
                  # Upload file CSV
-                def upload_and_preprocess():
-                 uploaded_file = st.file_uploader("Upload file CSV", type="csv")
+        def upload_and_preprocess():
+                uploaded_file = st.file_uploader("Upload file CSV", type="csv")
                 if uploaded_file is not None:
                     data = pd.read_csv(uploaded_file)
                     st.write("Dataset yang diunggah:")
