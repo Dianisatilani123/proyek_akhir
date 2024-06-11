@@ -354,20 +354,20 @@ def main():
             data = preprocess_data(data)
             st.success("Dataset berhasil di-upload dan diproses!")
             
-    # Setelah model diprediksi, buat visualisasi
-    st.write("Visualisasi Hasil Prediksi:")
+            # Setelah model diprediksi, buat visualisasi
+            st.write("Visualisasi Hasil Prediksi:")
 
-    # Buat plot bar untuk melihat distribusi hasil prediksi
-    st.write("Distribusi Hasil Prediksi:")
-    plt.figure(figsize=(8, 6))
-    sns.countplot(y_pred, palette="Set2")
-    st.pyplot()
+            # Buat plot bar untuk melihat distribusi hasil prediksi
+            st.write("Distribusi Hasil Prediksi:")
+            plt.figure(figsize=(8, 6))
+            sns.countplot(y_pred, palette="Set2")
+            st.pyplot()
 
-    # Buat confusion matrix untuk melihat performa model secara visual
-    st.write("Confusion Matrix:")
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(matrix, annot=True, fmt='g', cmap='Blues')
-    st.pyplot()
+            # Buat confusion matrix untuk melihat performa model secara visual
+            st.write("Confusion Matrix:")
+            plt.figure(figsize=(8, 6))
+            sns.heatmap(matrix, annot=True, fmt='g', cmap='Blues')
+            st.pyplot()
 
             st.write("Fitur Save dan Load Model:")
             st.write("Anda dapat menyimpan model yang sudah dilatih dan memuatnya kembali tanpa harus melatih dari awal.")
