@@ -350,7 +350,7 @@ def main():
         elif navigation == "Upload Dataset":
                 st.write("Upload Dataset")
                 uploaded_file = st.file_uploader("Upload Dataset", type="csv")
-        if uploaded_file is not None:
+                if uploaded_file is not None:
                     data = pd.read_csv(uploaded_file)
                     st.write("Data yang Diproses:")
                     st.write(data.head(14))
@@ -367,17 +367,17 @@ def main():
                     st.write("Fitur Save dan Load Model:")
             
                      # Fitur save dan load model
-        if st.button("Save Model"):
+                if st.button("Save Model"):
                     with open("model.pkl", "wb") as file:
                         pickle.dump(model, file)
                     st.success("Model berhasil disimpan!")
-        if st.button("Load Model"):
+                if st.button("Load Model"):
                     with open("model.pkl", "rb") as file:
                         model = pickle.load(file)
                     st.success("Model berhasil dimuat!")
     
                     st.write("Download Hasil:")
-        if st.button("Download Hasil"):
+                if st.button("Download Hasil"):
                     hasil = pd.DataFrame({"Enrollee ID": X_test["enrollee_id"], "Prediksi": y_pred})
                     csv = hasil.to_csv(index=False)
                     b64 = base64.b64encode(csv.encode()).decode()
