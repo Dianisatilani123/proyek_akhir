@@ -276,7 +276,7 @@ def main():
         login()
     else:
         # Navigasi header
-        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman","Upload Dataset"])
+        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman"])
 
         if navigation == "HOME":
             st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
@@ -345,33 +345,6 @@ def main():
                 pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
                 st.success("Laporan berhasil diekspor ke PDF!")
                 download_file(pdf_file)
-        
-        elif navigation == "Upload Dataset":
-            # Tambahkan custom CSS
-            add_custom_css()
-
-            # Upload file CSV
-            uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
-            # Langkah 2: Load dataset
-            def load_data(uploaded_file):
-                data = pd.read_csv(uploaded_file)
-                st.write("Dataset:")
-                st.write(data.head(14))  # Show the first 14 rows
-                st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
-                return data
-            if uploaded_file is not None:
-                data = load_data(uploaded_file)
-                data = preprocess_data(data)
-                X_train, X_test, y_train, y_test = split_data(data)
-                model = train_model(X_train, y_train)
-                accuracy = evaluate_model(model, X_test, y_test)
-
-                gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
-
-                # Export to PDF button
-            if st.button("Ekspor laporan ke PDF"):
-                pdf_output = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
-                st.success(f"Laporan berhasil diekspor ke {pdf_output}")
         
         
 
