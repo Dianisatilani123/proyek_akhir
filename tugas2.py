@@ -41,8 +41,8 @@ def add_custom_css():
     )
 
 # Langkah 2: Load dataset
-def load_data(file):
-    data = pd.read_csv(file)
+def load_data():
+    data = pd.read_csv("dataset_recruitment.csv")
     st.write("Dataset:")
     st.write(data.head(14))  # Show the first 14 rows
     st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
@@ -276,13 +276,13 @@ def main():
         login()
     else:
         # Navigasi header
-        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman", "Upload Dataset"])
+        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman"])
 
         if navigation == "HOME":
             st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
         elif navigation == "Prediksi":
             # Load data
-            data = load_data("dataset_recruitment.csv")
+            data = load_data()
 
             # Preprocessing data
             data = preprocess_data(data)
@@ -339,13 +339,13 @@ def main():
                             st.error("Kandidat tidak layak untuk dipertimbangkan!")
 
         elif navigation == "Laporan Keanekaragaman":
-            data = load_data("dataset_recruitment.csv")
+            data = load_data()
             gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
             if st.button("Export Laporan ke PDF"):
                 pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
                 st.success("Laporan berhasil diekspor ke PDF!")
                 download_file(pdf_file)
-
+        
         elif navigation == "Upload Dataset":
              # Tambahkan custom CSS
          add_custom_css()
@@ -366,6 +366,7 @@ def main():
         if st.button("Ekspor laporan ke PDF"):
             pdf_output = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
             st.success(f"Laporan berhasil diekspor ke {pdf_output}")
+
 
         # Tombol logout
         logout()
