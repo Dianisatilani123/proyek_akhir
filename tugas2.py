@@ -15,7 +15,7 @@ def add_custom_css():
     st.markdown(
         """
         <style>
-       .stButton button {
+        .stButton button {
             background-color: #4CAF50; /* Hijau */
             color: white;
             border: none;
@@ -30,7 +30,7 @@ def add_custom_css():
             transition-duration: 0.4s;
         }
 
-       .stButton button:hover {
+        .stButton button:hover {
             background-color: white;
             color: black;
             border: 2px solid #4CAF50;
@@ -41,14 +41,8 @@ def add_custom_css():
     )
 
 # Langkah 2: Load dataset
-def load_data(uploaded_file=None):
-    if uploaded_file is None:
-        st.write("Silakan unggah file CSV dataset menggunakan form di bawah.")
-        uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
-        if uploaded_file is None:
-            st.stop()
-
-    data = pd.read_csv(uploaded_file)
+def load_data():
+    data = pd.read_csv("dataset_recruitment.csv")
     st.write("Dataset:")
     st.write(data.head(14))  # Show the first 14 rows
     st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
@@ -236,7 +230,7 @@ def export_report_to_pdf(data, gender_counts, education_counts, experience_count
 
     pdf_file = "Laporan_Keberagaman.pdf"
     pdf.output(pdf_file)
-
+    
     return pdf_file
 
 # Fungsi untuk menampilkan tautan unduhan
@@ -262,7 +256,7 @@ def login():
             st.experimental_rerun()  # Refresh halaman setelah login berhasil
     else:
             st.error("Username atau Password salah!")
-
+           
 # Tombol logout
 def logout():
     if st.button("Logout"):
@@ -282,7 +276,7 @@ def main():
         login()
     else:
         # Navigasi header
-        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman","Upload Dataset"])
+        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman"])
 
         if navigation == "HOME":
             st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
@@ -306,7 +300,7 @@ def main():
             # Menampilkan form input untuk memprediksi kelayakan kandidat
             with st.sidebar:
                 st.markdown("<h1>Masukkan Biodata Kandidat</h1>", unsafe_allow_html=True)
-
+                
                 enrollee_id = st.text_input("Enrollee ID", "")
                 city = st.text_input("City", "")
                 city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
@@ -325,9 +319,9 @@ def main():
                 prediksi_button = st.button("Prediksi")
 
                 if prediksi_button:
-                    if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or
-                        enrolled_university == "" or education_level == "" or major_discipline == "" or
-                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or
+                    if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
+                        enrolled_university == "" or education_level == "" or major_discipline == "" or 
+                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
                         training_hours == 0):
                         st.error("Silakan isi semua form inputan terlebih dahulu!")
                     else:
@@ -351,7 +345,6 @@ def main():
                 pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
                 st.success("Laporan berhasil diekspor ke PDF!")
                 download_file(pdf_file)
-
         elif navigation == "Upload Dataset":
             # Tambahkan custom CSS
             add_custom_css()
@@ -372,9 +365,10 @@ def main():
                 if st.button("Ekspor laporan ke PDF"):
                     pdf_output = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
                     st.success(f"Laporan berhasil diekspor ke {pdf_output}")
+        
 
-    # Tombol logout
-    logout()
+        # Tombol logout
+        logout()
 
 if __name__ == "__main__":
     main()
