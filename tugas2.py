@@ -394,14 +394,13 @@ def main():
                         st.write("Dataset yang diunggah:")
                         st.write(data.head(14))  # Display the uploaded dataset
                         st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
-                      # Pilih kolom target
-                        target_column = st.selectbox("Pilih kolom target", data.columns)
-                    if st.button("Preprocess Data"):
-                        data = preprocess_data(data)
-                        X_train, X_test, y_train, y_test = split_data(data, target_column)
-                        model = train_model(X_train, y_train)
-                        accuracy = evaluate_model(model, X_test, y_test)
-                        save_model(model)
+                    if data is not None:
+                        X_train, X_test, y_train, y_test = split_data(data)
+                        if X_train is not None:
+                            model = train_model(X_train, y_train)
+                            if model is not None:
+                                accuracy = evaluate_model(model, X_test, y_test)
+                                save_model(model)
                        
         
 
