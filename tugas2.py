@@ -404,10 +404,8 @@ def main():
                     st.write("Dataset setelah preprocessing:")
                     st.write(data.head())
                     return data
-                else:
-                    st.warning("Tolong unggah file CSV.")
-                    return None    
-               if data is not None:
+           
+                if data is not None:
                         X_train, X_test, y_train, y_test = split_data(data)
                         if X_train is not None:
                             model = train_model(X_train, y_train)
