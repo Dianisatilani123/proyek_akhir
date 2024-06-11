@@ -332,26 +332,7 @@ def main():
             else:
                 st.error("Failed to load data")
                 return
-
-            # Preprocessing data
-            data = preprocess_data(data)
-
-            # Debug statement: Check if data is preprocessed correctly
-            if data is not None:
-                st.write("Data preprocessed successfully")
-                st.write(data.head())
-            else:
-                st.error("Failed to preprocess data")
-                return
-
-            # Split data
-            try:
-                X_train, X_test, y_train, y_test = split_data(data)
-                st.write("Data split successfully")
-            except Exception as e:
-                st.error(f"Failed to split data: {e}")
-                return
-
+                
             # Train model
             try:
                 model = train_model(X_train, y_train)
