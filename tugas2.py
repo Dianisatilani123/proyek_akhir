@@ -435,13 +435,6 @@ def main():
                 data = preprocess_data_dynamic(data)
                 st.write("Dataset setelah preprocessing:")
                 st.write(data.head())
-                # Split data
-                try:
-                    X_train, X_test, y_train, y_test = split_data(data)
-                    st.write("Data split successfully")
-                except Exception as e:
-                    st.error(f"Failed to split data: {e}")
-                    return
                 # Train model
                 try:
                     model = train_model(X_train, y_train)
