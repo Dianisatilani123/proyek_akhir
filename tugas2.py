@@ -272,15 +272,13 @@ def validate_input(data):
     # Tambahkan validasi tambahan sesuai kebutuhan
     return True
 
-def load_model():
+def save_model(model, file_path="model.pkl"):
     try:
-        model = joblib.load("model.pkl")
-        return model
+        joblib.dump(model, file_path)
+        st.success("Model berhasil disimpan!")
     except Exception as e:
-        st.error(f"Gagal memuat model: {str(e)}")
-        return None
+        st.error(f"Gagal menyimpan model: {str(e)}")
 
-# Fungsi utama
 def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
     add_custom_css()  # Tambahkan CSS khusus untuk tombol
@@ -395,4 +393,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
