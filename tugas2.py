@@ -14,7 +14,7 @@ def add_custom_css():
     st.markdown(
         """
         <style>
-       .stButton button {
+        .stButton button {
             background-color: #4CAF50; /* Hijau */
             color: white;
             border: none;
@@ -29,7 +29,7 @@ def add_custom_css():
             transition-duration: 0.4s;
         }
 
-       .stButton button:hover {
+        .stButton button:hover {
             background-color: white;
             color: black;
             border: 2px solid #4CAF50;
@@ -40,8 +40,8 @@ def add_custom_css():
     )
 
 # Langkah 2: Load dataset
-def load_data(uploaded_file):
-    data = pd.read_csv(uploaded_file)
+def load_data():
+    data = pd.read_csv("dataset_recruitment.csv")
     st.write("Dataset:")
     st.write(data.head(14))  # Show the first 14 rows
     st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
@@ -54,7 +54,7 @@ def preprocess_data(data):
 
     # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
     label_encoder = LabelEncoder()
-    categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
+    categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level',
                         'major_discipline', 'company_size', 'company_type', 'last_new_job']
     for col in categorical_cols:
         data[col] = label_encoder.fit_transform(data[col])
@@ -82,13 +82,13 @@ def evaluate_model(model, X_test, y_test):
     accuracy = accuracy_score(y_test, y_pred)
     report = classification_report(y_test, y_pred)
     matrix = confusion_matrix(y_test, y_pred)
-    
+
     st.write(f"Akurasi model: {accuracy * 100:.2f}%")
     st.write("Classification Report:")
     st.write(report)
     st.write("Confusion Matrix:")
     st.write(matrix)
-    
+
     return accuracy
 
 # Langkah 7: Membuat laporan analitik dan keberagaman
@@ -163,7 +163,7 @@ def generate_diversity_report(data):
     st.pyplot(fig6)
     figures.append(fig6)
 
-        # Plotting last new job counts
+    # Plotting last new job counts
     st.write("Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja:")
     last_new_job_counts = data['last_new_job'].value_counts()
     fig7, ax7 = plt.subplots()
@@ -184,41 +184,35 @@ def export_report_to_pdf(data, gender_counts, education_counts, experience_count
 
     # Menambahkan konten ke PDF
     pdf.cell(200, 10, txt="Laporan Analitik dan Keberagaman", ln=True, align='C')
-
-    # Menambahkan jumlah pelamar berdasarkan gender
+    pdf.cell(200, 10, txt="", ln=True)
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan gender:", ln=True)
     for gender, count in gender_counts.items():
         pdf.cell(200, 10, txt=f"{gender}: {count}", ln=True)
-
-    # Menambahkan jumlah pelamar berdasarkan tingkat pendidikan
+    pdf.cell(200, 10, txt="", ln=True)
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan tingkat pendidikan:", ln=True)
     for education, count in education_counts.items():
         pdf.cell(200, 10, txt=f"{education}: {count}", ln=True)
-
-    # Menambahkan jumlah pelamar berdasarkan pengalaman relevan
+    pdf.cell(200, 10, txt="", ln=True)
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan pengalaman relevan:", ln=True)
     for experience, count in experience_counts.items():
         pdf.cell(200, 10, txt=f"{experience}: {count}", ln=True)
-
-    # Menambahkan jumlah pelamar berdasarkan perusahaan sebelumnya
+    pdf.cell(200, 10, txt="", ln=True)
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan perusahaan sebelumnya:", ln=True)
     for company_type, count in company_type_counts.items():
         pdf.cell(200, 10, txt=f"{company_type}: {count}", ln=True)
-
-    # Menambahkan jumlah pelamar berdasarkan ukuran perusahaan sebelumnya
+    pdf.cell(200, 10, txt="", ln=True)
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya:", ln=True)
     for company_size, count in company_size_counts.items():
         pdf.cell(200, 10, txt=f"{company_size}: {count}", ln=True)
-
-    # Menambahkan jumlah pelamar berdasarkan disiplin ilmu
+    pdf.cell(200, 10, txt="", ln=True)
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan disiplin ilmu:", ln=True)
     for discipline, count in discipline_counts.items():
         pdf.cell(200, 10, txt=f"{discipline}: {count}", ln=True)
-
-    # Menambahkan jumlah pelamar berdasarkan waktu terakhir kali pindah kerja
+    pdf.cell(200, 10, txt="", ln=True)
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja:", ln=True)
     for last_new_job, count in last_new_job_counts.items():
         pdf.cell(200, 10, txt=f"{last_new_job}: {count}", ln=True)
+    pdf.cell(200, 10, txt="", ln=True)
 
     # Menyimpan grafik sebagai gambar dan menambahkannya ke PDF
     for i, fig in enumerate(figures, start=1):
@@ -229,8 +223,20 @@ def export_report_to_pdf(data, gender_counts, education_counts, experience_count
 
     pdf_file = "Laporan_Keberagaman.pdf"
     pdf.output(pdf_file)
-    
+
     return pdf_file
+
+# Fungsi untuk menampilkan tautan unduhan
+def download_file(file_path):
+    with open(file_path, "rb") as file:
+        btn = st.download_button(
+            label="Download Laporan",
+            data=file,
+            file_name=file_path,
+            mime="application/octet-stream"
+        )
+
+    return btn
 
 # Halaman login
 def login():
@@ -264,14 +270,91 @@ def main():
         login()
     else:
         # Navigasi header
-        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman","Upload Dataset"])
+        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman","Upload Dataset"])[0]
 
         if navigation == "HOME":
             st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
         elif navigation == "Prediksi":
             # Load data
+            data = load_data()
+
+            # Preprocessing data
+            data = preprocess_data(data)
+
+            # Split data
+            X_train, X_test, y_train, y_test = split_data(data)
+
+            # Train model
+            model = train_model(X_train, y_train)
+
+            # Evaluate model
+            accuracy = evaluate_model(model, X_test, y_test)
+            st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+
+            # Menampilkan form input untuk memprediksi kelayakan kandidat
+            with st.sidebar:
+                st.markdown("<h1>Masukkan Biodata Kandidat</h1>", unsafe_allow_html=True)
+
+                enrollee_id = st.text_input("Enrollee ID", " ")
+                city = st.text_input("City", " ")
+                city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
+                gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+                relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
+                enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
+                education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
+                major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
+                experience = st.number_input("Experience", value=0)
+                company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
+                company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
+                last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
+                training_hours = st.number_input("Training Hours", value=0)
+
+                # Tombol prediksi
+                prediksi_button = st.button("Prediksi")
+
+                if prediksi_button:
+                    if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or
+                        enrolled_university == "" or education_level == "" or major_discipline == "" or
+                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or
+                        training_hours == 0):
+                        st.error("Silakan isi semua form inputan terlebih dahulu!")
+                    else:
+                       # Menerapkan logika prediksi
+                        kelayakan = 0  # Initialize kelayakan to 0
+                        if (relevent_experience == "Has relevent experience" and
+                        (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
+                        major_discipline == "STEM" and  # Tambahkan syarat Major Discipline wajib STEM
+                        training_hours >= 50):
+                         kelayakan = 1
+
+                        if kelayakan == 1:
+                            st.success("Kandidat layak untuk dipertimbangkan!")
+                        else:
+                            st.error("Kandidat tidak layak untuk dipertimbangkan!")
+
+        elif navigation == "Laporan Keanekaragaman":
+            data = load_data()
+            gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
+            if st.button("Export Laporan ke PDF"):
+                pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
+                st.success("Laporan berhasil diekspor ke PDF!")
+                download_file(pdf_file)
+        elif navigation == "Upload Dataset":
+            # Tambahkan custom CSS
+            add_custom_css()
+
+            # Upload file CSV
             uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
-            if uploaded_file:
+            # Langkah 2: Load dataset
+            def load_data(uploaded_file):
+                data = pd.read_csv(uploaded_file)
+                st.write("Dataset:")
+                st.write(data.head(14))  # Show the first 14 rows
+                st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
+                return data
+
+
+        if uploaded_file:
                 data = load_data(uploaded_file)
                 data = preprocess_data(data)
                 X_train, X_test, y_train, y_test = split_data(data)
@@ -281,13 +364,13 @@ def main():
                 gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
 
                 # Export to PDF button
-                if st.button("Ekspor laporan ke PDF"):
+        if st.button("Ekspor laporan ke PDF"):
                     pdf_output = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
                     st.success(f"Laporan berhasil diekspor ke {pdf_output}")
         
+
         # Tombol logout
         logout()
 
 if __name__ == "__main__":
     main()
-
