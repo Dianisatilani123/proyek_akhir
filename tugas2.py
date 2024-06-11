@@ -273,7 +273,13 @@ def validate_input(data):
     # Tambahkan validasi tambahan sesuai kebutuhan
     return True
 
-# Define load_model function
+def save_model(model, file_path="model.pkl"):
+    try:
+        joblib.dump(model, file_path)
+        st.success("Model berhasil disimpan!")
+    except Exception as e:
+        st.error(f"Gagal menyimpan model: {str(e)}")
+
 def load_model(file_path="model.pkl"):
     try:
         model = joblib.load(file_path)
