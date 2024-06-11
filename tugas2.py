@@ -296,11 +296,6 @@ def save_model(model, file_path="model.pkl"):
         st.success("Model berhasil disimpan!")
     except Exception as e:
         st.error(f"Gagal menyimpan model: {str(e)}")
-        
-def cleanup_dataset(data):
-    cleaned_data = data.dropna()  # Membersihkan dataset dari sel yang kosong
-    return cleaned_data
-
 
 def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
@@ -400,12 +395,6 @@ def main():
                         st.write("Dataset yang diunggah:")
                         st.write(data.head(14))  # Display the uploaded dataset
                         st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
-
-                        cleaned_data = cleanup_dataset(data)
-                        st.write("Dataset setelah dibersihkan:")
-                        st.write(cleaned_data.head(14))
-                        st.write(f"Jumlah data pada dataset setelah dibersihkan: {len(cleaned_data)}")
-                    
                     if data is not None:
                         X_train, X_test, y_train, y_test = split_data(data)
                         if X_train is not None:
