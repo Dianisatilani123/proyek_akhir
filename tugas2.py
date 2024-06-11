@@ -382,6 +382,8 @@ def main():
                             if model is not None:
                                 accuracy = evaluate_model(model, X_test, y_test)
                                 save_model(model)
+                                 if st.button("Download Prediksi"):
+                                    download_file("prediksi.txt")
                        
         
 
