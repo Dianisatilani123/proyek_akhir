@@ -61,16 +61,6 @@ def preprocess_data(data):
         data[col] = label_encoder.fit_transform(data[col])
 
     return data
-    
-# Fungsi preprocess dynamic
-def preprocess_data_dynamic(data):
-    for col in data.columns:
-        if data[col].dtype == 'object':
-            label_encoder = LabelEncoder()
-            data[col] = label_encoder.fit_transform(data[col].astype(str))
-        elif data[col].dtype == 'int' or data[col].dtype == 'float':
-            data[col].fillna(data[col].mean(), inplace=True)
-    return data
 
 # Langkah 4: Split data train dan test
 def split_data(data):
@@ -325,29 +315,18 @@ def main():
             # Load data
             data = load_data()
 
-            # Debug statement: Check if data is loaded correctly
-            if data is not None:
-                st.write("Data loaded successfully")
-                st.write(data.head())
-            else:
-                st.error("Failed to load data")
-                return
-                
+            # Preprocessing data
+            data = preprocess_data(data)
+
+            # Split data
+            X_train, X_test, y_train, y_test = split_data(data)
+
             # Train model
-            try:
-                model = train_model(X_train, y_train)
-                st.write("Model trained successfully")
-            except Exception as e:
-                st.error(f"Failed to train model: {e}")
-                return
+            model = train_model(X_train, y_train)
 
             # Evaluate model
-            try:
-                accuracy = evaluate_model(model, X_test, y_test)
-                st.write(f"Akurasi model: {accuracy * 100:.2f}%")
-            except Exception as e:
-                st.error(f"Failed to evaluate model: {e}")
-                return
+            accuracy = evaluate_model(model, X_test, y_test)
+            st.write(f"Akurasi model: {accuracy * 100:.2f}%")
 
             # Menyimpan model setelah dilatih
             if model is not None:
@@ -395,45 +374,39 @@ def main():
                             st.error("Kandidat tidak layak untuk dipertimbangkan!")
 
         elif navigation == "Laporan Keanekaragaman":
-            data = load_data()
-            if data is not None:
-                gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
-                if st.button("Export Laporan ke PDF"):
-                    pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
-                    st.success("Laporan berhasil diekspor ke PDF!")
-                    download_file(pdf_file)
-            else:
-                st.error("Failed to load data")
 
+            data = load_data()
+            gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
+            if st.button("Export Laporan ke PDF"):
+                pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
+                st.success("Laporan berhasil diekspor ke PDF!")
+                download_file(pdf_file)
+        
         elif navigation == "Upload Dataset":
-            st.write("Upload Dataset")
-            # Upload file CSV
-            uploaded_file = st.file_uploader("Upload file CSV", type="csv")
-            if uploaded_file is not None:
-                data = pd.read_csv(uploaded_file)
-                st.write("Dataset yang diunggah:")
-                st.write(data.head())
-                data = preprocess_data_dynamic(data)
-                st.write("Dataset setelah preprocessing:")
-                st.write(data.head())
-                # Train model
-                try:
-                    model = train_model(X_train, y_train)
-                    st.write("Model trained successfully")
-                except Exception as e:
-                    st.error(f"Failed to train model: {e}")
-                    return
-                # Evaluate model
-                try:
-                    accuracy = evaluate_model(model, X_test, y_test)
-                    st.write(f"Akurasi model: {accuracy * 100:.2f}%")
-                except Exception as e:
-                    st.error(f"Failed to evaluate model: {e}")
-                    return
-                save_model(model)
+                st.write("Upload Dataset")
+                 # Upload file CSV
+                uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
+
+                if uploaded_file is not None:  # Check if file is uploaded
+                    data = pd.read_csv(uploaded_file)  # Read the uploaded file directly
+                    if validate_input(data):  # Call to validate_input
+                        data = preprocess_data(data)
+                        st.write("Dataset yang diunggah:")
+                        st.write(data.head(14))  # Display the uploaded dataset
+                        st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
+                    if data is not None:
+                        X_train, X_test, y_train, y_test = split_data(data)
+                        if X_train is not None:
+                            model = train_model(X_train, y_train)
+                            if model is not None:
+                                accuracy = evaluate_model(model, X_test, y_test)
+                                save_model(model)
+                       
+        
 
         # Tombol logout
         logout()
 
 if __name__ == "__main__":
     main()
+    
