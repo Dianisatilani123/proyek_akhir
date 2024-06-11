@@ -339,43 +339,25 @@ def main():
                             st.error("Kandidat tidak layak untuk dipertimbangkan!")
 
         elif navigation == "Laporan Keanekaragaman":
-            data = load_data("dataset_recruitment.csv")
-            gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
-            if st.button("Export Laporan ke PDF"):
-                pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
-                st.success("Laporan berhasil diekspor ke PDF!")
-                download_file(pdf_file)
+            # Tambahkan custom CSS
+         add_custom_css()
 
-        elif navigation == "Upload Dataset":
-            st.markdown("<h2>Upload Dataset</h2>", unsafe_allow_html=True)
-            uploaded_file = st.file_uploader("Upload file CSV", type=["csv"])
-        if uploaded_file:
-            data = load_data(uploaded_file)
-            data = preprocess_data(data)
-            st.success("Dataset berhasil di-upload dan diproses!")
-            
-            # Setelah model diprediksi, buat visualisasi
-            st.write("Visualisasi Hasil Prediksi:")
+    # Upload file CSV
+    uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
 
-            # Buat plot bar untuk melihat distribusi hasil prediksi
-            st.write("Distribusi Hasil Prediksi:")
-            plt.figure(figsize=(8, 6))
-            sns.countplot(y_pred, palette="Set2")
-            st.pyplot()
-
-            # Buat confusion matrix untuk melihat performa model secara visual
-            st.write("Confusion Matrix:")
-            plt.figure(figsize=(8, 6))
-            sns.heatmap(matrix, annot=True, fmt='g', cmap='Blues')
-            st.pyplot()
-
-            st.write("Fitur Save dan Load Model:")
-            st.write("Anda dapat menyimpan model yang sudah dilatih dan memuatnya kembali tanpa harus melatih dari awal.")
-
-            # Button export pdf dan download
-            if st.button("Export Dataset ke PDF"):
-                 export_data_to_pdf(data)
-                
+    if uploaded_file:
+        data = load_data(uploaded_file)
+        data = preprocess_data(data)
+        X_train, X_test, y_train, y_test = split_data(data)
+        model = train_model(X_train, y_train)
+        accuracy = evaluate_model(model, X_test, y_test)
+        
+        gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
+        
+        # Export to PDF button
+        if st.button("Ekspor laporan ke PDF"):
+            pdf_output = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
+            st.success(f"Laporan berhasil diekspor ke {pdf_output}")
         # Tombol logout
         logout()
 
