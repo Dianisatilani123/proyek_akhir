@@ -346,9 +346,9 @@ def main():
                 st.success("Laporan berhasil diekspor ke PDF!")
                 download_file(pdf_file)
 
-         elif navigation == "Upload Dataset":
-        st.markdown("<h2>Upload Dataset</h2>", unsafe_allow_html=True)
-        uploaded_file = st.file_uploader("Upload file CSV", type=["csv"])
+        elif navigation == "Upload Dataset":
+            st.markdown("<h2>Upload Dataset</h2>", unsafe_allow_html=True)
+            uploaded_file = st.file_uploader("Upload file CSV", type=["csv"])
         if uploaded_file:
             data = load_data(uploaded_file)
             data = preprocess_data(data)
@@ -382,11 +382,10 @@ def main():
 
             # Button export pdf dan download
             if st.button("Export Dataset ke PDF"):
-                export_data_to_pdf(data)
+                 export_data_to_pdf(data)
                 
         # Tombol logout
         logout()
 
 if __name__ == "__main__":
     main()
-
