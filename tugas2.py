@@ -61,6 +61,16 @@ def preprocess_data(data):
         data[col] = label_encoder.fit_transform(data[col])
 
     return data
+    
+# Fungsi preprocess dynamic
+def preprocess_data_dynamic(data):
+    for col in data.columns:
+        if data[col].dtype == 'object':
+            label_encoder = LabelEncoder()
+            data[col] = label_encoder.fit_transform(data[col].astype(str))
+        elif data[col].dtype == 'int' or data[col].dtype == 'float':
+            data[col].fillna(data[col].mean(), inplace=True)
+    return data
 
 # Langkah 4: Split data train dan test
 def split_data(data):
@@ -385,16 +395,21 @@ def main():
         elif navigation == "Upload Dataset":
                 st.write("Upload Dataset")
                  # Upload file CSV
-                uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
-
-                if uploaded_file is not None:  # Check if file is uploaded
-                    data = pd.read_csv(uploaded_file)  # Read the uploaded file directly
-                    if validate_input(data):  # Call to validate_input
-                        data = preprocess_data(data)
-                        st.write("Dataset yang diunggah:")
-                        st.write(data.head(14))  # Display the uploaded dataset
-                        st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
-                    if data is not None:
+                def upload_and_preprocess():
+                 uploaded_file = st.file_uploader("Upload file CSV", type="csv")
+                if uploaded_file is not None:
+                    data = pd.read_csv(uploaded_file)
+                    st.write("Dataset yang diunggah:")
+                    st.write(data.head())
+                    data = preprocess_data_dynamic(data)
+                    st.write("Dataset setelah preprocessing:")
+                    st.write(data.head())
+                    return data
+                else:
+                    st.warning("Tolong unggah file CSV.")
+                    return None 
+               
+                if data is not None:
                         X_train, X_test, y_train, y_test = split_data(data)
                         if X_train is not None:
                             model = train_model(X_train, y_train)
