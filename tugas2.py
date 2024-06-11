@@ -403,32 +403,33 @@ def main():
                                 accuracy = evaluate_model(model, X_test, y_test)
                                 save_model(model)
         elif navigation == "Cleanup Dataset":
-                        st.write("Cleanup Dataset")
-                        # Upload file CSV
-                        uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv", "xlsx"])
+                st.write("Cleanup Dataset")
+                # Upload file CSV
+                uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv", "xlsx"])
 
-                        if uploaded_file is not None:  # Check if file is uploaded
-                        # Read the uploaded file directly
-                            if uploaded_file.name.endswith('xlsx'):
-                                data = pd.read_excel(uploaded_file)
-                        else:
-                            data = pd.read_csv(uploaded_file)
+                if uploaded_file is not None:  # Check if file is uploaded
+                    # Read the uploaded file directly
+                 if uploaded_file.name.endswith('xlsx'):
+                    data = pd.read_excel(uploaded_file)
+                else:
+                    data = pd.read_csv(uploaded_file)
 
-                        # Check if the uploaded file is valid
-                        if validate_input(data):
-                        # Clean the dataset by removing empty cells
-                            data.dropna(inplace=True)
+                # Check if the uploaded file is valid
+                if validate_input(data):
+                    # Clean the dataset by removing empty cells
+                    data.dropna(inplace=True)
 
-                            # Show the cleaned dataset to the user
-                            st.write("Cleaned Dataset:")
-                            st.write(data.head(14))  # Display the cleaned dataset
+                    # Show the cleaned dataset to the user
+                    st.write("Cleaned Dataset:")
+                    st.write(data.head(14))  # Display the cleaned dataset
 
-                            # Allow the user to download the cleaned dataset in CSV format
-                            cleaned_file_path = "cleaned_dataset.csv"
-                            data.to_csv(cleaned_file_path, index=False)
-                            download_file(cleaned_file_path)
-                       
-        
+                    # Allow the user to download the cleaned dataset in CSV format
+                    cleaned_file_path = "cleaned_dataset.csv"
+                    data.to_csv(cleaned_file_path, index=False)
+                    download_file(cleaned_file_path)
+
+                            
+                
 
         # Tombol logout
         logout()
