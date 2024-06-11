@@ -339,25 +339,34 @@ def main():
                             st.error("Kandidat tidak layak untuk dipertimbangkan!")
 
         elif navigation == "Laporan Keanekaragaman":
-            # Tambahkan custom CSS
+            data = load_data("dataset_recruitment.csv")
+            gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
+            if st.button("Export Laporan ke PDF"):
+                pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
+                st.success("Laporan berhasil diekspor ke PDF!")
+                download_file(pdf_file)
+
+        elif navigation == "Upload Dataset":
+             # Tambahkan custom CSS
          add_custom_css()
 
-    # Upload file CSV
-    uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
+         # Upload file CSV
+         uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
 
-    if uploaded_file:
-        data = load_data(uploaded_file)
-        data = preprocess_data(data)
-        X_train, X_test, y_train, y_test = split_data(data)
-        model = train_model(X_train, y_train)
-        accuracy = evaluate_model(model, X_test, y_test)
+        if uploaded_file:
+            data = load_data(uploaded_file)
+            data = preprocess_data(data)
+            X_train, X_test, y_train, y_test = split_data(data)
+            model = train_model(X_train, y_train)
+            accuracy = evaluate_model(model, X_test, y_test)
+            
+            gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
         
-        gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
-        
-        # Export to PDF button
+             # Export to PDF button
         if st.button("Ekspor laporan ke PDF"):
             pdf_output = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
             st.success(f"Laporan berhasil diekspor ke {pdf_output}")
+
         # Tombol logout
         logout()
 
