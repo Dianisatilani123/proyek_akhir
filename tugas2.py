@@ -5,6 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
+from sqlalchemy import create_engine
 import base64
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -54,7 +55,7 @@ def preprocess_data(data):
 
     # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
     label_encoder = LabelEncoder()
-    categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level',
+    categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
                         'major_discipline', 'company_size', 'company_type', 'last_new_job']
     for col in categorical_cols:
         data[col] = label_encoder.fit_transform(data[col])
@@ -82,13 +83,13 @@ def evaluate_model(model, X_test, y_test):
     accuracy = accuracy_score(y_test, y_pred)
     report = classification_report(y_test, y_pred)
     matrix = confusion_matrix(y_test, y_pred)
-
+    
     st.write(f"Akurasi model: {accuracy * 100:.2f}%")
     st.write("Classification Report:")
     st.write(report)
     st.write("Confusion Matrix:")
     st.write(matrix)
-
+    
     return accuracy
 
 # Langkah 7: Membuat laporan analitik dan keberagaman
@@ -184,35 +185,41 @@ def export_report_to_pdf(data, gender_counts, education_counts, experience_count
 
     # Menambahkan konten ke PDF
     pdf.cell(200, 10, txt="Laporan Analitik dan Keberagaman", ln=True, align='C')
-    pdf.cell(200, 10, txt="", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan gender
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan gender:", ln=True)
     for gender, count in gender_counts.items():
         pdf.cell(200, 10, txt=f"{gender}: {count}", ln=True)
-    pdf.cell(200, 10, txt="", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan tingkat pendidikan
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan tingkat pendidikan:", ln=True)
     for education, count in education_counts.items():
         pdf.cell(200, 10, txt=f"{education}: {count}", ln=True)
-    pdf.cell(200, 10, txt="", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan pengalaman relevan
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan pengalaman relevan:", ln=True)
     for experience, count in experience_counts.items():
         pdf.cell(200, 10, txt=f"{experience}: {count}", ln=True)
-    pdf.cell(200, 10, txt="", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan perusahaan sebelumnya
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan perusahaan sebelumnya:", ln=True)
     for company_type, count in company_type_counts.items():
         pdf.cell(200, 10, txt=f"{company_type}: {count}", ln=True)
-    pdf.cell(200, 10, txt="", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan ukuran perusahaan sebelumnya
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan ukuran perusahaan sebelumnya:", ln=True)
     for company_size, count in company_size_counts.items():
         pdf.cell(200, 10, txt=f"{company_size}: {count}", ln=True)
-    pdf.cell(200, 10, txt="", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan disiplin ilmu
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan disiplin ilmu:", ln=True)
     for discipline, count in discipline_counts.items():
         pdf.cell(200, 10, txt=f"{discipline}: {count}", ln=True)
-    pdf.cell(200, 10, txt="", ln=True)
+
+    # Menambahkan jumlah pelamar berdasarkan waktu terakhir kali pindah kerja
     pdf.cell(200, 10, txt="Jumlah pelamar berdasarkan waktu terakhir kali pindah kerja:", ln=True)
     for last_new_job, count in last_new_job_counts.items():
         pdf.cell(200, 10, txt=f"{last_new_job}: {count}", ln=True)
-    pdf.cell(200, 10, txt="", ln=True)
 
     # Menyimpan grafik sebagai gambar dan menambahkannya ke PDF
     for i, fig in enumerate(figures, start=1):
@@ -223,7 +230,7 @@ def export_report_to_pdf(data, gender_counts, education_counts, experience_count
 
     pdf_file = "Laporan_Keberagaman.pdf"
     pdf.output(pdf_file)
-
+    
     return pdf_file
 
 # Fungsi untuk menampilkan tautan unduhan
@@ -235,8 +242,7 @@ def download_file(file_path):
             file_name=file_path,
             mime="application/octet-stream"
         )
-
-    return btn
+        return btn
 
 # Halaman login
 def login():
@@ -250,7 +256,7 @@ def login():
             st.experimental_rerun()  # Refresh halaman setelah login berhasil
     else:
             st.error("Username atau Password salah!")
-
+           
 # Tombol logout
 def logout():
     if st.button("Logout"):
@@ -270,7 +276,7 @@ def main():
         login()
     else:
         # Navigasi header
-        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman","Upload Dataset"])[0]
+        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman","Upload Dataset"])
 
         if navigation == "HOME":
             st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
@@ -294,9 +300,9 @@ def main():
             # Menampilkan form input untuk memprediksi kelayakan kandidat
             with st.sidebar:
                 st.markdown("<h1>Masukkan Biodata Kandidat</h1>", unsafe_allow_html=True)
-
-                enrollee_id = st.text_input("Enrollee ID", " ")
-                city = st.text_input("City", " ")
+                
+                enrollee_id = st.text_input("Enrollee ID", "")
+                city = st.text_input("City", "")
                 city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
                 gender = st.selectbox("Gender", ["Male", "Female", "Other"])
                 relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
@@ -313,9 +319,9 @@ def main():
                 prediksi_button = st.button("Prediksi")
 
                 if prediksi_button:
-                    if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or
-                        enrolled_university == "" or education_level == "" or major_discipline == "" or
-                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or
+                    if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or 
+                        enrolled_university == "" or education_level == "" or major_discipline == "" or 
+                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or 
                         training_hours == 0):
                         st.error("Silakan isi semua form inputan terlebih dahulu!")
                     else:
@@ -339,6 +345,7 @@ def main():
                 pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
                 st.success("Laporan berhasil diekspor ke PDF!")
                 download_file(pdf_file)
+        
         elif navigation == "Upload Dataset":
             # Tambahkan custom CSS
             add_custom_css()
@@ -365,6 +372,7 @@ def main():
             if st.button("Ekspor laporan ke PDF"):
                 pdf_output = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
                 st.success(f"Laporan berhasil diekspor ke {pdf_output}")
+        
         
 
         # Tombol logout
