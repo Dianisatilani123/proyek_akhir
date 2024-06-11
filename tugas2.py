@@ -404,14 +404,14 @@ def main():
                     st.write("Dataset setelah preprocessing:")
                     st.write(data.head())
                     return data
-           
-                if data is not None:
-                        X_train, X_test, y_train, y_test = split_data(data)
-                        if X_train is not None:
-                            model = train_model(X_train, y_train)
-                            if model is not None:
-                                accuracy = evaluate_model(model, X_test, y_test)
-                                save_model(model)
+                 # Split data
+                X_train, X_test, y_train, y_test = split_data(data)
+                 # Train model
+                model = train_model(X_train, y_train)
+                # Evaluate model
+                evaluate_model(model, X_test, y_test)
+                accuracy = evaluate_model(model, X_test, y_test)
+                save_model(model)
                        
         
 
