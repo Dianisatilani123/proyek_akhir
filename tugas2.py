@@ -15,7 +15,7 @@ def add_custom_css():
     st.markdown(
         """
         <style>
-        .stButton button {
+       .stButton button {
             background-color: #4CAF50; /* Hijau */
             color: white;
             border: none;
@@ -30,7 +30,7 @@ def add_custom_css():
             transition-duration: 0.4s;
         }
 
-        .stButton button:hover {
+       .stButton button:hover {
             background-color: white;
             color: black;
             border: 2px solid #4CAF50;
@@ -256,7 +256,7 @@ def login():
             st.experimental_rerun()  # Refresh halaman setelah login berhasil
     else:
             st.error("Username atau Password salah!")
-           
+
 # Tombol logout
 def logout():
     if st.button("Logout"):
