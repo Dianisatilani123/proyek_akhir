@@ -264,7 +264,15 @@ def logout():
         st.success("Logout berhasil!")
         st.experimental_rerun()  # Refresh halaman setelah logout berhasil
 
-# Langkah 8: Membuat model untuk aplikasi
+# Fungsi untuk memvalidasi dataset yang diunggah
+def validate_input(data):
+    if data is None:
+        st.error("File tidak diunggah atau dalam format yang salah.")
+        return False
+    # Tambahkan validasi tambahan sesuai kebutuhan
+    return True
+
+# Fungsi utama
 def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
     add_custom_css()  # Tambahkan CSS khusus untuk tombol
@@ -354,20 +362,20 @@ def main():
 
                 if uploaded_file:
                     data = load_data(uploaded_file)
-                if validate_input(data):
-                    data = preprocess_data(data)
-                if data is not None:
-                    X_train, X_test, y_train, y_test = split_data(data)
-                    if X_train is not None:
-                        model = train_model(X_train, y_train)
-                        if model is not None:
-                            accuracy = evaluate_model(model, X_test, y_test)
-                            save_model(model)
-                            
-                            if st.button("Muat Model yang Tersimpan"):
-                                model = load_model()
-                                if model:
-                                    accuracy = evaluate_model(model, X_test, y_test)   
+                    if validate_input(data):  # Call to validate_input
+                        data = preprocess_data(data)
+                    if data is not None:
+                        X_train, X_test, y_train, y_test = split_data(data)
+                        if X_train is not None:
+                            model = train_model(X_train, y_train)
+                            if model is not None:
+                                accuracy = evaluate_model(model, X_test, y_test)
+                                save_model(model)
+                                
+                                if st.button("Muat Model yang Tersimpan"):
+                                    model = load_model()
+                                    if model:
+                                        accuracy = evaluate_model(model, X_test, y_test)   
         
 
         # Tombol logout
@@ -375,3 +383,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
