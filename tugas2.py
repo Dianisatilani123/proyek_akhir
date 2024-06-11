@@ -280,14 +280,6 @@ def save_model(model, file_path="model.pkl"):
     except Exception as e:
         st.error(f"Gagal menyimpan model: {str(e)}")
 
-def load_model(file_path="model.pkl"):
-    try:
-        model = joblib.load(file_path)
-        return model
-    except Exception as e:
-        st.error(f"Failed to load model: {str(e)}")
-        return None
-
 def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
     add_custom_css()  # Tambahkan CSS khusus untuk tombol
@@ -390,11 +382,7 @@ def main():
                             if model is not None:
                                 accuracy = evaluate_model(model, X_test, y_test)
                                 save_model(model)
-                    
-                            if st.button("Muat Model yang Tersimpan"):
-                                model = load_model()
-                                if model:
-                                    accuracy = evaluate_model(model, X_test, y_test)    
+                       
         
 
         # Tombol logout
