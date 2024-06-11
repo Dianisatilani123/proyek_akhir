@@ -92,20 +92,20 @@ def evaluate_model(model, X_test, y_test):
     st.write(matrix)
 
     # Visualisasi distribusi hasil prediksi
-    plt.figure(figsize=(10, 6))
-    sns.countplot(x=y_pred)
-    plt.title("Distribusi Hasil Prediksi")
-    plt.xlabel("Label Prediksi")
-    plt.ylabel("Jumlah")
-    st.pyplot()
+    fig1, ax1 = plt.subplots(figsize=(10, 6))
+    sns.countplot(x=y_pred, ax=ax1)
+    ax1.set_title("Distribusi Hasil Prediksi")
+    ax1.set_xlabel("Label Prediksi")
+    ax1.set_ylabel("Jumlah")
+    st.pyplot(fig1)
 
     # Visualisasi confusion matrix
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(matrix, annot=True, fmt='d', cmap='Blues')
-    plt.title("Confusion Matrix")
-    plt.xlabel("Prediksi")
-    plt.ylabel("Aktual")
-    st.pyplot()
+    fig2, ax2 = plt.subplots(figsize=(8, 6))
+    sns.heatmap(matrix, annot=True, fmt='d', cmap='Blues', ax=ax2)
+    ax2.set_title("Confusion Matrix")
+    ax2.set_xlabel("Prediksi")
+    ax2.set_ylabel("Aktual")
+    st.pyplot(fig2)
 
     return accuracy
 
