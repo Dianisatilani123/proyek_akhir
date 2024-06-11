@@ -346,33 +346,43 @@ def main():
                 st.success("Laporan berhasil diekspor ke PDF!")
                 download_file(pdf_file)
 
-        elif navigation == "Upload Dataset":
-            st.markdown("<h2>Upload Dataset</h2>", unsafe_allow_html=True)
-            uploaded_file = st.file_uploader("Upload file CSV", type=["csv"])
-            if uploaded_file:
-                data = load_data(uploaded_file)
-                data = preprocess_data(data)
-                st.success("Dataset berhasil di-upload dan diproses!")
-                
-                # Menampilkan Data yang Diproses
-                st.write("Data yang Diproses:")
-                st.write(data.head(14))  # Show the first 14 rows
-                
-                # Visualisasi Hasil Prediksi
-                st.write("Visualisasi Hasil Prediksi:")
-                st.write("Distribusi hasil prediksi menggunakan plot bar:")
-                # Code for bar plot visualization
-                
-                st.write("Performa model secara visual menggunakan Confusion Matrix:")
-                # Code for confusion matrix visualization
-                
-                # Fitur Save dan Load Model
-                st.write("Fitur Save dan Load Model:")
-                # Code for saving and loading model
-                
-                # Button export pdf dan download
-                if st.button("Export Dataset ke CSV"):
-                    export_data_to_csv(data)
+         elif navigation == "Upload Dataset":
+        st.markdown("<h2>Upload Dataset</h2>", unsafe_allow_html=True)
+        uploaded_file = st.file_uploader("Upload file CSV", type=["csv"])
+        if uploaded_file:
+            data = load_data(uploaded_file)
+            data = preprocess_data(data)
+            st.success("Dataset berhasil di-upload dan diproses!")
+            
+            # Visualisasi Hasil Prediksi
+            st.write("Visualisasi Hasil Prediksi:")
+            st.write("Distribusi hasil prediksi menggunakan plot bar:")
+            
+            # Code for bar plot visualization
+            pred_counts = data['prediction'].value_counts()
+            fig_pred, ax_pred = plt.subplots()
+            sns.barplot(x=pred_counts.index, y=pred_counts.values, ax=ax_pred)
+            ax_pred.set_title("Distribusi Hasil Prediksi")
+            ax_pred.set_xlabel("Hasil Prediksi")
+            ax_pred.set_ylabel("Jumlah")
+            st.pyplot(fig_pred)
+            
+            st.write("Performa model secara visual menggunakan Confusion Matrix:")
+            
+            # Code for confusion matrix visualization
+            plt.figure(figsize=(8, 6))
+            sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt='g', cmap='Blues', cbar=False)
+            plt.xlabel('Predicted labels')
+            plt.ylabel('True labels')
+            plt.title('Confusion Matrix')
+            st.pyplot()
+            
+            st.write("Fitur Save dan Load Model:")
+            st.write("Anda dapat menyimpan model yang sudah dilatih dan memuatnya kembali tanpa harus melatih dari awal.")
+
+            # Button export pdf dan download
+            if st.button("Export Dataset ke PDF"):
+                export_data_to_pdf(data)
                 
         # Tombol logout
         logout()
