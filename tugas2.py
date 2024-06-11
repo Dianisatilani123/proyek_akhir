@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 import base64
 import matplotlib.pyplot as plt
 import seaborn as sns
+import joblib
 
 # CSS untuk mengubah gaya tombol
 def add_custom_css():
