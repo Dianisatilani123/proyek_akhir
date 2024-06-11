@@ -272,6 +272,14 @@ def validate_input(data):
     # Tambahkan validasi tambahan sesuai kebutuhan
     return True
 
+# Fungsi untuk menyimpan model ke file
+def save_model(model, file_path="model.pkl"):
+    try:
+        joblib.dump(model, file_path)
+        st.success("Model berhasil disimpan!")
+    except Exception as e:
+        st.error(f"Gagal menyimpan model: {str(e)}")
+
 # Fungsi utama
 def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
@@ -304,6 +312,10 @@ def main():
             # Evaluate model
             accuracy = evaluate_model(model, X_test, y_test)
             st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+
+            # Menyimpan model setelah dilatih
+            if model is not None:
+                save_model(model)  # Simpan model setelah dilatih
 
             # Menampilkan form input untuk memprediksi kelayakan kandidat
             with st.sidebar:
