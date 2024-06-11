@@ -354,13 +354,13 @@ def main():
         uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
 
         if uploaded_file:
-                data = load_data(uploaded_file)
-                data = preprocess_data(data)
-                X_train, X_test, y_train, y_test = split_data(data)
-                model = train_model(X_train, y_train)
-                accuracy = evaluate_model(model, X_test, y_test)
+            data = load_data(uploaded_file)
+            data = preprocess_data(data)
+            X_train, X_test, y_train, y_test = split_data(data)
+            model = train_model(X_train, y_train)
+            accuracy = evaluate_model(model, X_test, y_test)
                 
-                gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
+        gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
         
              # Export to PDF button
         if st.button("Ekspor laporan ke PDF"):
