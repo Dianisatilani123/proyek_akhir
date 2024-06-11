@@ -354,7 +354,6 @@ def main():
             data = preprocess_data(data)
             st.success("Dataset berhasil di-upload dan diproses!")
             
-            elif navigation == "Visualisasi Hasil Prediksi":
     # Setelah model diprediksi, buat visualisasi
     st.write("Visualisasi Hasil Prediksi:")
 
