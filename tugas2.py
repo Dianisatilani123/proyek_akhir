@@ -276,7 +276,7 @@ def main():
         login()
     else:
         # Navigasi header
-        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman"])
+        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman","Upload Dataset"])
 
         if navigation == "HOME":
             st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
@@ -345,6 +345,43 @@ def main():
                 pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
                 st.success("Laporan berhasil diekspor ke PDF!")
                 download_file(pdf_file)
+        
+        elif navigation == "Upload Dataset":
+                st.write("Upload Dataset")
+                uploaded_file = st.file_uploader("Upload Dataset", type="csv")
+        if uploaded_file is not None:
+                    data = pd.read_csv(uploaded_file)
+                    st.write("Data yang Diproses:")
+                    st.write(data.head(14))
+                    st.write(f"Jumlah data pada dataset: {len(data)}")
+        
+                    st.write("Visualisasi Hasil Prediksi:")
+                    # Visualisasi hasil prediksi
+                    y_pred = model.predict(X_test)
+                    st.write("Distribusi Hasil Prediksi:")
+                    st.bar(y_pred)
+                    st.write("Confusion Matrix:")
+                    st.write(confusion_matrix(y_test, y_pred))
+
+                    st.write("Fitur Save dan Load Model:")
+            
+                     # Fitur save dan load model
+        if st.button("Save Model"):
+                    with open("model.pkl", "wb") as file:
+                        pickle.dump(model, file)
+                    st.success("Model berhasil disimpan!")
+        if st.button("Load Model"):
+                    with open("model.pkl", "rb") as file:
+                        model = pickle.load(file)
+                    st.success("Model berhasil dimuat!")
+    
+                    st.write("Download Hasil:")
+        if st.button("Download Hasil"):
+                    hasil = pd.DataFrame({"Enrollee ID": X_test["enrollee_id"], "Prediksi": y_pred})
+                    csv = hasil.to_csv(index=False)
+                    b64 = base64.b64encode(csv.encode()).decode()
+                    href = f'<a href="data:file/csv;base64,{b64}" download="hasil_prediksi.csv">Download Hasil</a>'
+                    st.markdown(href, unsafe_allow_html=True)
         
         
 
