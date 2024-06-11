@@ -325,18 +325,48 @@ def main():
             # Load data
             data = load_data()
 
+            # Debug statement: Check if data is loaded correctly
+            if data is not None:
+                st.write("Data loaded successfully")
+                st.write(data.head())
+            else:
+                st.error("Failed to load data")
+                return
+
             # Preprocessing data
             data = preprocess_data(data)
 
+            # Debug statement: Check if data is preprocessed correctly
+            if data is not None:
+                st.write("Data preprocessed successfully")
+                st.write(data.head())
+            else:
+                st.error("Failed to preprocess data")
+                return
+
             # Split data
-            X_train, X_test, y_train, y_test = split_data(data)
+            try:
+                X_train, X_test, y_train, y_test = split_data(data)
+                st.write("Data split successfully")
+            except Exception as e:
+                st.error(f"Failed to split data: {e}")
+                return
 
             # Train model
-            model = train_model(X_train, y_train)
+            try:
+                model = train_model(X_train, y_train)
+                st.write("Model trained successfully")
+            except Exception as e:
+                st.error(f"Failed to train model: {e}")
+                return
 
             # Evaluate model
-            accuracy = evaluate_model(model, X_test, y_test)
-            st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+            try:
+                accuracy = evaluate_model(model, X_test, y_test)
+                st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+            except Exception as e:
+                st.error(f"Failed to evaluate model: {e}")
+                return
 
             # Menyimpan model setelah dilatih
             if model is not None:
@@ -384,40 +414,52 @@ def main():
                             st.error("Kandidat tidak layak untuk dipertimbangkan!")
 
         elif navigation == "Laporan Keanekaragaman":
-
             data = load_data()
-            gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
-            if st.button("Export Laporan ke PDF"):
-                pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
-                st.success("Laporan berhasil diekspor ke PDF!")
-                download_file(pdf_file)
-        
+            if data is not None:
+                gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
+                if st.button("Export Laporan ke PDF"):
+                    pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
+                    st.success("Laporan berhasil diekspor ke PDF!")
+                    download_file(pdf_file)
+            else:
+                st.error("Failed to load data")
+
         elif navigation == "Upload Dataset":
-                st.write("Upload Dataset")
-                 # Upload file CSV
-                uploaded_file = st.file_uploader("Upload file CSV", type="csv")
-                if uploaded_file is not None:
-                    data = pd.read_csv(uploaded_file)
-                    st.write("Dataset yang diunggah:")
-                    st.write(data.head())
-                    data = preprocess_data_dynamic(data)
-                    st.write("Dataset setelah preprocessing:")
-                    st.write(data.head())
-                    return data
-                 # Split data
-                X_train, X_test, y_train, y_test = split_data(data)
-                 # Train model
-                model = train_model(X_train, y_train)
+            st.write("Upload Dataset")
+            # Upload file CSV
+            uploaded_file = st.file_uploader("Upload file CSV", type="csv")
+            if uploaded_file is not None:
+                data = pd.read_csv(uploaded_file)
+                st.write("Dataset yang diunggah:")
+                st.write(data.head())
+                data = preprocess_data_dynamic(data)
+                st.write("Dataset setelah preprocessing:")
+                st.write(data.head())
+                # Split data
+                try:
+                    X_train, X_test, y_train, y_test = split_data(data)
+                    st.write("Data split successfully")
+                except Exception as e:
+                    st.error(f"Failed to split data: {e}")
+                    return
+                # Train model
+                try:
+                    model = train_model(X_train, y_train)
+                    st.write("Model trained successfully")
+                except Exception as e:
+                    st.error(f"Failed to train model: {e}")
+                    return
                 # Evaluate model
-                evaluate_model(model, X_test, y_test)
-                accuracy = evaluate_model(model, X_test, y_test)
+                try:
+                    accuracy = evaluate_model(model, X_test, y_test)
+                    st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+                except Exception as e:
+                    st.error(f"Failed to evaluate model: {e}")
+                    return
                 save_model(model)
-                       
-        
 
         # Tombol logout
         logout()
 
 if __name__ == "__main__":
     main()
-    
