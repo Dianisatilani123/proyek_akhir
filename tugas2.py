@@ -357,11 +357,11 @@ def main():
         
         elif navigation == "Upload Dataset":
                 st.write("Upload Dataset")
-               # Upload file CSV
+                 # Upload file CSV
                 uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
 
-                if uploaded_file:
-                    data = load_data(uploaded_file)
+                if uploaded_file is not None:  # Check if file is uploaded
+                    data = pd.read_csv(uploaded_file)  # Read the uploaded file directly
                     if validate_input(data):  # Call to validate_input
                         data = preprocess_data(data)
                     if data is not None:
@@ -371,11 +371,11 @@ def main():
                             if model is not None:
                                 accuracy = evaluate_model(model, X_test, y_test)
                                 save_model(model)
-                                
-                                if st.button("Muat Model yang Tersimpan"):
-                                    model = load_model()
-                                    if model:
-                                        accuracy = evaluate_model(model, X_test, y_test)   
+                    
+                            if st.button("Muat Model yang Tersimpan"):
+                                model = load_model()
+                                if model:
+                                    accuracy = evaluate_model(model, X_test, y_test)    
         
 
         # Tombol logout
