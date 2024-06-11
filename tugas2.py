@@ -90,7 +90,23 @@ def evaluate_model(model, X_test, y_test):
     st.write(report)
     st.write("Confusion Matrix:")
     st.write(matrix)
-    
+
+    # Visualisasi distribusi hasil prediksi
+    plt.figure(figsize=(10, 6))
+    sns.countplot(x=y_pred)
+    plt.title("Distribusi Hasil Prediksi")
+    plt.xlabel("Label Prediksi")
+    plt.ylabel("Jumlah")
+    st.pyplot()
+
+    # Visualisasi confusion matrix
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(matrix, annot=True, fmt='d', cmap='Blues')
+    plt.title("Confusion Matrix")
+    plt.xlabel("Prediksi")
+    plt.ylabel("Aktual")
+    st.pyplot()
+
     return accuracy
 
 # Langkah 7: Membuat laporan analitik dan keberagaman
