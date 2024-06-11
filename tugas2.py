@@ -273,12 +273,14 @@ def validate_input(data):
     # Tambahkan validasi tambahan sesuai kebutuhan
     return True
 
-def save_model(model, file_path="model.pkl"):
+# Define load_model function
+def load_model(file_path="model.pkl"):
     try:
-        joblib.dump(model, file_path)
-        st.success("Model berhasil disimpan!")
+        model = joblib.load(file_path)
+        return model
     except Exception as e:
-        st.error(f"Gagal menyimpan model: {str(e)}")
+        st.error(f"Failed to load model: {str(e)}")
+        return None
 
 def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
