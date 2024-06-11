@@ -353,9 +353,30 @@ def main():
                 data = load_data(uploaded_file)
                 data = preprocess_data(data)
                 st.success("Dataset berhasil di-upload dan diproses!")
-
+                
+                # Menampilkan Data yang Diproses
+                st.write("Data yang Diproses:")
+                st.write(data.head(14))  # Show the first 14 rows
+                
+                # Visualisasi Hasil Prediksi
+                st.write("Visualisasi Hasil Prediksi:")
+                st.write("Distribusi hasil prediksi menggunakan plot bar:")
+                # Code for bar plot visualization
+                
+                st.write("Performa model secara visual menggunakan Confusion Matrix:")
+                # Code for confusion matrix visualization
+                
+                # Fitur Save dan Load Model
+                st.write("Fitur Save dan Load Model:")
+                # Code for saving and loading model
+                
+                # Button export pdf dan download
+                if st.button("Export Dataset ke CSV"):
+                    export_data_to_csv(data)
+                
         # Tombol logout
         logout()
 
 if __name__ == "__main__":
     main()
+
