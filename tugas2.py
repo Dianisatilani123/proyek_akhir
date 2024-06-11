@@ -375,6 +375,9 @@ def main():
                     data = pd.read_csv(uploaded_file)  # Read the uploaded file directly
                     if validate_input(data):  # Call to validate_input
                         data = preprocess_data(data)
+                        st.write("Dataset yang diunggah:")
+                        st.write(data.head(14))  # Display the uploaded dataset
+                        st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
                     if data is not None:
                         X_train, X_test, y_train, y_test = split_data(data)
                         if X_train is not None:
