@@ -5,10 +5,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
+from sqlalchemy import create_engine
 import base64
 import matplotlib.pyplot as plt
 import seaborn as sns
-import joblib
 
 # CSS untuk mengubah gaya tombol
 def add_custom_css():
@@ -272,13 +272,13 @@ def validate_input(data):
     # Tambahkan validasi tambahan sesuai kebutuhan
     return True
 
-# Fungsi untuk menyimpan model ke file
-def save_model(model, file_path="model.pkl"):
+def load_model():
     try:
-        joblib.dump(model, file_path)
-        st.success("Model berhasil disimpan!")
+        model = joblib.load("model.pkl")
+        return model
     except Exception as e:
-        st.error(f"Gagal menyimpan model: {str(e)}")
+        st.error(f"Gagal memuat model: {str(e)}")
+        return None
 
 # Fungsi utama
 def main():
