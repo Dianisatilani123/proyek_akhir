@@ -48,21 +48,8 @@ def load_data():
     st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
     return data
 
-# Langkah 3: Standarisasi data
+
 def preprocess_data(data):
-    # Ubah nilai "<1" menjadi 0 dan nilai ">20" menjadi 25
-    data['experience'] = data['experience'].apply(lambda x: 0 if x == '<1' else (25 if x == '>20' else int(x)))
-
-    # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
-    label_encoder = LabelEncoder()
-    categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
-                        'major_discipline', 'company_size', 'company_type', 'last_new_job']
-    for col in categorical_cols:
-        data[col] = label_encoder.fit_transform(data[col])
-
-    return data
-
-def preprocess_data_dynamic(data):
     # Contoh standarisasi untuk data dinamis. Anda bisa menyesuaikannya sesuai kebutuhan.
     for col in data.select_dtypes(include=['object']).columns:
         data[col] = LabelEncoder().fit_transform(data[col])
@@ -445,7 +432,7 @@ def main():
             if uploaded_file is not None:  # Check if file is uploaded
                 data = pd.read_csv(uploaded_file)  # Read the uploaded file directly
                 if validate_input(data):  # Call to validate_input
-                    data = preprocess_data_dynamic(data)
+                    data = preprocess_data(data)
                     st.write("Dataset yang diunggah:")
                     st.write(data.head(14))  # Display the uploaded dataset
                     st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
