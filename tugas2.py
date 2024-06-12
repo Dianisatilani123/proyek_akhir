@@ -62,13 +62,39 @@ def preprocess_data(data):
 
     return data
 
+# Langkah 3: Standarisasi data dinamis
+def preprocess_data_dynamic(data):
+    # Identifikasi kolom numerik dan kategorikal
+    numeric_cols = data.select_dtypes(include=['int64', 'float64']).columns
+    categorical_cols = data.select_dtypes(include=['object']).columns
+
+    # Mengisi nilai yang hilang
+    for col in numeric_cols:
+        data[col].fillna(data[col].median(), inplace=True)
+    for col in categorical_cols:
+        data[col].fillna(data[col].mode()[0], inplace=True)
+
+    # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
+    label_encoder = LabelEncoder()
+    for col in categorical_cols:
+        data[col] = label_encoder.fit_transform(data[col])
+
+    return data
+
 # Langkah 4: Split data train dan test
 def split_data(data):
     X = data.drop(columns=["gender", "city"])  # Hapus fitur "City"
     y = data["gender"]
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    return X_train, X_test, y_train, y_test
 
+# Langkah 4: Split data train dan test dinamis
+def split_data_dynamic(data, target_col):
+    X = data.drop(columns=[target_col])
+    y = data[target_col]
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     return X_train, X_test, y_train, y_test
 
 # Langkah 5: Membuat data latih menggunakan algoritma machine learning
@@ -429,7 +455,7 @@ def main():
             if uploaded_file is not None:  # Check if file is uploaded
                 data = pd.read_csv(uploaded_file)  # Read the uploaded file directly
                 if validate_input(data):  # Call to validate_input
-                    data = preprocess_data(data)
+                    data = preprocess_data_dynamic(data)
                     st.write("Dataset yang diunggah:")
                     st.write(data.head(14))  # Display the uploaded dataset
                     st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
