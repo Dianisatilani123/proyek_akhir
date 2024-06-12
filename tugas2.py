@@ -331,7 +331,7 @@ def main():
         login()
     else:
         # Navigasi header
-        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman","Upload Dataset"])
+        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman","Upload Dataset","Hyperparameter Tuning"])
 
         if navigation == "HOME":
             st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
@@ -347,14 +347,15 @@ def main():
 
             # Train model
             model = train_model(X_train, y_train)
+            model = hyperparameter_tuning(X_train, y_train)
 
             # Evaluate model
             accuracy = evaluate_model(model, X_test, y_test)
             st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+            st.write(f"Akurasi model setelah tuning: {accuracy * 100:.2f}%")
 
             # Menyimpan model setelah dilatih
             if model is not None:
-                st.write(f"Akurasi model setelah tuning: {accuracy * 100:.2f}%")
                 save_model(model)
                 display_feature_importance(model, X_train)
 
@@ -397,7 +398,7 @@ def main():
                         if kelayakan == 1:
                             st.success("Kandidat layak untuk dipertimbangkan!")
                         else:
-                            st.error("Kandidat tidak layak untuk dipertimbangkan!")
+                            st.error("Kandidat tidak layak untuk dipertimbangkan!")   
 
         elif navigation == "Laporan Keanekaragaman":
 
