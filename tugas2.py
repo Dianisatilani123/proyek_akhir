@@ -412,6 +412,8 @@ def main():
                         pdf_file = export_prediction_to_pdf(prediction_data)
                         st.success("Hasil prediksi berhasil diekspor ke PDF!")
                         download_file(pdf_file)
+                        # Reset form input
+                        st.session_state.input_data = {}
 
         elif navigation == "Laporan Keanekaragaman":
             data = load_data()
