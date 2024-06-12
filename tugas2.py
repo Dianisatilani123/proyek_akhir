@@ -49,26 +49,12 @@ def load_data():
     return data
 
 # Langkah 3: Standarisasi data
-def preprocess_data(data):
+def preprocess_data(data,data1):
+    numeric_cols = data1.select_dtypes(include=['int64', 'float64']).columns
     # Ubah nilai "<1" menjadi 0 dan nilai ">20" menjadi 25
     data['experience'] = data['experience'].apply(lambda x: 0 if x == '<1' else (25 if x == '>20' else int(x)))
 
-    # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
-    label_encoder = LabelEncoder()
-    categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
-                        'major_discipline', 'company_size', 'company_type', 'last_new_job']
-    for col in categorical_cols:
-        data[col] = label_encoder.fit_transform(data[col])
-
-    return data
-
-# Langkah 3: Standarisasi data dinamis
-def preprocess_data_dynamic(data1):
-    # Identifikasi kolom numerik dan kategorikal
-    numeric_cols = data1.select_dtypes(include=['int64', 'float64']).columns
-    categorical_cols = data1.select_dtypes(include=['object']).columns
-
-    # Mengisi nilai yang hilang
+     # Mengisi nilai yang hilang
     for col in numeric_cols:
         data1[col].fillna(data1[col].median(), inplace=True)
     for col in categorical_cols:
@@ -76,22 +62,18 @@ def preprocess_data_dynamic(data1):
 
     # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
     label_encoder = LabelEncoder()
+    categorical_cols = data1.select_dtypes(include=['object']).columns
+    categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
+                        'major_discipline', 'company_size', 'company_type', 'last_new_job'] 
     for col in categorical_cols:
-        data1[col] = label_encoder.fit_transform(data1[col])
-
-    return data1
+        data[col] = label_encoder.fit_transform(data,data1[col])
+    return data,data1
 
 # Langkah 4: Split data train dan test
-def split_data(data):
+def split_data(data,data1, target_col):
     X = data.drop(columns=["gender", "city"])  # Hapus fitur "City"
-    y = data["gender"]
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    return X_train, X_test, y_train, y_test
-
-# Langkah 4: Split data train dan test dinamis
-def split_data_dynamic(data1, target_col):
     X = data1.drop(columns=[target_col])
+    y = data["gender"]
     y = data1[target_col]
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -455,7 +437,7 @@ def main():
             if uploaded_file is not None:  # Check if file is uploaded
                 data1 = pd.read_csv(uploaded_file)  # Read the uploaded file directly
                 if validate_input(data1):  # Call to validate_input
-                    data1 = preprocess_data_dynamic(data1)
+                    data1 = preprocess_data(data1)
                     st.write("Dataset yang diunggah:")
                     st.write(data1.head(14))  # Display the uploaded dataset
                     st.write(f"Jumlah data pada dataset: {len(data1)}")  # Menambahkan informasi jumlah data
