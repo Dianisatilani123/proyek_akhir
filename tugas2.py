@@ -62,30 +62,13 @@ def preprocess_data(data):
 
     return data
 
-# Langkah 3: Standarisasi data dinamis
-def preprocess_data_dynamic(data1):
-    # Identifikasi kolom numerik dan kategorikal
-    numeric_cols = data1.select_dtypes(include=['int64', 'float64']).columns
-    categorical_cols = data1.select_dtypes(include=['object']).columns
-
-    # Mengisi nilai yang hilang
-    for col in numeric_cols:
-        data1[col].fillna(data1[col].median(), inplace=True)
-    for col in categorical_cols:
-        data1[col].fillna(data1[col].mode()[0], inplace=True)
-
-    # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
-    label_encoder = LabelEncoder()
-    for col in categorical_cols:
-        data1[col] = label_encoder.fit_transform(data1[col])
-
-    return data1
-
-def split_data_dynamic(data1, target_col):
-    X = data1.drop(columns=[target_col])
-    y = data1[target_col]
+# Langkah 4: Split data train dan test
+def split_data(data):
+    X = data.drop(columns=["gender", "city"])  # Hapus fitur "City"
+    y = data["gender"]
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
     return X_train, X_test, y_train, y_test
 
 # Langkah 5: Membuat data latih menggunakan algoritma machine learning
@@ -315,8 +298,8 @@ def logout():
         st.experimental_rerun()  # Refresh halaman setelah logout berhasil
 
 # Fungsi untuk memvalidasi dataset yang diunggah
-def validate_input(data1):
-    if data1 is None:
+def validate_input(data):
+    if data is None:
         st.error("File tidak diunggah atau dalam format yang salah.")
         return False
     # Tambahkan validasi tambahan sesuai kebutuhan
@@ -352,7 +335,7 @@ def main():
             data = preprocess_data(data)
 
             # Split data
-            X_train, X_test, y_train, y_test = split_data_dynamic(data)
+            X_train, X_test, y_train, y_test = split_data(data)
 
             # Train model
             model = train_model(X_train, y_train)
@@ -444,14 +427,14 @@ def main():
             uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
 
             if uploaded_file is not None:  # Check if file is uploaded
-                data1 = pd.read_csv(uploaded_file)  # Read the uploaded file directly
-                if validate_input(data1):  # Call to validate_input
-                    data1 = preprocess_data_dynamic(data1)
+                data = pd.read_csv(uploaded_file)  # Read the uploaded file directly
+                if validate_input(data):  # Call to validate_input
+                    data = preprocess_data(data)
                     st.write("Dataset yang diunggah:")
-                    st.write(data1.head(14))  # Display the uploaded dataset
-                    st.write(f"Jumlah data pada dataset: {len(data1)}")  # Menambahkan informasi jumlah data
-                if data1 is not None:
-                    X_train, X_test, y_train, y_test = split_data_dynamic(data1)
+                    st.write(data.head(14))  # Display the uploaded dataset
+                    st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
+                if data is not None:
+                    X_train, X_test, y_train, y_test = split_data(data)
                     if X_train is not None:
                         model = train_model(X_train, y_train)
                         if model is not None:
