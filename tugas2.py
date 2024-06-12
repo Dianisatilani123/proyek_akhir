@@ -401,10 +401,9 @@ def main():
                             "Last New Job": last_new_job,
                             "Training Hours": training_hours,
                             "Keterangan": "Kandidat Diterima" if keterangan == 1 else "Kandidat Ditolak"
+                        }
                              # Reset form input
                             st.session_state.input_data = {}
-                        }
-
                         if keterangan == 1:
                             st.success("Kandidat Diterima!")
                         else:
