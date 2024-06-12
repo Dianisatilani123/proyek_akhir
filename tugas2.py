@@ -382,7 +382,7 @@ def main():
                             (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
                             major_discipline == "STEM" and  # Tambahkan syarat Major Discipline wajib STEM
                             training_hours >= 50):
-                            kelayakan = 1
+                            keterangan = 1
 
                         prediction_data = {
                             "Enrollee ID": enrollee_id,
@@ -398,13 +398,13 @@ def main():
                             "Company Type": company_type,
                             "Last New Job": last_new_job,
                             "Training Hours": training_hours,
-                            "Kelayakan": "Layak untuk dipertimbangkan" if kelayakan == 1 else "Tidak layak untuk dipertimbangkan"
+                            "Keterangan": "Kandidat Diterima" if keterangan == 1 else "Kandidat Ditolak"
                         }
 
-                        if kelayakan == 1:
-                            st.success("Kandidat layak untuk dipertimbangkan!")
+                        if keterangan == 1:
+                            st.success("Kandidat Diterima!")
                         else:
-                            st.error("Kandidat tidak layak untuk dipertimbangkan!")
+                            st.error("Kandidat Ditolak!")
 
                         # Export prediction results to PDF
                         pdf_file = export_prediction_to_pdf(prediction_data)
