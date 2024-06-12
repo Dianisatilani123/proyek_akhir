@@ -409,28 +409,28 @@ def main():
                             st.error("Kandidat Ditolak!")
 
                         # Ekspor hasil prediksi ke PDF
-                        def export_prediction_to_pdf(prediction_data):
-                            pdf = FPDF()
-                            pdf.add_page()
-                            pdf.set_font("Arial", size=12)
+                    def export_prediction_to_pdf(prediction_data):
+                        pdf = FPDF()
+                        pdf.add_page()
+                        pdf.set_font("Arial", size=12)
 
-                            # Menambahkan konten ke PDF
-                            pdf.cell(200, 10, txt="Hasil Prediksi Kandidat", ln=True, align='C')
-                            for key, value in prediction_data.items():
-                                if key == "Keterangan":
-                                    if value == "Kandidat Diterima":
-                                        pdf.set_text_color(0, 128, 0)  # Set text color to green
-                                    else:
-                                        pdf.set_text_color(255, 0, 0)  # Set text color to red
-                                    pdf.cell(200, 10, txt=f"{key}: {value}", ln=True)
-                                    pdf.set_text_color(0, 0, 0)  # Reset text color to black
+                        # Menambahkan konten ke PDF
+                        pdf.cell(200, 10, txt="Hasil Prediksi Kandidat", ln=True, align='C')
+                        for key, value in prediction_data.items():
+                            if key == "Keterangan":
+                                if value == "Kandidat Diterima":
+                                    pdf.set_text_color(0, 128, 0)  # Set text color to green
                                 else:
-                                    pdf.cell(200, 10, txt=f"{key}: {value}", ln=True)
+                                    pdf.set_text_color(255, 0, 0)  # Set text color to red
+                                pdf.cell(200, 10, txt=f"{key}: {value}", ln=True)
+                                pdf.set_text_color(0, 0, 0)  # Reset text color to black
+                            else:
+                                pdf.cell(200, 10, txt=f"{key}: {value}", ln=True)
 
-                            pdf_file = "Hasil_Prediksi.pdf"
-                            pdf.output(pdf_file)
+                        pdf_file = "Hasil_Prediksi.pdf"
+                        pdf.output(pdf_file)
 
-                            return pdf_file
+                        return pdf_file
 
         elif navigation == "Laporan Keanekaragaman":
             data = load_data()
