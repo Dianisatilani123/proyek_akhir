@@ -331,7 +331,7 @@ def main():
         login()
     else:
         # Navigasi header
-        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman","Upload Dataset","Hyperparameter Tuning"])
+        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman","Upload Dataset"])
 
         if navigation == "HOME":
             st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
@@ -354,7 +354,8 @@ def main():
 
             # Menyimpan model setelah dilatih
             if model is not None:
-                save_model(model)  # Simpan model setelah dilatih
+                st.write(f"Akurasi model setelah tuning: {accuracy * 100:.2f}%")
+                save_model(model)
                 display_feature_importance(model, X_train)
 
             # Menampilkan form input untuk memprediksi kelayakan kandidat
@@ -397,16 +398,6 @@ def main():
                             st.success("Kandidat layak untuk dipertimbangkan!")
                         else:
                             st.error("Kandidat tidak layak untuk dipertimbangkan!")
-
-        elif navigation == "Hyperparameter Tuning":
-                data = load_data()
-                data = preprocess_data(data)
-                X_train, X_test, y_train, y_test = split_data(data)
-                model = hyperparameter_tuning(X_train, y_train)
-                accuracy = evaluate_model(model, X_test, y_test)
-                st.write(f"Akurasi model setelah tuning: {accuracy * 100:.2f}%")
-                save_model(model)
-                display_feature_importance(model, X_train)    
 
         elif navigation == "Laporan Keanekaragaman":
 
