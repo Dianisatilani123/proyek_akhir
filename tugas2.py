@@ -355,6 +355,7 @@ def main():
             # Menyimpan model setelah dilatih
             if model is not None:
                 save_model(model)  # Simpan model setelah dilatih
+                display_feature_importance(model, X_train)
 
             # Menampilkan form input untuk memprediksi kelayakan kandidat
             with st.sidebar:
@@ -397,14 +398,24 @@ def main():
                         else:
                             st.error("Kandidat tidak layak untuk dipertimbangkan!")
 
+        elif navigation == "Hyperparameter Tuning":
+                data = load_data()
+                data = preprocess_data(data)
+                X_train, X_test, y_train, y_test = split_data(data)
+                model = hyperparameter_tuning(X_train, y_train)
+                accuracy = evaluate_model(model, X_test, y_test)
+                st.write(f"Akurasi model setelah tuning: {accuracy * 100:.2f}%")
+                save_model(model)
+                display_feature_importance(model, X_train)    
+
         elif navigation == "Laporan Keanekaragaman":
 
-            data = load_data()
-            gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
-            if st.button("Export Laporan ke PDF"):
-                pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
-                st.success("Laporan berhasil diekspor ke PDF!")
-                download_file(pdf_file)
+                data = load_data()
+                gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
+                if st.button("Export Laporan ke PDF"):
+                    pdf_file = export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
+                    st.success("Laporan berhasil diekspor ke PDF!")
+                    download_file(pdf_file)
         
         elif navigation == "Upload Dataset":
                 st.write("Upload Dataset")
@@ -423,9 +434,6 @@ def main():
                         if X_train is not None:
                             model = train_model(X_train, y_train)
                             if model is not None:
-                                display_feature_importance(model, X_train)
-                                st.write(f"Akurasi model setelah tuning: {accuracy * 100:.2f}%")
-                                display_feature_importance(model, X_train)
                                 accuracy = evaluate_model(model, X_test, y_test)
                                 save_model(model)
                                 
