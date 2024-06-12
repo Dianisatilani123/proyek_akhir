@@ -413,6 +413,21 @@ def main():
                         pdf_file = export_prediction_to_pdf(prediction_data)
                         st.success("Hasil prediksi berhasil diekspor ke PDF!")
                         download_file(pdf_file)
+
+                        # Kosongkan form input
+                        st.session_state["enrollee_id"] = ""
+                        st.session_state["city"] = ""
+                        st.session_state["city_development_index"] = 0.000
+                        st.session_state["gender"] = ""
+                        st.session_state["relevent_experience"] = ""
+                        st.session_state["enrolled_university"] = ""
+                        st.session_state["education_level"] = ""
+                        st.session_state["major_discipline"] = ""
+                        st.session_state["experience"] = 0
+                        st.session_state["company_size"] = ""
+                        st.session_state["company_type"] = ""
+                        st.session_state["last_new_job"] = ""
+                        st.session_state["training_hours"] = 0
                        
 
         elif navigation == "Laporan Keanekaragaman":
