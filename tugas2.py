@@ -425,9 +425,9 @@ def main():
                             if model is not None:
                                 accuracy = evaluate_model(model, X_test, y_test)
                                 display_feature_importance(model, X_train)
-                                 st.write(f"Akurasi model setelah tuning: {accuracy * 100:.2f}%")
-                                 save_model(model)
-                                 display_feature_importance(model, X_train)
+                                st.write(f"Akurasi model setelah tuning: {accuracy * 100:.2f}%")
+                                save_model(model)
+                                display_feature_importance(model, X_train)
                        
         
 
