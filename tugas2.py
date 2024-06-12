@@ -48,27 +48,24 @@ def load_data():
     st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
     return data
 
-
+# Langkah 3: Standarisasi data
 def preprocess_data(data):
-    # Contoh standarisasi untuk data dinamis. Anda bisa menyesuaikannya sesuai kebutuhan.
-    for col in data.select_dtypes(include=['object']).columns:
-        data[col] = LabelEncoder().fit_transform(data[col])
+    # Ubah nilai "<1" menjadi 0 dan nilai ">20" menjadi 25
+    data['experience'] = data['experience'].apply(lambda x: 0 if x == '<1' else (25 if x == '>20' else int(x)))
+
+    # Mengonversi fitur kategorikal ke dalam representasi numerik menggunakan label encoding
+    label_encoder = LabelEncoder()
+    categorical_cols = ['relevent_experience', 'enrolled_university', 'education_level', 
+                        'major_discipline', 'company_size', 'company_type', 'last_new_job']
+    for col in categorical_cols:
+        data[col] = label_encoder.fit_transform(data[col])
+
     return data
 
 # Langkah 4: Split data train dan test
 def split_data(data):
     X = data.drop(columns=["gender", "city"])  # Hapus fitur "City"
     y = data["gender"]
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    return X_train, X_test, y_train, y_test
-
-# Langkah 4: Split data train dan test untuk data dinamis
-def split_data_dynamic(data):
-    target_column = st.selectbox("Pilih kolom target", data.columns)
-    X = data.drop(columns=[target_column])
-    y = data[target_column]
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -252,22 +249,6 @@ def export_report_to_pdf(data, gender_counts, education_counts, experience_count
     
     return pdf_file
 
-# Ekspor hasil prediksi ke PDF
-def export_prediction_to_pdf(prediction_data):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-
-    # Menambahkan konten ke PDF
-    pdf.cell(200, 10, txt="Hasil Prediksi Kandidat", ln=True, align='C')
-    for key, value in prediction_data.items():
-        pdf.cell(200, 10, txt=f"{key}: {value}", ln=True)
-
-    pdf_file = "Hasil_Prediksi.pdf"
-    pdf.output(pdf_file)
-
-    return pdf_file
-
 # Fungsi untuk menampilkan tautan unduhan
 def download_file(file_path):
     with open(file_path, "rb") as file:
@@ -314,6 +295,30 @@ def save_model(model, file_path="model.pkl"):
         st.success("Model berhasil disimpan!")
     except Exception as e:
         st.error(f"Gagal menyimpan model: {str(e)}")
+# Hyperparameter Tuning
+from sklearn.model_selection import GridSearchCV
+
+def hyperparameter_tuning(X_train, y_train):
+    param_grid = {
+        'n_estimators': [100, 200, 300],
+        'max_features': ['auto', 'sqrt', 'log2'],
+        'max_depth': [4, 5, 6, 7, 8],
+        'criterion': ['gini', 'entropy']
+    }
+    grid_search = GridSearchCV(RandomForestClassifier(), param_grid, cv=5, scoring='accuracy')
+    grid_search.fit(X_train, y_train)
+    return grid_search.best_estimator_
+
+# Feature Importance
+def display_feature_importance(model, X_train):
+    feature_importances = pd.Series(model.feature_importances_, index=X_train.columns)
+    feature_importances = feature_importances.sort_values(ascending=False)
+    
+    st.write("Feature Importances:")
+    fig, ax = plt.subplots()
+    sns.barplot(x=feature_importances, y=feature_importances.index, ax=ax)
+    ax.set_title("Feature Importances")
+    st.pyplot(fig)
 
 def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
@@ -379,44 +384,21 @@ def main():
                         training_hours == 0):
                         st.error("Silakan isi semua form inputan terlebih dahulu!")
                     else:
-                        # Menerapkan logika prediksi
+                       # Menerapkan logika prediksi
                         kelayakan = 0  # Initialize kelayakan to 0
-                        keterangan = 0  # Initialize keterangan to 0
                         if (relevent_experience == "Has relevent experience" and
-                            (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
-                            major_discipline == "STEM" and  # Tambahkan syarat Major Discipline wajib STEM
-                            training_hours >= 50):
-                            kelayakan = 1
-                            keterangan = 1
+                        (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
+                        major_discipline == "STEM" and  # Tambahkan syarat Major Discipline wajib STEM
+                        training_hours >= 50):
+                         kelayakan = 1
 
-                        prediction_data = {
-                            "Enrollee ID": enrollee_id,
-                            "City": city,
-                            "City Development Index": city_development_index,
-                            "Gender": gender,
-                            "Relevent Experience": relevent_experience,
-                            "Enrolled University": enrolled_university,
-                            "Education Level": education_level,
-                            "Major Discipline": major_discipline,
-                            "Experience": experience,
-                            "Company Size": company_size,
-                            "Company Type": company_type,
-                            "Last New Job": last_new_job,
-                            "Training Hours": training_hours,
-                            "Keterangan": "Kandidat Diterima" if keterangan == 1 else "Kandidat Ditolak"
-                        }
-
-                        if keterangan == 1:
-                            st.success("Kandidat Diterima!")
+                        if kelayakan == 1:
+                            st.success("Kandidat layak untuk dipertimbangkan!")
                         else:
-                            st.error("Kandidat Ditolak!")
-
-                        # Export prediction results to PDF
-                        pdf_file = export_prediction_to_pdf(prediction_data)
-                        st.success("Hasil prediksi berhasil diekspor ke PDF!")
-                        download_file(pdf_file)
+                            st.error("Kandidat tidak layak untuk dipertimbangkan!")
 
         elif navigation == "Laporan Keanekaragaman":
+
             data = load_data()
             gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
             if st.button("Export Laporan ke PDF"):
@@ -425,27 +407,33 @@ def main():
                 download_file(pdf_file)
         
         elif navigation == "Upload Dataset":
-            st.write("Upload Dataset")
-            # Upload file CSV
-            uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
+                st.write("Upload Dataset")
+                 # Upload file CSV
+                uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
 
-            if uploaded_file is not None:  # Check if file is uploaded
-                data = pd.read_csv(uploaded_file)  # Read the uploaded file directly
-                if validate_input(data):  # Call to validate_input
-                    data = preprocess_data(data)
-                    st.write("Dataset yang diunggah:")
-                    st.write(data.head(14))  # Display the uploaded dataset
-                    st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
-                if data is not None:
-                    X_train, X_test, y_train, y_test = split_data_dynamic(data)
-                    if X_train is not None:
-                        model = train_model(X_train, y_train)
-                        if model is not None:
-                            accuracy = evaluate_model(model, X_test, y_test)
-                            save_model(model)
+                if uploaded_file is not None:  # Check if file is uploaded
+                    data = pd.read_csv(uploaded_file)  # Read the uploaded file directly
+                    if validate_input(data):  # Call to validate_input
+                        data = preprocess_data(data)
+                        st.write("Dataset yang diunggah:")
+                        st.write(data.head(14))  # Display the uploaded dataset
+                        st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
+                    if data is not None:
+                        X_train, X_test, y_train, y_test = split_data(data)
+                        if X_train is not None:
+                            model = train_model(X_train, y_train)
+                            if model is not None:
+                                accuracy = evaluate_model(model, X_test, y_test)
+                                display_feature_importance(model, X_train)
+                                 st.write(f"Akurasi model setelah tuning: {accuracy * 100:.2f}%")
+                                 save_model(model)
+                                 display_feature_importance(model, X_train)
+                       
+        
 
         # Tombol logout
         logout()
 
 if __name__ == "__main__":
     main()
+    
