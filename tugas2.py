@@ -403,7 +403,7 @@ def main():
                             "Keterangan": "Kandidat Diterima" if keterangan == 1 else "Kandidat Ditolak"
                         }
                              # Reset form input
-                            st.session_state.input_data = {}
+                        st.session_state.input_data = {}
                         if keterangan == 1:
                             st.success("Kandidat Diterima!")
                         else:
