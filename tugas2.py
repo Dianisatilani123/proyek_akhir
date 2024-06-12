@@ -349,84 +349,69 @@ def main():
                 save_model(model)  # Simpan model setelah dilatih
 
             # Menampilkan form input untuk memprediksi kelayakan kandidat
-        with st.sidebar:
-            st.markdown("<h1>Masukkan Biodata Kandidat</h1>", unsafe_allow_html=True)
+            with st.sidebar:
+                st.markdown("<h1>Masukkan Biodata Kandidat</h1>", unsafe_allow_html=True)
 
-        enrollee_id = st.text_input("Enrollee ID", key="enrollee_id")
-        city = st.text_input("City", key="city")
-        city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f", key="city_development_index")
-        gender = st.selectbox("Gender", ["Male", "Female", "Other"], key="gender")
-        relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"], key="relevent_experience")
-        enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"], key="enrolled_university")
-        education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"], key="education_level")
-        major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"], key="major_discipline")
-        experience = st.number_input("Experience", value=0, key="experience")
-        company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"], key="company_size")
-        company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"], key="company_type")
-        last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"], key="last_new_job")
-        training_hours = st.number_input("Training Hours", value=0, key="training_hours")
+                enrollee_id = st.text_input("Enrollee ID", "")
+                city = st.text_input("City", "")
+                city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
+                gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+                relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
+                enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
+                education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
+                major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
+                experience = st.number_input("Experience", value=0)
+                company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
+                company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
+                last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
+                training_hours = st.number_input("Training Hours", value=0)
 
-        # Tombol prediksi
-        prediksi_button = st.button("Prediksi")
+                # Tombol prediksi
+                prediksi_button = st.button("Prediksi")
 
-        if prediksi_button:
-            if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or
-                enrolled_university == "" or education_level == "" or major_discipline == "" or
-                experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or
-                training_hours == 0):
-                st.error("Silakan isi semua form inputan terlebih dahulu!")
-            else:
-                # Menerapkan logika prediksi
-                kelayakan = 0  # Initialize kelayakan to 0
-                keterangan = 0  # Initialize keterangan to 0
-                if (relevent_experience == "Has relevent experience" and
-                    (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
-                    major_discipline == "STEM" and  # Tambahkan syarat Major Discipline wajib STEM
-                    training_hours >= 50):
-                    kelayakan = 1
-                    keterangan = 1
+                if prediksi_button:
+                    if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or
+                        enrolled_university == "" or education_level == "" or major_discipline == "" or
+                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or
+                        training_hours == 0):
+                        st.error("Silakan isi semua form inputan terlebih dahulu!")
+                    else:
+                        # Menerapkan logika prediksi
+                        kelayakan = 0  # Initialize kelayakan to 0
+                        keterangan = 0  # Initialize keterangan to 0
+                        if (relevent_experience == "Has relevent experience" and
+                            (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
+                            major_discipline == "STEM" and  # Tambahkan syarat Major Discipline wajib STEM
+                            training_hours >= 50):
+                            kelayakan = 1
+                            keterangan = 1
 
-                prediction_data = {
-                    "Enrollee ID": enrollee_id,
-                    "City": city,
-                    "City Development Index": city_development_index,
-                    "Gender": gender,
-                    "Relevent Experience": relevent_experience,
-                    "Enrolled University": enrolled_university,
-                    "Education Level": education_level,
-                    "Major Discipline": major_discipline,
-                    "Experience": experience,
-                    "Company Size": company_size,
-                    "Company Type": company_type,
-                    "Last New Job": last_new_job,
-                    "Training Hours": training_hours,
-                    "Keterangan": "Kandidat Diterima" if keterangan == 1 else "Kandidat Ditolak"
-                }
+                        prediction_data = {
+                            "Enrollee ID": enrollee_id,
+                            "City": city,
+                            "City Development Index": city_development_index,
+                            "Gender": gender,
+                            "Relevent Experience": relevent_experience,
+                            "Enrolled University": enrolled_university,
+                            "Education Level": education_level,
+                            "Major Discipline": major_discipline,
+                            "Experience": experience,
+                            "Company Size": company_size,
+                            "Company Type": company_type,
+                            "Last New Job": last_new_job,
+                            "Training Hours": training_hours,
+                            "Keterangan": "Kandidat Diterima" if keterangan == 1 else "Kandidat Ditolak"
+                        }
 
-                if keterangan == 1:
-                    st.success("Kandidat Diterima!")
-                else:
-                    st.error("Kandidat Ditolak!")
+                        if keterangan == 1:
+                            st.success("Kandidat Diterima!")
+                        else:
+                            st.error("Kandidat Ditolak!")
 
-                # Export prediction results to PDF
-                pdf_file = export_prediction_to_pdf(prediction_data)
-                st.success("Hasil prediksi berhasil diekspor ke PDF!")
-                download_file(pdf_file)
-
-                # Kosongkan form input
-                st.session_state["enrollee_id"] = ""
-                st.session_state["city"] = ""
-                st.session_state["city_development_index"] = 0.000
-                st.session_state["gender"] = ""
-                st.session_state["relevent_experience"] = ""
-                st.session_state["enrolled_university"] = ""
-                st.session_state["education_level"] = ""
-                st.session_state["major_discipline"] = ""
-                st.session_state["experience"] = 0
-                st.session_state["company_size"] = ""
-                st.session_state["company_type"] = ""
-                st.session_state["last_new_job"] = ""
-                st.session_state["training_hours"] = 0
+                        # Export prediction results to PDF
+                        pdf_file = export_prediction_to_pdf(prediction_data)
+                        st.success("Hasil prediksi berhasil diekspor ke PDF!")
+                        download_file(pdf_file)
 
         elif navigation == "Laporan Keanekaragaman":
             data = load_data()
