@@ -62,10 +62,26 @@ def preprocess_data(data):
 
     return data
 
+def preprocess_data_dynamic(data):
+    # Contoh standarisasi untuk data dinamis. Anda bisa menyesuaikannya sesuai kebutuhan.
+    for col in data.select_dtypes(include=['object']).columns:
+        data[col] = LabelEncoder().fit_transform(data[col])
+    return data
+
 # Langkah 4: Split data train dan test
 def split_data(data):
     X = data.drop(columns=["gender", "city"])  # Hapus fitur "City"
     y = data["gender"]
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    return X_train, X_test, y_train, y_test
+
+# Langkah 4: Split data train dan test untuk data dinamis
+def split_data_dynamic(data):
+    target_column = st.selectbox("Pilih kolom target", data.columns)
+    X = data.drop(columns=[target_column])
+    y = data[target_column]
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -429,12 +445,12 @@ def main():
             if uploaded_file is not None:  # Check if file is uploaded
                 data = pd.read_csv(uploaded_file)  # Read the uploaded file directly
                 if validate_input(data):  # Call to validate_input
-                    data = preprocess_data(data)
+                    data = preprocess_data_dynamic(data)
                     st.write("Dataset yang diunggah:")
                     st.write(data.head(14))  # Display the uploaded dataset
                     st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
                 if data is not None:
-                    X_train, X_test, y_train, y_test = split_data(data)
+                    X_train, X_test, y_train, y_test = split_data_dynamic(data)
                     if X_train is not None:
                         model = train_model(X_train, y_train)
                         if model is not None:
