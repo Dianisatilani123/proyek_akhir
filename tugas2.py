@@ -378,10 +378,12 @@ def main():
                     else:
                         # Menerapkan logika prediksi
                         kelayakan = 0  # Initialize kelayakan to 0
+                        keterangan = 0  # Initialize keterangan to 0
                         if (relevent_experience == "Has relevent experience" and
                             (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
                             major_discipline == "STEM" and  # Tambahkan syarat Major Discipline wajib STEM
                             training_hours >= 50):
+                            kelayakan = 1
                             keterangan = 1
 
                         prediction_data = {
