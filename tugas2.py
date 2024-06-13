@@ -376,15 +376,22 @@ def main():
                         training_hours == 0):
                         st.error("Silakan isi semua form inputan terlebih dahulu!")
                     else:
-                        # Menerapkan logika prediksi
-                        kelayakan = 0  # Initialize kelayakan to 0
-                        keterangan = 0  # Initialize keterangan to 0
-                        if (relevent_experience == "Has relevent experience" and
-                            (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
-                            major_discipline == "STEM" and  # Tambahkan syarat Major Discipline wajib STEM
-                            training_hours >= 50):
-                            kelayakan = 1
-                            keterangan = 1
+                       keterangan = 0  # Initialize keterangan to 0
+
+                    # Misalkan relevan_experience_years menyimpan jumlah tahun pengalaman relevan
+                    if (relevent_experience == "Has relevent experience" and
+                        (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
+                        major_discipline == "STEM"):
+                        
+                        if (relevent_experience > 5 and training_hours >= 22):
+                            keterangan = 1  # Terima kandidat dengan pengalaman lebih dari 5 tahun dan minimal 22 jam pelatihan
+                        elif training_hours >= 50:
+                            keterangan = 1  # Terima kandidat dengan minimal 50 jam pelatihan terlepas dari pengalaman
+                        else:
+                            keterangan = 0  # Tolak kandidat jika tidak memenuhi salah satu dari dua kondisi di atas
+                    else:
+                        keterangan = 0  # Tolak kandidat jika tidak memenuhi kondisi dasar
+
 
                         prediction_data = {
                             "Enrollee ID": enrollee_id,
