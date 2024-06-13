@@ -383,7 +383,7 @@ def main():
                         (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
                         major_discipline == "STEM"):
                         
-                        if (relevent_experience > 5 and training_hours >= 22):
+                        if (experience > 5 and training_hours >= 22):
                             keterangan = 1  # Terima kandidat dengan pengalaman lebih dari 5 tahun dan minimal 22 jam pelatihan
                         elif training_hours >= 50:
                             keterangan = 1  # Terima kandidat dengan minimal 50 jam pelatihan terlepas dari pengalaman
