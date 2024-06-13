@@ -331,7 +331,7 @@ def main():
         login()
     else:
         # Navigasi header
-        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman","Upload Dataset","Hyperparameter Tuning"])
+        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman","Upload Dataset"])
 
         if navigation == "HOME":
             st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
@@ -426,10 +426,8 @@ def main():
                         st.write(f"Akurasi model setelah tuning: {accuracy * 100:.2f}%")
                         if X_train is not None:
                             model = train_model(X_train, y_train)
-                            if model is not None:
-                                accuracy = evaluate_model(model, X_test, y_test)
-                                save_model(model)
-                                display_feature_importance(model, X_train) 
+                            save_model(model)
+                            display_feature_importance(model, X_train) 
                                
                                 
                        
