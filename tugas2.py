@@ -347,16 +347,14 @@ def main():
 
             # Train model
             model = train_model(X_train, y_train)
-            model = hyperparameter_tuning(X_train, y_train)
 
             # Evaluate model
             accuracy = evaluate_model(model, X_test, y_test)
             st.write(f"Akurasi model: {accuracy * 100:.2f}%")
-            st.write(f"Akurasi model setelah tuning: {accuracy * 100:.2f}%")
 
             # Menyimpan model setelah dilatih
             if model is not None:
-                save_model(model)
+                save_model(model)  # Simpan model setelah dilatih
                 display_feature_importance(model, X_train)
 
             # Menampilkan form input untuk memprediksi kelayakan kandidat
@@ -423,11 +421,16 @@ def main():
                         st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
                     if data is not None:
                         X_train, X_test, y_train, y_test = split_data(data)
+                        model = hyperparameter_tuning(X_train, y_train)
+                        accuracy = evaluate_model(model, X_test, y_test)
+                        st.write(f"Akurasi model setelah tuning: {accuracy * 100:.2f}%")
                         if X_train is not None:
                             model = train_model(X_train, y_train)
                             if model is not None:
                                 accuracy = evaluate_model(model, X_test, y_test)
                                 save_model(model)
+                                display_feature_importance(model, X_train) 
+                               
                                 
                        
         
