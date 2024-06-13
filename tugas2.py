@@ -249,22 +249,6 @@ def export_report_to_pdf(data, gender_counts, education_counts, experience_count
     
     return pdf_file
 
-# Ekspor hasil prediksi ke PDF
-def export_prediction_to_pdf(prediction_data):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-
-    # Menambahkan konten ke PDF
-    pdf.cell(200, 10, txt="Hasil Prediksi Kandidat", ln=True, align='C')
-    for key, value in prediction_data.items():
-        pdf.cell(200, 10, txt=f"{key}: {value}", ln=True)
-
-    pdf_file = "Hasil_Prediksi.pdf"
-    pdf.output(pdf_file)
-
-    return pdf_file
-
 # Fungsi untuk menampilkan tautan unduhan
 def download_file(file_path):
     with open(file_path, "rb") as file:
@@ -376,51 +360,21 @@ def main():
                         training_hours == 0):
                         st.error("Silakan isi semua form inputan terlebih dahulu!")
                     else:
-                       keterangan = 0  # Initialize keterangan to 0
-
-                    # Misalkan relevan_experience_years menyimpan jumlah tahun pengalaman relevan
-                    if (relevent_experience == "Has relevent experience" and
+                       # Menerapkan logika prediksi
+                        kelayakan = 0  # Initialize kelayakan to 0
+                        if (relevent_experience == "Has relevent experience" and
                         (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
-                        major_discipline == "STEM"):
-                        
-                        if (experience > 5 and training_hours >= 22):
-                            keterangan = 1  # Terima kandidat dengan pengalaman lebih dari 5 tahun dan minimal 22 jam pelatihan
-                        elif training_hours >= 50:
-                            keterangan = 1  # Terima kandidat dengan minimal 50 jam pelatihan terlepas dari pengalaman
+                        major_discipline == "STEM" and  # Tambahkan syarat Major Discipline wajib STEM
+                        training_hours >= 50):
+                         kelayakan = 1
+
+                        if kelayakan == 1:
+                            st.success("Kandidat layak untuk dipertimbangkan!")
                         else:
-                            keterangan = 0  # Tolak kandidat jika tidak memenuhi salah satu dari dua kondisi di atas
-                    else:
-                        keterangan = 0  # Tolak kandidat jika tidak memenuhi kondisi dasar
-
-
-                        prediction_data = {
-                            "Enrollee ID": enrollee_id,
-                            "City": city,
-                            "City Development Index": city_development_index,
-                            "Gender": gender,
-                            "Relevent Experience": relevent_experience,
-                            "Enrolled University": enrolled_university,
-                            "Education Level": education_level,
-                            "Major Discipline": major_discipline,
-                            "Experience": experience,
-                            "Company Size": company_size,
-                            "Company Type": company_type,
-                            "Last New Job": last_new_job,
-                            "Training Hours": training_hours,
-                            "Keterangan": "Kandidat Diterima" if keterangan == 1 else "Kandidat Ditolak"
-                        }
-
-                        if keterangan == 1:
-                            st.success("Kandidat Diterima!")
-                        else:
-                            st.error("Kandidat Ditolak!")
-
-                        # Export prediction results to PDF
-                        pdf_file = export_prediction_to_pdf(prediction_data)
-                        st.success("Hasil prediksi berhasil diekspor ke PDF!")
-                        download_file(pdf_file)
+                            st.error("Kandidat tidak layak untuk dipertimbangkan!")
 
         elif navigation == "Laporan Keanekaragaman":
+
             data = load_data()
             gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
             if st.button("Export Laporan ke PDF"):
@@ -429,27 +383,30 @@ def main():
                 download_file(pdf_file)
         
         elif navigation == "Upload Dataset":
-            st.write("Upload Dataset")
-            # Upload file CSV
-            uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
+                st.write("Upload Dataset")
+                 # Upload file CSV
+                uploaded_file = st.file_uploader("Unggah file CSV dataset", type=["csv"])
 
-            if uploaded_file is not None:  # Check if file is uploaded
-                data = pd.read_csv(uploaded_file)  # Read the uploaded file directly
-                if validate_input(data):  # Call to validate_input
-                    data = preprocess_data(data)
-                    st.write("Dataset yang diunggah:")
-                    st.write(data.head(14))  # Display the uploaded dataset
-                    st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
-                if data is not None:
-                    X_train, X_test, y_train, y_test = split_data(data)
-                    if X_train is not None:
-                        model = train_model(X_train, y_train)
-                        if model is not None:
-                            accuracy = evaluate_model(model, X_test, y_test)
-                            save_model(model)
+                if uploaded_file is not None:  # Check if file is uploaded
+                    data = pd.read_csv(uploaded_file)  # Read the uploaded file directly
+                    if validate_input(data):  # Call to validate_input
+                        data = preprocess_data(data)
+                        st.write("Dataset yang diunggah:")
+                        st.write(data.head(14))  # Display the uploaded dataset
+                        st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
+                    if data is not None:
+                        X_train, X_test, y_train, y_test = split_data(data)
+                        if X_train is not None:
+                            model = train_model(X_train, y_train)
+                            if model is not None:
+                                accuracy = evaluate_model(model, X_test, y_test)
+                                save_model(model)
+                       
+        
 
         # Tombol logout
         logout()
 
 if __name__ == "__main__":
     main()
+    
