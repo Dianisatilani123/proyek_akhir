@@ -323,112 +323,113 @@ def main():
         login()
     else:
         # Navigasi header
-        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman","Upload Dataset"])
+        navigation = st.sidebar.selectbox("Navigasi", ["HOME", "Prediksi", "Laporan Keanekaragaman", "Upload Dataset"])
 
         if navigation == "HOME":
             st.write("Selamat datang di Aplikasi Rekrutmen Tanpa Bias Gender!")
+        
         elif navigation == "Prediksi":
-         # Load data
-          data = load_data()
+            # Load data
+            data = load_data()
 
-        # Preprocessing data
-        data = preprocess_data(data)
+            # Preprocessing data
+            data = preprocess_data(data)
 
-        # Split data
-        X_train, X_test, y_train, y_test = split_data(data)
+            # Split data
+            X_train, X_test, y_train, y_test = split_data(data)
 
-        # Train model
-        model = train_model(X_train, y_train)
+            # Train model
+            model = train_model(X_train, y_train)
 
-        # Evaluate model
-        accuracy = evaluate_model(model, X_test, y_test)
-        st.write(f"Akurasi model: {accuracy * 100:.2f}%")
+            # Evaluate model
+            accuracy = evaluate_model(model, X_test, y_test)
+            st.write(f"Akurasi model: {accuracy * 100:.2f}%")
 
-        # Menyimpan model setelah dilatih
-        if model is not None:
-            save_model(model)  # Simpan model setelah dilatih
+            # Menyimpan model setelah dilatih
+            if model is not None:
+                save_model(model)  # Simpan model setelah dilatih
 
-    # Menampilkan form input untuk memprediksi kelayakan kandidat
-    with st.sidebar:
-        st.markdown("<h1>Masukkan Biodata Kandidat</h1>", unsafe_allow_html=True)
+            # Menampilkan form input untuk memprediksi kelayakan kandidat
+            with st.sidebar:
+                st.markdown("<h1>Masukkan Biodata Kandidat</h1>", unsafe_allow_html=True)
 
-        enrollee_id = st.text_input("Enrollee ID", "")
-        city = st.text_input("City", "")
-        city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
-        gender = st.selectbox("Gender", ["Male", "Female", "Other"])
-        relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
-        enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
-        education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
-        major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
-        experience = st.number_input("Experience", value=0)
-        company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
-        company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
-        last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
-        training_hours = st.number_input("Training Hours", value=0)
+                enrollee_id = st.text_input("Enrollee ID", "")
+                city = st.text_input("City", "")
+                city_development_index = st.number_input("City Development Index", value=0.000, format="%.3f")
+                gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+                relevent_experience = st.selectbox("Relevent Experience", ["Has relevent experience", "No relevent experience"])
+                enrolled_university = st.selectbox("Enrolled University", ["no_enrollment", "Full time course", "Part time course"])
+                education_level = st.selectbox("Education Level", ["Graduate", "Masters", "Phd"])
+                major_discipline = st.selectbox("Major Discipline", ["STEM", "Business Degree", "Arts", "No Major", "Other"])
+                experience = st.number_input("Experience", value=0)
+                company_size = st.selectbox("Company Size", ["<10", "10-49", "50-99", "100-500", "500-999", "1000-4999", "5000-9999", "10000+"])
+                company_type = st.selectbox("Company Type", ["Pvt Ltd", "Funded Startup", "Public Sector", "Early Stage Startup", "NGO", "Other"])
+                last_new_job = st.selectbox("Last New Job", ["never", "1", "2", "3", "4", ">4"])
+                training_hours = st.number_input("Training Hours", value=0)
 
-        # Tombol prediksi
-        prediksi_button = st.button("Prediksi")
+                # Tombol prediksi
+                prediksi_button = st.button("Prediksi")
 
-        if prediksi_button:
-            if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or
-                enrolled_university == "" or education_level == "" or major_discipline == "" or
-                experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or
-                training_hours == 0):
-                st.error("Silakan isi semua form inputan terlebih dahulu!")
-            else:
-                kelayakan = 0  # Initialize kelayakan to 0
-                if (relevent_experience == "Has relevent experience" and
-                    (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
-                    major_discipline == "STEM"):  # Tambahkan syarat Major Discipline wajib STEM
-                    if (experience > 5 and training_hours >= 22):
-                        kelayakan = 1  # Terima kandidat dengan pengalaman lebih dari 5 tahun dan minimal 22 jam pelatihan
-                    elif (experience >= 2 and training_hours >= 50):
-                        kelayakan = 1  # Terima kandidat dengan minimal 50 jam pelatihan terlepas dari pengalaman
+                if prediksi_button:
+                    if (enrollee_id == "" or city == "" or gender == "" or relevent_experience == "" or
+                        enrolled_university == "" or education_level == "" or major_discipline == "" or
+                        experience == 0 or company_size == "" or company_type == "" or last_new_job == "" or
+                        training_hours == 0):
+                        st.error("Silakan isi semua form inputan terlebih dahulu!")
+                    else:
+                        kelayakan = 0  # Initialize kelayakan to 0
+                        if (relevent_experience == "Has relevent experience" and
+                            (education_level == "Graduate" or education_level == "Masters" or education_level == "Phd") and
+                            major_discipline == "STEM"):  # Tambahkan syarat Major Discipline wajib STEM
+                            if (experience > 5 and training_hours >= 22):
+                                kelayakan = 1  # Terima kandidat dengan pengalaman lebih dari 5 tahun dan minimal 22 jam pelatihan
+                            elif (experience >= 2 and training_hours >= 50):
+                                kelayakan = 1  # Terima kandidat dengan minimal 50 jam pelatihan terlepas dari pengalaman
 
-                # Predict salary based on experience and education level
-                if experience <= 2:
-                    salary = 5000000  # Salary for 0-2 years of experience
-                elif experience <= 5:
-                    salary = 8000000  # Salary for 2-5 years of experience
-                elif experience <= 10:
-                    salary = 12000000  # Salary for 5-10 years of experience
-                else:
-                    salary = 18000000  # Salary for more than 10 years of experience
+                        # Predict salary based on experience and education level
+                        if experience <= 2:
+                            salary = 5000000  # Salary for 0-2 years of experience
+                        elif experience <= 5:
+                            salary = 8000000  # Salary for 2-5 years of experience
+                        elif experience <= 10:
+                            salary = 12000000  # Salary for 5-10 years of experience
+                        else:
+                            salary = 18000000  # Salary for more than 10 years of experience
 
-                if education_level == "Graduate":
-                    salary *= 1.2  # Increase salary by 20% for graduates
-                elif education_level == "Masters":
-                    salary *= 1.5  # Increase salary by 50% for masters
-                elif education_level == "Phd":
-                    salary *= 2.0  # Increase salary by 100% for phd
+                        if education_level == "Graduate":
+                            salary *= 1.2  # Increase salary by 20% for graduates
+                        elif education_level == "Masters":
+                            salary *= 1.5  # Increase salary by 50% for masters
+                        elif education_level == "Phd":
+                            salary *= 2.0  # Increase salary by 100% for phd
 
-                prediction_data = {
-                    "Enrollee ID": enrollee_id,
-                    "City": city,
-                    "City Development Index": city_development_index,
-                    "Gender": gender,
-                    "Relevent Experience": relevent_experience,
-                    "Enrolled University": enrolled_university,
-                    "Education Level": education_level,
-                    "Major Discipline": major_discipline,
-                    "Experience": experience,
-                    "Company Size": company_size,
-                    "Company Type": company_type,
-                    "Last New Job": last_new_job,
-                    "Training Hours": training_hours,
-                    "Keterangan": "Kandidat Diterima" if kelayakan == 1 else "Kandidat Ditolak",
-                    "Gaji Prediksi": salary
-                }
+                        prediction_data = {
+                            "Enrollee ID": enrollee_id,
+                            "City": city,
+                            "City Development Index": city_development_index,
+                            "Gender": gender,
+                            "Relevent Experience": relevent_experience,
+                            "Enrolled University": enrolled_university,
+                            "Education Level": education_level,
+                            "Major Discipline": major_discipline,
+                            "Experience": experience,
+                            "Company Size": company_size,
+                            "Company Type": company_type,
+                            "Last New Job": last_new_job,
+                            "Training Hours": training_hours,
+                            "Keterangan": "Kandidat Diterima" if kelayakan == 1 else "Kandidat Ditolak",
+                            "Gaji Prediksi": salary
+                        }
 
-                if kelayakan == 1:
-                    st.success("Kandidat Diterima!")
-                else:
-                    st.error("Kandidat Ditolak!")
+                        if kelayakan == 1:
+                            st.success("Kandidat Diterima!")
+                        else:
+                            st.error("Kandidat Ditolak!")
 
-                # Export prediction results to PDF
-                pdf_file = export_prediction_to_pdf(prediction_data)
-                st.success("Hasil prediksi berhasil diekspor ke PDF!")
-                download_file(pdf_file)
+                        # Export prediction results to PDF
+                        pdf_file = export_prediction_to_pdf(prediction_data)
+                        st.success("Hasil prediksi berhasil diekspor ke PDF!")
+                        download_file(pdf_file)
 
         elif navigation == "Laporan Keanekaragaman":
             data = load_data()
