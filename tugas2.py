@@ -8,7 +8,6 @@ from fpdf import FPDF
 import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
-import pickle
 
 # CSS untuk mengubah gaya tombol
 def add_custom_css():
@@ -41,16 +40,12 @@ def add_custom_css():
     )
 
 # Langkah 2: Load dataset
-def load_data(uploaded_file):
-    if uploaded_file is not None:
-        data = pd.read_csv(uploaded_file)
-        st.write("Dataset:")
-        st.write(data.head(14))  # Show the first 14 rows
-        st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
-        return data
-    else:
-        st.warning("Harap unggah file dataset dengan format .csv")
-        return None
+def load_data():
+    data = pd.read_csv("dataset_recruitment.csv")
+    st.write("Dataset:")
+    st.write(data.head(14))  # Show the first 14 rows
+    st.write(f"Jumlah data pada dataset: {len(data)}")  # Menambahkan informasi jumlah data
+    return data
 
 # Langkah 3: Standarisasi data
 def preprocess_data(data):
@@ -91,9 +86,8 @@ def train_model(X_train, y_train):
     model = SVC(kernel='linear', C=1.0, random_state=42)
     model.fit(X_train, y_train)
     
-    # Simpan scaler dan model untuk digunakan pada data uji dan prediksi
+    # Simpan scaler untuk digunakan pada data uji dan prediksi
     joblib.dump(scaler, 'scaler.pkl')
-    joblib.dump(model, 'model.pkl')
     
     return model
 
@@ -277,33 +271,27 @@ def main():
     add_custom_css()
     st.title("Aplikasi Analitik Data Pelamar Kerja")
     
-    # Upload file dataset
-    uploaded_file = st.file_uploader("Unggah file dataset dengan format .csv", type=["csv"])
-    data = load_data(uploaded_file)
+    # Langkah 2: Load dataset
+    data = load_data()
     
-    if data is not None:
-        # Langkah 3: Standarisasi data
-        data = preprocess_data(data)
-        
-        # Langkah 4: Split data train dan test
-        X_train, X_test, y_train, y_test = split_data(data)
-        
-        # Langkah 5: Membuat data latih menggunakan algoritma machine learning
-        model = train_model(X_train, y_train)
-        
-        # Langkah 6: Membuat model evaluasi untuk uji akurasi
-        evaluate_model(model, X_test, y_test)
-        
-        # Tombol untuk men-download model
-        with open('model.pkl', 'rb') as model_file:
-            st.download_button(label="Download Model", data=model_file, file_name="model.pkl", mime="application/octet-stream")
-        
-        # Langkah 7: Membuat laporan analitik dan keberagaman
-        gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
-        
-        # Tombol untuk mengekspor laporan ke PDF
-        if st.button("Ekspor Laporan ke PDF"):
-            export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
+    # Langkah 3: Standarisasi data
+    data = preprocess_data(data)
+    
+    # Langkah 4: Split data train dan test
+    X_train, X_test, y_train, y_test = split_data(data)
+    
+    # Langkah 5: Membuat data latih menggunakan algoritma machine learning
+    model = train_model(X_train, y_train)
+    
+    # Langkah 6: Membuat model evaluasi untuk uji akurasi
+    evaluate_model(model, X_test, y_test)
+    
+    # Langkah 7: Membuat laporan analitik dan keberagaman
+    gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures = generate_diversity_report(data)
+    
+    # Tombol untuk mengekspor laporan ke PDF
+    if st.button("Ekspor Laporan ke PDF"):
+        export_report_to_pdf(data, gender_counts, education_counts, experience_counts, company_type_counts, company_size_counts, discipline_counts, last_new_job_counts, figures)
 
 if __name__ == "__main__":
     main()
