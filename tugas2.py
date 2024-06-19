@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC  # Import SVM classifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from fpdf import FPDF
@@ -81,7 +81,7 @@ def split_data(data):
 
 # Langkah 5: Membuat data latih menggunakan algoritma machine learning
 def train_model(X_train, y_train):
-    model = RandomForestClassifier()
+    model = SVC(kernel='linear')  # You can choose different kernels like 'linear', 'rbf', 'poly', etc.
     model.fit(X_train, y_train)
     return model
 
