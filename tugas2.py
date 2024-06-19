@@ -319,6 +319,17 @@ def save_model(model, file_path="model.pkl"):
         st.success("Model berhasil disimpan!")
     except Exception as e:
         st.error(f"Gagal menyimpan model: {str(e)}")
+    
+    # Fungsi untuk menampilkan tombol unduhan
+def download_file(file_path):
+    with open(file_path, "rb") as file:
+        btn = st.download_button(
+            label="Download Model",
+            data=file,
+            file_name=file_path,
+            mime="application/octet-stream"
+        )
+        return btn
 
 def main():
     st.markdown("<h1 style='text-align: center'>Aplikasi Rekrutmen Tanpa Bias Gender</h1>", unsafe_allow_html=True)
@@ -353,9 +364,17 @@ def main():
             accuracy = evaluate_model(model, X_test, y_test)
             st.write(f"Akurasi model: {accuracy * 100:.2f}%")
 
-            # Menyimpan model setelah dilatih
-            if model is not None:
-                save_model(model)  # Simpan model setelah dilatih
+              # Simpan model setelah dilatih
+            model = RandomForestClassifier()
+            model.fit(X_train, y_train)
+            model_file = save_model(model)
+
+            # Tambahkan tombol unduh setelah model disimpan
+            if model_file:
+                st.markdown("### Download Model")
+                download_btn = download_file(model_file)
+                if download_btn:
+                    st.markdown(download_btn, unsafe_allow_html=True)
 
             # Menampilkan form input untuk memprediksi kelayakan kandidat
             with st.sidebar:
